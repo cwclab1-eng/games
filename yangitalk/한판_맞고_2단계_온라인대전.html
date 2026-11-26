@@ -2968,7 +2968,7 @@ window.HP.STAGE = 2;
       if (n === 2) tags.push({ c: 't', t: b[1] + ' 2/3' });
     });
     var pi = sc.counts.pi;
-    if (pi >= 8 && pi < 10) tags.push({ c: 'p', t: '피 ' + pi + ' · 10피까지 ' + (10 - pi) });
+    if (pi >= 8 && pi < 10) tags.push({ c: 'p', t: '10피까지 ' + (10 - pi) + '장' });
     if (HP.hasGuk(cards)) tags.push({ c: 'guk', t: '국진 ' + (mode === 'pi' ? '쌍피 피2' : '열끗') });
     return tags;
   }
