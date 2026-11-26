@@ -2915,6 +2915,8 @@ window.HP.STAGE = 1;
     var tags = [];
     risks.forEach(function (t) { tags.push({ c: 'risk', t: t }); });
     sc.parts.forEach(function (p) {
+      /* 장수만 알려 주는 항목(예: '피 10장')은 구역 머리글과 겹치므로 이름난 족보만 배지로 */
+      if (/^(광|열끗|띠|피) \d+장$/.test(p.name)) return;
       tags.push({ c: p.zone === 'gwang' ? 'g' : p.zone === 'yeol' ? 'y' : p.zone === 'tti' ? 't' : 'p', t: p.name + ' +' + p.pts });
     });
     var yeol = zoneCards(cards, { k: 'yeol' }, mode);
