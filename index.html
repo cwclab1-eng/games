@@ -65,6 +65,7 @@
 
   .card{
     position:relative;display:flex;flex-direction:column;gap:10px;
+    cursor:pointer;
     padding:18px 18px 14px;border-radius:var(--radius);
     background:
       linear-gradient(150deg, rgba(255,255,255,.07), rgba(255,255,255,.015)),
@@ -75,6 +76,7 @@
     transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
     overflow:hidden;
   }
+  .card > :not(.stretch){position:relative;z-index:2}
   .card::before{
     content:"";position:absolute;inset:-1px -1px auto;height:3px;
     background:linear-gradient(90deg,var(--a),transparent 85%);opacity:.9;
@@ -83,8 +85,10 @@
     content:"";position:absolute;right:-60px;top:-70px;width:190px;height:190px;border-radius:50%;
     background:radial-gradient(circle, var(--a), transparent 70%);opacity:.16;pointer-events:none;
   }
-  .card:hover,.card:focus-visible{transform:translateY(-3px);border-color:rgba(255,255,255,.2);box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.2);box-shadow:0 18px 40px rgba(0,0,0,.45)}
   .card:active{transform:scale(.988)}
+  .stretch{position:absolute;inset:0;z-index:1;border-radius:inherit}
+  .stretch:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
   .card.matgo{--a:#ff6b6b}
   .card.yangi{--a:#ffd23f}
@@ -144,7 +148,8 @@
 
   <main class="grid">
 
-    <a class="card matgo" href="./matgo/index.html">
+    <div class="card matgo">
+      <a class="stretch" href="./matgo/index.html" aria-label="한판 맞고 열기 — 온라인 1:1 대전 · AI 대전"></a>
       <div class="top">
         <div class="icon" aria-hidden="true">🎴</div>
         <div class="titles">
@@ -162,9 +167,10 @@
         <span>방 코드로 초대 · 폰 세로 화면 지원</span>
         <a class="alt" href="./matgo/ai.html">AI 전용판</a>
       </div>
-    </a>
+    </div>
 
-    <a class="card yangi" href="./yangitalk/index.html">
+    <div class="card yangi">
+      <a class="stretch" href="./yangitalk/index.html" aria-label="양이톡 열기 — 메신저 + 게임 초대"></a>
       <div class="top">
         <div class="icon" aria-hidden="true">🐱</div>
         <div class="titles">
@@ -182,9 +188,10 @@
         <span>6자리 코드로 1:1 대화방 열기</span>
         <span>🎮</span>
       </div>
-    </a>
+    </div>
 
-    <a class="card block" href="./block-duel/index.html">
+    <div class="card block">
+      <a class="stretch" href="./block-duel/index.html" aria-label="블록 듀얼 열기 — 온라인 1:1 대전 · AI 대전"></a>
       <div class="top">
         <div class="icon" aria-hidden="true">🧱</div>
         <div class="titles">
@@ -202,9 +209,10 @@
         <span>키보드 · 터치 버튼 조작</span>
         <a class="alt" href="./block-duel/ai.html">AI 전용판</a>
       </div>
-    </a>
+    </div>
 
-    <a class="card match" href="./match3/index.html">
+    <div class="card match">
+      <a class="stretch" href="./match3/index.html" aria-label="Match3 낙하형 열기 — 3매치 퍼즐"></a>
       <div class="top">
         <div class="icon" aria-hidden="true">💎</div>
         <div class="titles">
@@ -222,7 +230,7 @@
         <span>전체화면 · 이어하기 지원</span>
         <span>💎</span>
       </div>
-    </a>
+    </div>
 
   </main>
 
