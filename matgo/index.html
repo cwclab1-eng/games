@@ -4486,8 +4486,9 @@ window.HP.STAGE = 2;
         { name: 'Mosquitto', url: 'wss://test.mosquitto.org:8081/mqtt' }
       ],
       connectMs: 7000,
-      joinMs: 12000,
+      joinMs: 75000,          // 게스트가 방장 신호를 기다리는 시간 (한 번 열면 계속 기다린다)
       joinEveryMs: 600,
+      helloMs: 600,           // 인사(hello) 재전송 주기 — 방장 응답이 올 때까지
       beatMs: 2000,
       deadMs: 15000,
       keepaliveS: 45,
@@ -4791,6 +4792,10 @@ window.HP.STAGE = 2;
     this.main = -1;
     this.peerSeen = {};
     this.lastPeer = 0;
+    this.seq = 0;                   // 내가 보낸 데이터 번호(중복 제거용)
+    this.seenQ = {};                // 이미 받은 (보낸이:번호) — 여러 중계로 같은 메시지가 와도 한 번만
+    this.qCount = 0;
+    this._visBound = false;
     this._dead = false;
     this._busy = false;
     this._ok = null;
@@ -4807,6 +4812,7 @@ window.HP.STAGE = 2;
       if (!any) throw netErr('relay-unreachable');
       self._startBeat();
       self._startWatch();
+      self._bindVisibility();
       self._beat();
       if (room.role === 'host') {
         room.onLinkWaiting();
@@ -4896,8 +4902,16 @@ window.HP.STAGE = 2;
       this._setConnected();
       return;
     }
-    if (!this.lastPeer) return;
-    if (m.d && typeof m.d === 'object') this.room.onLinkData(m.d);
+    if (!m.d || typeof m.d !== 'object') return;
+    /* 같은 메시지를 여러 브로커로 보냈으므로 번호로 중복만 걸러 낸다(순서는 건드리지 않는다) */
+    if (typeof m.q === 'number') {
+      var key = m.s + ':' + m.q;
+      if (this.seenQ[key]) return;
+      this.seenQ[key] = 1;
+      if (++this.qCount > 400) { this.seenQ = {}; this.qCount = 0; }
+    }
+    if (!this.lastPeer) this._peerHere(i);           // 데이터가 왔다는 것 자체가 생존 신호
+    this.room.onLinkData(m.d);
   };
 
   RelayLink.prototype._peerHere = function (i) {
@@ -4962,6 +4976,18 @@ window.HP.STAGE = 2;
     if (this.joinStopTimer) { clearTimeout(this.joinStopTimer); this.joinStopTimer = null; }
   };
 
+  /* 앱을 다시 켰을 때 바로 존재를 알린다 — 배경 탭에서는 타이머가 느려진다 */
+  RelayLink.prototype._bindVisibility = function () {
+    if (this._visBound || typeof document === 'undefined') return;
+    this._visBound = true;
+    var self = this;
+    document.addEventListener('visibilitychange', function () {
+      if (self._dead || document.hidden) return;
+      self._beat();
+      if (!self.connected && self.room.role === 'guest') self._joinOnce();
+    });
+  };
+
   RelayLink.prototype._startWatch = function () {
     var self = this;
     if (this.watchTimer) return;
@@ -5016,14 +5042,15 @@ window.HP.STAGE = 2;
 
   RelayLink.prototype.send = function (obj) {
     if (this._dead) return false;
-    var text = JSON.stringify({ s: this.sid, d: obj });
-    var i = this.main;
-    if (i < 0 || !this.clients[i] || !this.clients[i].ready) i = this._firstReady(-1);
-    if (i < 0) return false;
-    if (this.clients[i].mq.publish(this.topic, text)) return true;
-    var alt = this._firstReady(i);
-    if (alt < 0) return false;
-    return this.clients[alt].mq.publish(this.topic, text);
+    /* 붙어 있는 브로커 모두에 같은 번호로 보낸다 — 한 곳이 조용히 끊겨도
+       상대는 다른 곳에서 받는다. 받는 쪽은 번호로 중복을 버린다. */
+    var text = JSON.stringify({ s: this.sid, q: ++this.seq, d: obj });
+    var sent = 0;
+    for (var i = 0; i < this.clients.length; i++) {
+      var c = this.clients[i];
+      if (c && c.ready && c.mq.publish(this.topic, text)) sent++;
+    }
+    return sent > 0;
   };
 
   RelayLink.prototype.close = function () {
@@ -5148,6 +5175,8 @@ window.HP.STAGE = 2;
     this.graceLeft = 0;
     this.lastErr = null;
     this.bye = false;
+    this.peerHeard = false;        // 상대의 인사·데이터를 받았는지
+    this.helloTimer = null;
   }
 
   NetRoom.prototype.on = function (type, fn) { if (typeof fn === 'function') this.handlers[type] = fn; return this; };
@@ -5200,8 +5229,27 @@ window.HP.STAGE = 2;
     this.setStatus('connected');
     this.startPing();
     this.stopGrace();
+    this.peerHeard = false;
     this.send('hello', { name: this.name, ver: NET.version });
+    this.startHello();
     this.emit('connected', { mode: this.mode });
+  };
+
+  /* 상대가 응답할 때까지 인사를 되푼다 — hello/start 한 번이 유실되면
+     양쪽 다 '연결됨'인 채로 서로 기다리기만 해서 두 번 초대해야 했다. */
+  NetRoom.prototype.startHello = function () {
+    var self = this;
+    this.stopHello();
+    var n = 0;
+    this.helloTimer = setInterval(function () {
+      if (!self.connected || self.peerHeard) { self.stopHello(); return; }
+      if (++n > 90) { self.stopHello(); return; }
+      self.send('hello', { name: self.name, ver: NET.version });
+    }, NET.relay.helloMs);
+  };
+
+  NetRoom.prototype.stopHello = function () {
+    if (this.helloTimer) { clearInterval(this.helloTimer); this.helloTimer = null; }
   };
 
   NetRoom.prototype.onLinkClose = function () {
@@ -5209,6 +5257,8 @@ window.HP.STAGE = 2;
     this.connected = false;
     this.latency = 0;
     this.stopPing();
+    this.stopHello();
+    this.peerHeard = false;
     this.setStatus('closed');
     this.emit('disconnected', {});
     if (this.inMatch) this.beginGrace();
@@ -5225,6 +5275,8 @@ window.HP.STAGE = 2;
       if (r >= 0 && r < 60000) this.latency = r;
       return;
     }
+    this.peerHeard = true;
+    this.stopHello();
     if (t === 'hello') {
       this.peerName = String(d.name || '상대').slice(0, 10);
       this.emit('hello', { name: this.peerName });
@@ -5293,6 +5345,7 @@ window.HP.STAGE = 2;
   NetRoom.prototype.close = function () {
     this.stopGrace();
     this.stopPing();
+    this.stopHello();
     try { if (this.link) this.link.close(); } catch (e) {}
     this.link = null;
     this.connected = false;
@@ -5400,6 +5453,8 @@ window.HP.STAGE = 2;
   function closeNet() {
     stopTick();
     clearTimeout(OL.ackTimer);
+    if (OL.startResend) { clearInterval(OL.startResend); OL.startResend = null; }
+    clearTimeout(OL.joinHint);
     restoreActs();
     if (OL.room) { try { OL.room.close(); } catch (e) { } }
     OL.room = null;
@@ -5460,13 +5515,20 @@ window.HP.STAGE = 2;
     if ($('codeInput')) $('codeInput').value = c;
     $('joinWait').className = 'waitLine';
     $('joinWait').textContent = '방을 찾는 중…';
+    clearTimeout(OL.joinHint);
+    OL.joinHint = setTimeout(function () {
+      if (!OL.room || OL.room.connected || !$('joinWait')) return;
+      $('joinWait').className = 'waitLine';
+      $('joinWait').textContent = '방장을 기다리는 중 — 방장이 게임을 열면 자동으로 들어갑니다';
+    }, 8000);
     OL.room.inMatch = true;
     return OL.room.open().then(function (ok) {
+      clearTimeout(OL.joinHint);
       if (!ok) {
         setPill('off', '연결 실패');
         $('joinWait').className = 'waitLine err';
         var why = OL.room && OL.room.lastErr && OL.room.lastErr.type === 'room-not-found'
-          ? '방을 찾지 못했습니다 — 코드를 확인해 주세요' : '연결하지 못했습니다 — 잠시 뒤 다시 시도해 주세요';
+          ? '방을 찾지 못했습니다 — 방장이 게임을 열어 두었는지 확인하고 [참가]를 다시 눌러 주세요' : '연결하지 못했습니다 — 잠시 뒤 다시 시도해 주세요';
         $('joinWait').textContent = why;
         return false;
       }
@@ -5511,9 +5573,10 @@ window.HP.STAGE = 2;
     });
 
     r.on('start', function (m) { guestStart(m); });
-    r.on('st', function (m) { guestState(m); });
-    r.on('act', function (m) { hostAct(m); });
-    r.on('sync', function () { if (OL.role === 'host') broadcast([], null); });
+    r.on('st', function (m) { ackStart(); guestState(m); });
+    r.on('act', function (m) { ackStart(); hostAct(m); });
+    r.on('sync', function () { ackStart(); if (OL.role === 'host') broadcast([], null); });
+    r.on('ready', function () { ackStart(); });
     r.on('rematch', function () {
       if (OL.role === 'host') {
         if (Date.now() - OL.startedAt < 900) return;
@@ -5651,6 +5714,25 @@ window.HP.STAGE = 2;
     if (HP.playDealEvents) HP.playDealEvents(S);
   }
 
+  /* ---------- 방장: 'start' 재전송 ----------
+     중계가 한 번 놓쳐도 손님이 들어오도록, 손님이 받았다고 알릴 때까지 같은 start를 다시 보낸다. */
+  function resendStart(payload) {
+    if (OL.startResend) { clearInterval(OL.startResend); OL.startResend = null; }
+    OL.startAcked = false;
+    var n = 0;
+    OL.startResend = setInterval(function () {
+      if (OL.startAcked || !OL.on || OL.role !== 'host' || !OL.room || !OL.room.connected) {
+        clearInterval(OL.startResend); OL.startResend = null; return;
+      }
+      if (++n > 40) { clearInterval(OL.startResend); OL.startResend = null; return; }
+      OL.room.send('start', payload);
+    }, 800);
+  }
+  function ackStart() {
+    OL.startAcked = true;
+    if (OL.startResend) { clearInterval(OL.startResend); OL.startResend = null; }
+  }
+
   function startHostRound(first) {
     var starter = first ? 'p1' : (OL.prevStarter || 'p1');
     var S = HP.newGame({ starter: starter, nagariPrev: !!OL.nagariNext });
@@ -5664,13 +5746,21 @@ window.HP.STAGE = 2;
     OL.paused = false;
     OL.room.inMatch = true;
     newTable(S);
-    OL.room.send('start', { st: pack(S), dl: NET().turnMs, round: OL.round });
+    var payload = { st: pack(S), dl: NET().turnMs, round: OL.round };
+    OL.room.send('start', payload);
+    resendStart(payload);
     S.dealEvents = [];            // 배분 연출은 첫 상태에만 담는다
     startTick();
     if (S.over) onGameOver(S);
   }
 
   function guestStart(m) {
+    if (!m || !m.st) return;
+    /* 같은 판의 'start' 재전송 — 이미 시작한 판이면 처음부터 다시 그리지 않는다 */
+    if (OL.S && typeof m.round === 'number' && m.round === OL.round) {
+      if (OL.room) OL.room.send('ready', { round: OL.round });
+      return;
+    }
     installGuestActs();
     OL.round = (m && m.round) || 1;
     OL.startedAt = Date.now();
@@ -5679,6 +5769,7 @@ window.HP.STAGE = 2;
     newTable(S);
     OL.deadline = Date.now() + (m.dl || NET().turnMs) - Math.round((OL.room.latency || 0) / 2);
     startTick();
+    if (OL.room) OL.room.send('ready', { round: OL.round });   // 방장에게 '들어왔다'고 알린다
     if (S.over) onGameOver(S);
   }
 

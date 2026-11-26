@@ -937,6 +937,17 @@ body.wide .itemArea { max-width: 580px; margin: 0 auto; width: 100%; padding: 2p
 }
 .lobbyNote.err { color: #ffb3c0; }
 .lobbyNote b { color: #a9c0e8; }
+.btnSmall {
+  margin-top: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #eafcff;
+  background: rgba(30, 120, 180, 0.55);
+  border: 1px solid rgba(120, 220, 255, 0.5);
+}
+.btnSmall:active { background: rgba(40, 150, 210, 0.75); }
 
 button.primary.online {
   background: linear-gradient(180deg, #b8f7ff 0%, #38e0ff 45%, #2aa4f4 100%);
@@ -2942,8 +2953,9 @@ const NET = {
       { name: 'Mosquitto', url: 'wss://test.mosquitto.org:8081/mqtt' }
     ],
     connectMs: 7000,                // 브로커 한 곳 접속 제한 시간
-    joinMs: 9000,                   // 게스트가 방장 신호를 기다리는 시간
+    joinMs: 75000,                  // 게스트가 방장 신호를 기다리는 시간 (한 번 열면 계속 기다린다)
     joinEveryMs: 500,
+    helloMs: 600,                   // 인사(hello) 재전송 주기 — 방장 응답이 올 때까지
     beatMs: 2000,                   // 존재 알림(하트비트) 주기
     deadMs: 15000,                  // 상대 신호가 이만큼 없으면 끊김 판정
     keepaliveS: 45,
@@ -3317,6 +3329,10 @@ class RelayLink {
     this.main = -1;                 // 상대 신호가 보인 브로커(가장 앞 번호)
     this.peerSeen = {};
     this.lastPeer = 0;
+    this.seq = 0;                   // 내가 보낸 데이터 번호(중복 제거용)
+    this.seenQ = {};                // 이미 받은 (보낸이:번호) — 여러 중계로 같은 메시지가 와도 한 번만
+    this.qCount = 0;
+    this._visBound = false;
     this._dead = false;
     this._busy = false;
     this._ok = null;
@@ -3335,6 +3351,7 @@ class RelayLink {
       if (!any) throw netErr('relay-unreachable');
       self._startBeat();
       self._startWatch();
+      self._bindVisibility();
       self._beat();
       if (room.role === 'host') {
         room.onLinkWaiting();
@@ -3433,8 +3450,17 @@ class RelayLink {
       this._setConnected();
       return;
     }
-    if (!this.lastPeer) return;                      // 아직 상대 신호 전
-    if (m.d && typeof m.d === 'object') this.room.onLinkData(m.d);
+    if (!m.d || typeof m.d !== 'object') return;
+    /* 같은 메시지를 여러 브로커로 보냈으므로 번호로 중복만 걸러 낸다(순서는 건드리지 않는다) */
+    if (typeof m.q === 'number') {
+      const key = m.s + ':' + m.q;
+      if (this.seenQ[key]) return;
+      this.seenQ[key] = 1;
+      if (++this.qCount > 400) { this.seenQ = {}; this.qCount = 0; }
+    }
+    /* 데이터가 왔다는 것 자체가 상대가 살아 있다는 뜻이다 */
+    if (!this.lastPeer) this._peerHere(i);
+    this.room.onLinkData(m.d);
   }
 
   _peerHere(i) {
@@ -3502,6 +3528,18 @@ class RelayLink {
   }
 
   /* ── 감시·복구 ────────────────────────────────────────── */
+  /* 앱을 다시 켰을 때 바로 존재를 알린다 — 배경 탭에서는 타이머가 느려진다 */
+  _bindVisibility() {
+    if (this._visBound || typeof document === 'undefined') return;
+    this._visBound = true;
+    const self = this;
+    document.addEventListener('visibilitychange', function () {
+      if (self._dead || document.hidden) return;
+      self._beat();
+      if (!self.connected && self.room.role === 'guest') self._joinOnce();
+    });
+  }
+
   _startWatch() {
     const self = this;
     if (this.watchTimer) return;
@@ -3559,14 +3597,15 @@ class RelayLink {
   /* ── 송신 ─────────────────────────────────────────────── */
   send(obj) {
     if (this._dead) return false;
-    const text = JSON.stringify({ s: this.sid, d: obj });
-    let i = this.main;
-    if (i < 0 || !this.clients[i] || !this.clients[i].ready) i = this._firstReady(-1);
-    if (i < 0) return false;
-    if (this.clients[i].mq.publish(this.topic, text)) return true;
-    const alt = this._firstReady(i);
-    if (alt < 0) return false;
-    return this.clients[alt].mq.publish(this.topic, text);
+    /* 붙어 있는 브로커 모두에 같은 번호로 보낸다 — 한 곳이 조용히 끊겨도
+       상대는 다른 곳에서 받는다. 받는 쪽은 번호로 중복을 버린다. */
+    const text = JSON.stringify({ s: this.sid, q: ++this.seq, d: obj });
+    let sent = 0;
+    for (let i = 0; i < this.clients.length; i++) {
+      const c = this.clients[i];
+      if (c && c.ready && c.mq.publish(this.topic, text)) sent++;
+    }
+    return sent > 0;
   }
 
   close() {
@@ -3829,6 +3868,8 @@ class NetRoom {
     this.lastErr = null;
     this.bye = false;
     this.fellBack = false;
+    this.peerHeard = false;        // 상대의 인사·데이터를 받았는지
+    this.helloTimer = null;
   }
 
   on(type, fn) { if (typeof fn === 'function') this.handlers[type] = fn; return this; }
@@ -3927,8 +3968,27 @@ class NetRoom {
     this.setStatus('connected');
     this.startPing();
     this.stopGrace();
+    this.peerHeard = false;
     this.send('hello', { name: this.name, ver: NET.version });
+    this.startHello();
     this.emit('connected', { mode: this.mode });
+  }
+
+  /* 상대가 응답할 때까지 인사를 되푼다 — hello/start 한 번이 유실되면
+     양쪽 다 '연결됨'인 채로 서로 기다리기만 해서 두 번 초대해야 했다. */
+  startHello() {
+    const self = this;
+    this.stopHello();
+    let n = 0;
+    this.helloTimer = setInterval(function () {
+      if (!self.connected || self.peerHeard) { self.stopHello(); return; }
+      if (++n > 90) { self.stopHello(); return; }
+      self.send('hello', { name: self.name, ver: NET.version });
+    }, NET.relay.helloMs);
+  }
+
+  stopHello() {
+    if (this.helloTimer) { clearInterval(this.helloTimer); this.helloTimer = null; }
   }
 
   onLinkClose() {
@@ -3936,6 +3996,8 @@ class NetRoom {
     this.connected = false;
     this.latency = 0;
     this.stopPing();
+    this.stopHello();
+    this.peerHeard = false;
     this.setStatus('closed');
     this.emit('disconnected', {});
     if (this.match) this.beginGrace();
@@ -3959,6 +4021,8 @@ class NetRoom {
       if (r >= 0 && r < 60000) this.latency = r;
       return;
     }
+    this.peerHeard = true;
+    this.stopHello();
     if (t === 'hello') {
       this.peerName = String(d.name || '상대').slice(0, 10);
       this.emit('hello', { name: this.peerName });
@@ -4032,6 +4096,7 @@ class NetRoom {
   close() {
     this.stopGrace();
     this.stopPing();
+    this.stopHello();
     try { if (this.link) this.link.close(); } catch (e) {}
     this.link = null;
     this.connected = false;
@@ -4133,11 +4198,15 @@ class OnlineMatch extends Match {
   }
 
   onPeerStart(m) {
+    /* 같은 판의 'start'가 여러 번 올 수 있다(유실 대비 재전송) — 판을 되감지 않는다 */
+    if (m && typeof m.roundNo === 'number' && m.roundNo === this.roundNo &&
+        typeof m.seed === 'number' && m.seed === this.seed && this.state !== 'wait') return false;
     if (typeof m.itemsOn === 'boolean') this.itemsOn = m.itemsOn;
     if (Array.isArray(m.itemTypes) && m.itemTypes.length) this.itemTypes = m.itemTypes.slice();
     if (typeof m.roundNo === 'number') this.roundNo = m.roundNo;
     if (Array.isArray(m.wins) && m.wins.length === 2) this.wins = [m.wins[1] | 0, m.wins[0] | 0];
     this.beginRound(false, m.seed);
+    return true;
   }
 
   send(t, d) {
@@ -5164,15 +5233,26 @@ const App = {
       forceBc: this.forceBc, forceRelay: this.forceRelay, forcePeer: this.forcePeer
     });
     this.attachNet(net);
+    /* 방장이 아직 게임 화면을 열지 않았어도 이 화면을 닫지 않으면 자동으로 계속 찾는다 */
+    const self = this;
+    clearTimeout(this.joinHintTimer);
+    this.joinHintTimer = setTimeout(function () {
+      if (!self.net || self.net !== net || self.match || net.connected) return;
+      self.setLobbyNote('방장을 기다리는 중입니다 — 방장이 게임을 열면 <b>자동으로 들어갑니다</b>. ' +
+        '이 화면을 닫지 마세요.<br>(코드 ' + code + ')');
+    }, 6000);
     const ok = await net.open();
     this.lobbyBusy = false;
+    clearTimeout(this.joinHintTimer);
     if (!ok) { this.showNetError(net.lastErr); return; }
-    if (net.connected) return;
-    this.setLobbyNote('<span class="spin"></span> 방장과 연결하는 중… (코드 ' + code + ')');
   },
 
   showNetError(err) {
     const type = (err && err.type) || '';
+    const code = netNormalizeCode(this.els.codeInput ? this.els.codeInput.value : '');
+    const retry = (code.length === NET.codeLen)
+      ? '<br><button class="btnSmall" id="btnRetryJoin" type="button">다시 찾기</button>'
+      : '';
     let msg;
     if (type === 'room-not-found' || type === 'peer-unavailable') {
       msg = '그 코드의 방을 찾지 못했습니다. 코드를 다시 확인하고, 방장이 아직 대기 중인지 봐 주세요.';
@@ -5191,11 +5271,17 @@ const App = {
     } else {
       msg = '연결하지 못했습니다. 잠시 뒤 다시 시도해 주세요.';
     }
+    msg += retry;
     this.setLobbyNote(msg, true);
     this.setNetBadge('off', '🔴 연결 실패');
     if (this.els.waitLine) {
       this.els.waitLine.className = 'waitLine';
       this.els.waitLine.textContent = '연결 실패';
+    }
+    const self = this;
+    const btn = document.getElementById('btnRetryJoin');
+    if (btn && code.length === NET.codeLen) {
+      btn.addEventListener('click', function () { self.joinRoom(code); });
     }
   },
 
@@ -5267,23 +5353,24 @@ const App = {
         });
         return;
       }
-      self.match.onPeerStart(m);
+      if (self.match.onPeerStart(m) === false) return;   // 같은 판의 'start' 재전송
       self.hideOverlay();
       self.roundShown = false;
       self.resetGameKeys();
       self.layout();
     });
 
-    net.on('st', function (m) { if (self.match) self.match.applyState(m); });
-    net.on('g', function (m) { if (self.match) self.match.applyGarbage(m.rows, m.hole); });
-    net.on('item', function (m) { if (self.match) self.match.applyItem(m.kind); });
-    net.on('ko', function () { if (self.match) self.match.onPeerKo(); });
-    net.on('time', function (m) { if (self.match) self.match.onPeerTime(m); });
-    net.on('roundEnd', function (m) { if (self.match) self.match.onPeerRoundEnd(m); });
+    net.on('st', function (m) { self.guestAlive(); if (self.match) self.match.applyState(m); });
+    net.on('g', function (m) { self.guestAlive(); if (self.match) self.match.applyGarbage(m.rows, m.hole); });
+    net.on('item', function (m) { self.guestAlive(); if (self.match) self.match.applyItem(m.kind); });
+    net.on('ko', function () { self.guestAlive(); if (self.match) self.match.onPeerKo(); });
+    net.on('time', function (m) { self.guestAlive(); if (self.match) self.match.onPeerTime(m); });
+    net.on('roundEnd', function (m) { self.guestAlive(); if (self.match) self.match.onPeerRoundEnd(m); });
     net.on('next', function () { self.onPeerWants('next'); });
     net.on('rematch', function () { self.onPeerWants('rematch'); });
     net.on('resume', function () {
       net.send('resume-ok', {});
+      self.guestAlive();
       if (self.match && self.match.state === 'wait') {
         self.match.state = 'playing';
         self.toastBanner('다시 연결되었습니다');
@@ -5312,11 +5399,32 @@ const App = {
       role: 'host', seed: seed, roundNo: 1, wins: wins,
       itemsOn: itemsOn, itemTypes: itemTypes, foeName: this.peerName || '상대'
     });
-    if (this.match) {
-      this.match.send('start', {
-        seed: seed, roundNo: 1, wins: wins,
-        itemsOn: itemsOn, itemTypes: itemTypes, matchStart: true
-      });
+    if (!this.match) return;
+    const payload = {
+      seed: seed, roundNo: 1, wins: wins,
+      itemsOn: itemsOn, itemTypes: itemTypes, matchStart: true
+    };
+    this.match.send('start', payload);
+    /* 손님이 뭔가 보내 올 때까지(받았다는 증거) 같은 start를 다시 보낸다 */
+    const self = this;
+    let n = 0;
+    this.startAcked = false;
+    clearTimeout(this.startTimer);
+    const again = function () {
+      self.startTimer = null;
+      if (self.startAcked || !self.net || !self.net.connected) return;
+      if (++n > 30) return;
+      if (self.match && self.match.send) self.match.send('start', payload);
+      self.startTimer = setTimeout(again, 800);
+    };
+    this.startTimer = setTimeout(again, 800);
+  },
+
+  /* 손님 쪽에서 온 메시지 = start가 손님에게 닿았다는 뜻 */
+  guestAlive() {
+    if (this.net && this.net.role === 'host') {
+      this.startAcked = true;
+      if (this.startTimer) { clearTimeout(this.startTimer); this.startTimer = null; }
     }
   },
 

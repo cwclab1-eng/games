@@ -1343,16 +1343,54 @@ function sendMsg(room, m, opts) {
   addLocal(room, m, false);
   if (!opts.silent) {
     Bus.pub(TOPIC + 'r/' + room.code, { k: 'msg', m: m });
+    queueResend(room, m);
   }
   if (S.active === room.rid) { renderRoom(); scrollBottom(); }
   renderChats(); updateBadges();
   return m;
 }
+
+/* ── 메시지 재전송 · 수신 확인(ack) ───────────────────────────
+   중계가 첫 메시지를 한 번 놓치면 초대 카드가 오지 않아 다시 보내야 했다.
+   상대가 받았다고 알릴 때까지 1.5초 간격으로 두 번 더 보낸다(받는 쪽은 id로 중복을 버린다). */
+var PENDING = {};
+function queueResend(room, m) {
+  PENDING[m.id] = { room: room, m: m, n: 0, acked: false };
+  setTimeout(function () { tryResend(m.id); }, 1500);
+}
+function tryResend(id) {
+  var p = PENDING[id];
+  if (!p) return;
+  if (p.acked || p.n >= 2) { delete PENDING[id]; return; }
+  p.n++;
+  Bus.pub(TOPIC + 'r/' + p.room.code, { k: 'msg', m: p.m });
+  setTimeout(function () { tryResend(id); }, 1500);
+}
+function gotAck(id) {
+  var p = PENDING[id];
+  if (!p) return;
+  p.acked = true;
+  delete PENDING[id];
+}
 function onRoomMsg(code, p) {
   var room = roomByCode(code); if (!room || !p) return;
+  if (p.k === 'ack' && p.id) {
+    if (p.by && p.by.uid === S.me.uid) return;
+    gotAck(p.id);
+    return;
+  }
+  if (p.k === 'gjoin' && p.by && p.by.uid !== S.me.uid) {
+    /* 상대가 게임에 들어오려는데 이쪽 게임 화면이 닫혀 있으면 알려 준다 */
+    if (!S.overlay || S.overlay.code !== p.roomCode) {
+      toast((p.by.nick || '상대') + ' 님이 「' + ((p.game && p.game.name) || '게임') + '」에 들어오려 합니다 — 초대 카드를 눌러 게임을 열어 주세요', 4200);
+    }
+    return;
+  }
   if (p.k === 'msg' && p.m) {
     var m = p.m;
     if (!m.id || !m.by || m.by.uid === S.me.uid) return;
+    /* 받았다고 알려 준다 — 보낸 쪽은 이 신호가 오면 재전송을 멈춘다 */
+    Bus.pub(TOPIC + 'r/' + code, { k: 'ack', id: m.id, by: myBrief() });
     if (!Array.isArray(m.readBy)) m.readBy = [];
     if (addLocal(room, m, true)) {
       if (S.active === room.rid && isRoomVisible()) { scrollBottom(); renderRoom(); }
@@ -1515,8 +1553,9 @@ function joinByCode(code) {
   Bus.pub(TOPIC + 'u/' + code, { k: 'hi', by: myBrief() });
   var tries = 0;
   showJoinBar(code);
+  /* 방장 앱이 잠깐 배경에 있었어도 들어갈 수 있게 1분 가까이 다시 물어본다 */
   var timer = setInterval(function () {
-    if (S.pending !== code || tries > 8) {
+    if (S.pending !== code || tries > 60) {
       clearInterval(timer);
       if (S.pending === code) {
         hideJoinBar();
@@ -1960,6 +1999,16 @@ function openGame(g, code, host) {
   $('#goName').textContent = g.name;
   $('#goCode').textContent = code || '';
   $('#goLoading').classList.remove('hidden');
+  /* 참여자라면 대화방에 '들어가는 중'을 알려 방장이 게임을 열어 두었는지 바로 보이게 한다 */
+  if (!host && code) {
+    var rm = roomById(S.active);
+    if (rm) {
+      Bus.pub(TOPIC + 'r/' + rm.code, {
+        k: 'gjoin', roomCode: code, by: myBrief(),
+        game: { id: g.id, name: g.name }
+      });
+    }
+  }
   var f = $('#gameFrame');
   f.src = gameUrl(g, code, host);
   $('#gameOverlay').classList.add('open');
