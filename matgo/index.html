@@ -2367,14 +2367,16 @@ window.HP.STAGE = 2;
     var item = V.queue.shift();
     if (!item) return;
     try {
-      var u = new window.SpeechSynthesisUtterance(item.t);
+      var say = sanitizeSpeakText(item.t);          // 마지막 관문 — 기호 한 글자도 못 넘는다
+      if (!say) { V.speaking = false; flush(); return; }
+      var u = new window.SpeechSynthesisUtterance(say);
       u.lang = 'ko-KR';
       u.rate = item.rate || 1.04;
       u.pitch = item.pitch || 1.08;
       u.volume = 1;
       if (V.ko) u.voice = V.ko;
       V.speaking = true;
-      V.spoken.push({ t: item.t, at: Date.now() });
+      V.spoken.push({ t: say, at: Date.now() });
       if (V.spoken.length > 60) V.spoken.shift();
       u.onend = function () { V.speaking = false; flush(); };
       u.onerror = function () { V.speaking = false; flush(); };
@@ -2383,8 +2385,25 @@ window.HP.STAGE = 2;
       setTimeout(function () { if (V.speaking) { V.speaking = false; flush(); } }, 2600);
     } catch (e) { V.speaking = false; }
   }
+  /* =========================================================
+     TTS 로 나가는 글자 다듬기 (sanitizeSpeakText)
+     · 안드로이드 TTS 가 "보너스여~!" 의 ~ ! ? 를 "물결표", "느낌표", "물음표"
+       라고 소리 내어 읽어 버린다 → 기호·문장부호는 음성으로 절대 보내지 않는다
+     · 화면(토스트·배너) 글자는 그대로 두고, SpeechSynthesisUtterance 에
+       들어가는 문자열만 한글·숫자·영문·띄어쓰기로 남긴다
+     ========================================================= */
+  var PUNCT_SRC = /[~!?·…—–\-.,:;'"“”‘’()\[\]{}<>《》「」『』〈〉<>★☆♥♡♪#@$%^&*_+=|\\\/]/g;
+  var KEEP_SRC = /[^\uAC00-\uD7A3\u3131-\u318E0-9A-Za-z\s]/g;
+  function sanitizeSpeakText(s) {
+    if (s == null) return '';
+    var out = String(s).replace(PUNCT_SRC, ' ').replace(KEEP_SRC, ' ');
+    return out.replace(/\s+/g, ' ').trim();
+  }
+  V.sanitize = sanitizeSpeakText;
+  V.hasSymbol = function (s) { return /[~!?·…—–\-.,:;'"“”‘’()\[\]{}<>《》「」『』〈〉★☆♥♡♪#@$%^&*_+=|\\\/]/.test(String(s == null ? '' : s)); };
   /* opts: { pri: 1|2, rate, pitch } */
   V.say = function (text, opts) {
+    text = sanitizeSpeakText(text);
     if (!text) return false;
     opts = opts || {};
     var pri = opts.pri || 1;
@@ -2416,39 +2435,39 @@ window.HP.STAGE = 2;
      ========================================================= */
   var GO = [
     null,
-    { name: '원고', t: '원고여~ 가보자고!', rate: 1.03, pitch: 1.06 },
-    { name: '투고', t: '투고다잉! 슬슬 달아오르네!', rate: 1.08, pitch: 1.12 },
-    { name: '쓰리고', t: '쓰리고! 아따 판 커진다잉!', rate: 1.13, pitch: 1.18 },
-    { name: '포고', t: '포고!! 미쳤당께!', rate: 1.18, pitch: 1.24 },
-    { name: '파이브고', t: '파이브고!! 오늘 다 쓸어묵자잉!', rate: 1.22, pitch: 1.30 },
-    { name: '식스고', t: '식스고!! 난리났네 난리났어!', rate: 1.25, pitch: 1.34 },
-    { name: '세븐고', t: '세븐고!! 멈추면 반칙이여!', rate: 1.27, pitch: 1.37 },
-    { name: '에잇고', t: '에잇고!! 전설 썼당께!!', rate: 1.30, pitch: 1.40 }
+    { name: '원고', t: '원고여 가보자고', rate: 1.03, pitch: 1.06 },
+    { name: '투고', t: '투고다잉 슬슬 달아오르네', rate: 1.08, pitch: 1.12 },
+    { name: '쓰리고', t: '쓰리고 아따 판 커진다잉', rate: 1.13, pitch: 1.18 },
+    { name: '포고', t: '포고 미쳤당께', rate: 1.18, pitch: 1.24 },
+    { name: '파이브고', t: '파이브고 오늘 다 쓸어묵자잉', rate: 1.22, pitch: 1.30 },
+    { name: '식스고', t: '식스고 아따 난리났네', rate: 1.25, pitch: 1.34 },
+    { name: '세븐고', t: '세븐고 멈추면 반칙이여', rate: 1.27, pitch: 1.37 },
+    { name: '에잇고', t: '에잇고 전설 썼당께', rate: 1.30, pitch: 1.40 }
   ];
   /* 그 밖의 외침 — 이름난 족보·특수·박까지 전라도 사투리로 */
   var LINES = {
-    bbeok: { t: '아따 쌌다잉!', rate: 1.06, pitch: 1.14 },
-    bbeokFirst: { t: '첫뻑이여~!', rate: 1.10, pitch: 1.20 },
-    selfBbeok: { t: '자뻑이다잉!', rate: 1.08, pitch: 1.18 },
-    bomb: { t: '폭탄이다! 다 비켜잉!', rate: 1.12, pitch: 1.24 },
-    ddadak: { t: '따닥이여~!', rate: 1.10, pitch: 1.20 },
-    jjok: { t: '쪽이다잉!', rate: 1.10, pitch: 1.20 },
-    sweep: { t: '쓸었당께!', rate: 1.10, pitch: 1.22 },
-    shake: { t: '흔들었당께!', rate: 1.08, pitch: 1.18 },
-    stop: { t: '스톱이여! 돈 내놔!', rate: 1.10, pitch: 1.22 },
-    bonus: { t: '보너스여~!', rate: 1.08, pitch: 1.16 },
-    '고도리': { t: '고도리여~!', rate: 1.10, pitch: 1.22 },
-    '청단': { t: '청단이다잉!', rate: 1.10, pitch: 1.20 },
-    '홍단': { t: '홍단이다잉!', rate: 1.10, pitch: 1.20 },
-    '초단': { t: '초단이다잉!', rate: 1.10, pitch: 1.20 },
-    '삼광': { t: '삼광이여!', rate: 1.10, pitch: 1.22 },
-    '비삼광': { t: '비삼광이여!', rate: 1.08, pitch: 1.20 },
-    '사광': { t: '사광이다잉!', rate: 1.14, pitch: 1.26 },
-    '오광': { t: '오광이여! 대박났네!', rate: 1.18, pitch: 1.32 },
-    parkPi: { t: '피박이여!', rate: 1.10, pitch: 1.22 },
-    parkGwang: { t: '광박이다잉!', rate: 1.10, pitch: 1.22 },
-    mangtta: { t: '멍따여!', rate: 1.12, pitch: 1.24 },
-    gobak: { t: '고박이여!', rate: 1.10, pitch: 1.22 }
+    bbeok: { t: '아따 쌌다잉', rate: 1.06, pitch: 1.14 },
+    bbeokFirst: { t: '첫뻑이여', rate: 1.10, pitch: 1.20 },
+    selfBbeok: { t: '자뻑이다잉', rate: 1.08, pitch: 1.18 },
+    bomb: { t: '폭탄이다 다 비켜잉', rate: 1.12, pitch: 1.24 },
+    ddadak: { t: '따닥이여', rate: 1.10, pitch: 1.20 },
+    jjok: { t: '쪽이다잉', rate: 1.10, pitch: 1.20 },
+    sweep: { t: '쓸었당께', rate: 1.10, pitch: 1.22 },
+    shake: { t: '흔들었당께', rate: 1.08, pitch: 1.18 },
+    stop: { t: '스톱이여 돈 내놔', rate: 1.10, pitch: 1.22 },
+    bonus: { t: '보너스여', rate: 1.08, pitch: 1.16 },
+    '고도리': { t: '고도리여', rate: 1.10, pitch: 1.22 },
+    '청단': { t: '청단이다잉', rate: 1.10, pitch: 1.20 },
+    '홍단': { t: '홍단이다잉', rate: 1.10, pitch: 1.20 },
+    '초단': { t: '초단이다잉', rate: 1.10, pitch: 1.20 },
+    '삼광': { t: '삼광이여', rate: 1.10, pitch: 1.22 },
+    '비삼광': { t: '비삼광이여', rate: 1.08, pitch: 1.20 },
+    '사광': { t: '사광이다잉', rate: 1.14, pitch: 1.26 },
+    '오광': { t: '오광이여 대박났네', rate: 1.18, pitch: 1.32 },
+    parkPi: { t: '피박이여', rate: 1.10, pitch: 1.22 },
+    parkGwang: { t: '광박이다잉', rate: 1.10, pitch: 1.22 },
+    mangtta: { t: '멍따여', rate: 1.12, pitch: 1.24 },
+    gobak: { t: '고박이여', rate: 1.10, pitch: 1.22 }
   };
   HP.VOICE = { go: GO, lines: LINES };
   /* 8고를 넘어도 텐션은 계속 올린다 (멈추지 않는다) */
@@ -2457,7 +2476,7 @@ window.HP.STAGE = 2;
     var g = GO[k];
     var extra = Math.max(0, (Math.round(n || 1)) - 8);
     return {
-      n: k, name: g.name, text: extra ? '에잇고!! 전설 썼당께!!' : g.t,
+      n: k, name: g.name, text: extra ? '에잇고 전설 썼당께' : g.t,
       rate: Math.min(1.45, g.rate + extra * 0.02),
       pitch: Math.min(1.55, g.pitch + extra * 0.02)
     };
