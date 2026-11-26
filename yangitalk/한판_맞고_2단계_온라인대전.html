@@ -3996,8 +3996,10 @@ window.HP.STAGE = 2;
     if (allin && reward) {
       allinBox = '<div class="allinBox">' +
         '<div class="abTitle">올인 성공! <b>배경 ' + reward.ch + '</b> 획득</div>' +
-        '<div class="abSub">' + (reward.newly ? '갤러리에 저장했습니다' : '이미 가진 배경 · 보너스 1,000냥') +
-        ' · 다음 도전 <b>배경 ' + reward.next + '</b> · 새 상대 잔액 <b>' + fmt(AI_START) + '냥</b></div>' +
+        '<div class="abSub">' + (reward.all ? '<b>배경 20장 모두 획득!</b> ' : '') +
+        (reward.newly ? '갤러리에 저장했습니다' : '이미 가진 배경 · 보너스 1,000냥') +
+        (reward.all ? ' · 더 하면 판마다 보너스 1,000냥' : ' · 다음 도전 <b>배경 ' + reward.next + '</b>') +
+        ' · 새 상대 잔액 <b>' + fmt(AI_START) + '냥</b></div>' +
         '<div class="abThumb"><img src="' + HP.BG[reward.ch - 1] + '" alt="획득한 배경 ' + reward.ch + '"></div></div>';
     }
     var btns = allin
@@ -4044,16 +4046,17 @@ window.HP.STAGE = 2;
     var ch = HP.clamp(d.challenge, 1, 20);
     var rw = d.lastReward || { ch: Math.max(1, ch - 1), next: ch, newly: true, bonus: 0 };
     var isNew = !!rw.newly;
-    var more = rw.next > rw.ch;
+    var more = rw.next > rw.ch && !rw.all;
     clearModal();
     HP.play('unlock');
     var box = document.createElement('div');
     box.className = 'center';
     box.innerHTML = '<div class="reward">' +
-      '<div class="rewardTitle">' + (isNew ? '배경 ' + rw.ch + ' 획득!' : '배경 ' + rw.ch + ' · 보너스 1,000냥') + '</div>' +
+      '<div class="rewardTitle">' + (rw.all ? '배경 20장 모두 획득!' : isNew ? '배경 ' + rw.ch + ' 획득!' : '배경 ' + rw.ch + ' · 보너스 1,000냥') + '</div>' +
       '<img class="rewardImg" src="' + HP.BG[rw.ch - 1] + '" alt="획득한 배경">' +
       '<div class="rewardSub">' + (isNew ? 'AI를 올인시켰습니다 · 갤러리에 저장되었습니다' : '이미 가진 배경입니다 · 1,000냥을 받았습니다') +
-      (more ? '<br>다음 도전 <b>배경 ' + rw.next + '</b> · 새 상대 잔액 <b>' + fmt(AI_START) + '냥</b>' : '') + '</div>' +
+      (more ? '<br>다음 도전 <b>배경 ' + rw.next + '</b> · 새 상대 잔액 <b>' + fmt(AI_START) + '냥</b>' :
+        (rw.all ? '<br>20장을 다 모았습니다 · 더 하면 판마다 보너스 1,000냥' : '')) + '</div>' +
       '<div class="btnrow"><button class="btn go" id="rwNext">' +
       (more ? '다음 사진 도전 · 배경 ' + rw.next : '다시 한 판') + '</button></div>' +
       '<div class="btnrow"><button class="btn ghost" id="rwHome">홈</button></div></div>' +
