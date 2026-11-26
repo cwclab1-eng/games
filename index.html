@@ -76,7 +76,7 @@
     transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
     overflow:hidden;
   }
-  .card > :not(.stretch){position:relative;z-index:2}
+  .card > :not(.stretch){position:relative;z-index:1}
   .card::before{
     content:"";position:absolute;inset:-1px -1px auto;height:3px;
     background:linear-gradient(90deg,var(--a),transparent 85%);opacity:.9;
@@ -87,7 +87,7 @@
   }
   .card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.2);box-shadow:0 18px 40px rgba(0,0,0,.45)}
   .card:active{transform:scale(.988)}
-  .stretch{position:absolute;inset:0;z-index:1;border-radius:inherit}
+  .stretch{position:absolute;inset:0;z-index:3;border-radius:inherit}
   .stretch:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
   .card.matgo{--a:#ff6b6b}
@@ -124,7 +124,7 @@
   .alt{
     font-size:12px;font-weight:700;color:var(--txt);text-decoration:none;
     padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.13);position:relative;z-index:2;
+    border:1px solid rgba(255,255,255,.13);position:relative;z-index:4;
   }
   .alt:hover{background:rgba(255,255,255,.16)}
   .hint{
