@@ -81,6 +81,15 @@ h3{margin:18px 0 8px;font-size:15px}
 .chip{background:rgba(251,244,228,.14);border:1px solid rgba(251,244,228,.28);color:#FBF4E4;
   padding:6px 11px;border-radius:999px;font-size:12px;backdrop-filter:blur(8px)}
 .chip b{font-size:13px;color:#F2D489}
+/* 내 보유 냥 — 홈 상단 금색 배지 (크고 굵게) */
+.chip.goldWallet{display:flex;align-items:center;gap:5px;padding:5px 13px 5px 10px;
+  background:linear-gradient(160deg,#F9E8B4,#E6B23A 55%,#C9962F);
+  border:1.5px solid rgba(255,246,214,.9);border-radius:999px;
+  box-shadow:0 5px 16px rgba(201,150,47,.5),inset 0 1px 0 rgba(255,255,255,.65)}
+.chip.goldWallet .wLabel{font-size:11.5px;font-weight:800;color:#6a4a0c;letter-spacing:-.3px}
+.chip.goldWallet b{font-size:22px;font-weight:900;color:#231704;letter-spacing:-.8px;line-height:1;
+  font-variant-numeric:tabular-nums;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.chip.goldWallet b.big{font-size:19px}
 .iconbtn{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:17px;
   background:rgba(10,16,11,.55);border:1px solid var(--hair);color:#FBF4E4;backdrop-filter:blur(10px)}
 .iconbtn:active{transform:scale(.94)}
@@ -153,8 +162,8 @@ h3{margin:18px 0 8px;font-size:15px}
 .hud{display:flex;align-items:center;gap:7px;padding-top:1px}
 .opp{flex:1;min-width:0;padding:4px 10px;border-radius:12px;background:var(--glass);
   border:1px solid var(--hair);backdrop-filter:blur(12px);color:#FBF4E4}
-.oppname{display:flex;align-items:center;gap:6px;font-size:13px;line-height:1.1}
-.oppname b{font-weight:700}
+.oppname{display:flex;align-items:center;gap:6px;font-size:13px;line-height:1.1;white-space:nowrap;overflow:hidden}
+.oppname b{font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .oppname .dot{width:7px;height:7px;border-radius:50%;background:#7d756c;flex:0 0 auto}
 .oppname .dot.on{background:#F2D489;box-shadow:0 0 0 3px rgba(242,212,137,.25);animation:dotpulse 1.6s infinite}
 @keyframes dotpulse{0%,100%{box-shadow:0 0 0 2px rgba(242,212,137,.18)}50%{box-shadow:0 0 0 5px rgba(242,212,137,.05)}}
@@ -164,6 +173,22 @@ h3{margin:18px 0 8px;font-size:15px}
 .starterPill.ai{background:rgba(178,58,58,.8);color:#FFE7B0;border:1px solid rgba(255,231,176,.45)}
 .oppbal{font-size:10.5px;color:rgba(251,244,228,.72);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hudright{display:flex;align-items:center;gap:6px}
+/* 내 보유 냥 — 플레이 화면 금색 배지 (배경 현상 게이지와 한 칸에) */
+.wallet{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;padding:4px 8px 3px;border-radius:12px;
+  background:linear-gradient(160deg,#F9E8B4,#E4B039 58%,#C9962F);
+  border:1.5px solid rgba(255,246,214,.92);
+  box-shadow:0 4px 16px rgba(201,150,47,.5),inset 0 1px 0 rgba(255,255,255,.65)}
+.wallet .wTop{display:flex;align-items:baseline;justify-content:center;gap:3px;line-height:1}
+.wallet .wLabel{font-size:9px;font-weight:800;color:#6a4a0c;letter-spacing:-.3px}
+.wallet #myNyang{font-size:19px;font-weight:900;color:#231704;letter-spacing:-.8px;line-height:1;
+  font-variant-numeric:tabular-nums;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.wallet #myNyang.big{font-size:15.5px;letter-spacing:-.9px}
+.wallet .revealPill{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0;
+  background:none;border:0;border-radius:0;color:#3d2c0a;font-size:8px;line-height:1.05}
+.wallet .revealPill .rv{font-weight:800;letter-spacing:-.2px}
+.wallet .revealPill b{color:#231704;font-size:9.5px}
+.wallet .rvbar{display:block;width:100%;height:3px;border-radius:99px;background:rgba(42,29,7,.26);overflow:hidden}
+.wallet .rvbar em{display:block;height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#7a5410,#231704);transition:width .7s}
 .revealPill{display:flex;flex-direction:column;gap:3px;padding:4px 9px;border-radius:11px;background:var(--glass);
   border:1px solid var(--hair);backdrop-filter:blur(12px);color:#FBF4E4;font-size:9.5px;line-height:1.15}
 .revealPill b{color:#F2D489;font-size:12px}
@@ -209,8 +234,8 @@ h3{margin:18px 0 8px;font-size:15px}
 .mzone.p .mhead span{color:#F5B0A0}
 .mzone .mhead b{color:#FBF4E4;font-size:11px;font-variant-numeric:tabular-nums}
 .mzone .mhead em{font-style:normal;color:#F2D489;font-size:8.5px;font-weight:800}
-.mzone .mstack{flex:1;display:flex;align-items:center;min-height:37px;overflow:hidden;padding-bottom:1px}
-.mini{position:relative;display:block;flex:0 0 auto;width:25px;height:37px;border-radius:3px;overflow:hidden;
+.mzone .mstack{flex:1;display:flex;align-items:center;min-height:41px;overflow:hidden;padding-bottom:1px}
+.mini{position:relative;display:block;flex:0 0 auto;width:28px;height:41px;border-radius:3.5px;overflow:hidden;
   box-shadow:0 1px 3px rgba(0,0,0,.5),0 0 0 .5px rgba(0,0,0,.35);margin-left:calc(-1 * var(--ov,9px))}
 .mini:first-child{margin-left:0}
 .mini svg{display:block;width:100%;height:100%}
@@ -363,7 +388,38 @@ h3{margin:18px 0 8px;font-size:15px}
 .sheet .gukBtn.on em{color:#5a3a08}
 .sheet .gukBtn .pt{font-size:13px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
 
-/* ================= GALLERY ================= */
+/* ---------- 족보별 화투패 그림 (규칙판 · 점수현황 · 정산) ---------- */
+.ycards{display:inline-flex;align-items:center;gap:2px;flex:0 0 auto}
+.ycard{display:block;width:22px;height:33px;border-radius:3px;overflow:hidden;flex:0 0 auto;
+  background:#FFFDF7;box-shadow:0 1px 3px rgba(10,7,4,.35),0 0 0 .5px rgba(0,0,0,.28)}
+.ycard svg{display:block;width:100%;height:100%}
+.yakuBoard{display:flex;flex-direction:column;gap:5px;margin:6px 0 10px}
+.yakuRow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:12px;
+  background:rgba(255,255,255,.62);border:1px solid var(--line);box-shadow:0 1px 2px rgba(34,28,23,.06)}
+.yakuRow .yInfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.yakuRow .yInfo b{font-size:12.5px;color:var(--ink);line-height:1.15}
+.yakuRow .yInfo em{font-style:normal;font-size:10px;color:var(--ink2);line-height:1.25;word-break:keep-all}
+.yakuRow .yPts{flex:0 0 auto;text-align:right;color:var(--red);font-weight:800;line-height:1}
+.yakuRow .yPts b{font-size:15px;font-variant-numeric:tabular-nums}
+.yakuRow .yPts small{font-size:8.5px;color:var(--ink2);margin-left:1px}
+/* 정산·점수현황 — 족보 줄에 실제 패 그림 */
+.srow.yrow{align-items:center;gap:6px}
+.srow.yrow .sMain{display:flex;align-items:center;gap:6px;min-width:0}
+.srow.yrow .sn{font-weight:700;white-space:nowrap}
+.srow.yrow .sp{flex:0 0 auto}
+.srow.yrow .ycard{width:19px;height:28px}
+/* 올인 성공 — 다음 사진 안내 */
+.allinBox{margin:8px 0 6px;padding:10px 12px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(249,232,180,.9),rgba(228,176,57,.55));
+  border:1.5px solid rgba(201,150,47,.65);box-shadow:0 8px 22px rgba(201,150,47,.28)}
+.allinBox .abTitle{font-size:15px;font-weight:800;color:#5a3a08;text-align:center}
+.allinBox .abTitle b{color:var(--red);font-size:16px}
+.allinBox .abSub{font-size:11px;color:#5a3a08;text-align:center;margin-top:3px;line-height:1.4}
+.allinBox .abSub b{color:#2a1d07}
+.allinBox .abThumb{margin-top:8px;border-radius:10px;overflow:hidden;aspect-ratio:16/9;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.allinBox .abThumb img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
+
+/* ================= GALLERY ================= */ */
 #gallery{gap:8px}
 .galProgress{font-size:12px;color:#FBF4E4}
 .galProgress b{color:#F2D489;font-size:15px}
@@ -561,8 +617,8 @@ body.embed .lobbyNote{display:none}
   .takenRow{min-height:64px;padding:3px 5px}
   .mtags{height:12px}
   .mtag{font-size:7.5px;padding:1px 3px}
-  .mzone .mstack{min-height:32px}
-  .mini{width:22px;height:33px}
+  .mzone .mstack{min-height:34px}
+  .mini{width:24px;height:35px}
   .mini .mm{font-size:6.5px}
   .oppHand{height:44px}
   .oppHand i{width:27px;height:40px}
@@ -577,8 +633,8 @@ body.embed .lobbyNote{display:none}
   #table{--fw:56px;--hw:50px;gap:4px}
   .takenRow{min-height:54px;padding:3px 5px}
   .mtags{height:12px}
-  .mzone .mstack{min-height:26px}
-  .mini{width:19px;height:28px}
+  .mzone .mstack{min-height:29px}
+  .mini{width:21px;height:31px}
   .mini .mm{font-size:6px}
   .oppHand{height:38px}
   .oppHand i{width:24px;height:36px}
@@ -591,8 +647,8 @@ body.embed .lobbyNote{display:none}
   .handHint{display:none}
   .takenRow{min-height:46px;padding:2px 4px}
   .mtags{height:11px}
-  .mzone .mstack{min-height:23px}
-  .mini{width:17px;height:25px}
+  .mzone .mstack{min-height:26px}
+  .mini{width:18px;height:27px}
   .mini .mm{font-size:5.5px}
   .oppHand{height:34px}
   .oppHand i{width:22px;height:33px}
@@ -604,6 +660,21 @@ body.embed .lobbyNote{display:none}
   .floor{gap:4px}
   .revealPill{display:none}
   .mzone .mhead span{font-size:7.5px}
+  /* 좁은 화면 — HUD 를 줄여 상대 정보와 내 냥이 같이 보이게 */
+  .hud{gap:5px}
+  #table .iconbtn{width:30px;height:30px;font-size:14px;border-radius:10px}
+  .wallet{padding:3px 7px;border-radius:10px}
+  .wallet .revealPill{display:none}
+  .wallet .wLabel{display:none}
+  .wallet #myNyang{font-size:16px}
+  .wallet #myNyang.big{font-size:15px}
+  .opp{padding:3px 8px}
+  .oppname{font-size:12px;gap:4px}
+  .oppbal{font-size:9.5px}
+  .starterPill{font-size:8px}
+  .oppgo{font-size:9px}
+  .chip.goldWallet b{font-size:19px}
+  .chip.goldWallet{padding:4px 10px 4px 8px}
 }
 .iconbtn.on{background:linear-gradient(160deg,#F2D489,#C9962F);color:#2a1d07;border-color:rgba(255,235,180,.85)}
 
@@ -684,8 +755,8 @@ body.embed .lobbyNote{display:none}
   .takenRow{min-height:44px}
   .mzone .mhead{font-size:7.5px}
   .mzone .mhead b{font-size:9px}
-  .mzone .mstack{min-height:21px}
-  .mini{width:14px;height:21px}
+  .mzone .mstack{min-height:24px}
+  .mini{width:16px;height:24px}
   .mini .mm{font-size:5.5px;padding:0 1px}
   .oppHand i{width:22px;height:33px}
   .handHint{font-size:10px;bottom:0}
@@ -734,7 +805,7 @@ body.embed .lobbyNote{display:none}
     <header class="topbar">
       <div class="brand"><span class="logo">花</span> 한판 맞고</div>
       <div class="topright">
-        <button class="chip nyang" id="btnNyang" aria-label="냥 잔액">냥 <b id="homeNyang">10,000</b></button>
+        <button class="chip nyang goldWallet" id="btnNyang" aria-label="내 보유 냥"><span class="wLabel">냥</span><b id="homeNyang">10,000</b></button>
         <button class="iconbtn" id="btnSoundHome" aria-label="소리">🔊</button>
       </div>
     </header>
@@ -791,11 +862,14 @@ body.embed .lobbyNote{display:none}
         <div class="oppname"><span class="dot" id="turnDot"></span><b id="oppName">중수 AI</b><span class="oppgo" id="oppGo">0고</span><span class="starterPill" id="starterPill">선: 나</span></div>
         <div class="oppbal"><span id="oppBal">냥 2,000</span> · <span id="oppHandN">손패 10</span></div>
       </div>
-      <div class="hudright">
+      <div class="wallet" id="myWallet" title="내 보유 냥">
+        <div class="wTop"><span class="wLabel">냥</span><b id="myNyang">10,000</b></div>
         <div class="revealPill" id="revealPill" title="판에서 얻은 점수만큼 배경이 드러납니다">
           <span class="rv">배경 <b id="revealBgNo">1</b> · <b id="revealN">0</b>/7</span>
           <i class="rvbar"><em id="revealBar"></em></i>
         </div>
+      </div>
+      <div class="hudright">
         <button class="iconbtn" id="btnSoundGame" aria-label="소리">🔊</button>
         <button class="iconbtn" id="btnFull" aria-label="전체화면" aria-pressed="false" title="전체화면">⛶</button>
       </div>
@@ -893,23 +967,8 @@ body.embed .lobbyNote{display:none}
     </header>
     <div class="rulesBody">
       <h3>족보</h3>
-      <table class="tbl">
-        <tr><th>족보</th><th>조건</th><th>점수</th></tr>
-        <tr><td>삼광</td><td>비광 뺀 광 3장</td><td>3</td></tr>
-        <tr><td>비삼광</td><td>비광 낀 광 3장</td><td>2</td></tr>
-        <tr><td>사광</td><td>광 4장</td><td>4</td></tr>
-        <tr><td>오광</td><td>광 5장</td><td>15</td></tr>
-        <tr><td>고도리</td><td>2·4·8월 새 3장 (국진 쌍피면 제외)</td><td>5</td></tr>
-        <tr><td>열끗</td><td>5장부터 1점, 1장마다 +1</td><td>1~5</td></tr>
-        <tr><td>홍단</td><td>1·2·3월 홍띠</td><td>3</td></tr>
-        <tr><td>청단</td><td>6·9·10월 청띠</td><td>3</td></tr>
-        <tr><td>초단</td><td>4·5·7월 초띠</td><td>3</td></tr>
-        <tr><td>띠</td><td>5장부터 1점, 1장마다 +1</td><td>1~6</td></tr>
-        <tr><td>피</td><td>10장부터 1점 (쌍피=2장 · 쓰리피=3장)</td><td>1~16</td></tr>
-        <tr><td>국진(9월 열끗)</td><td>먹으면 열끗 1장 ↔ 쌍피(피 2장) 중 골라 쓴다<br>먹은 패의 국진을 눌러 언제든 바꿈</td><td>1 or 2</td></tr>
-        <tr><td>보너스 쌍피 2장</td><td>붉은 비단 ①② · 내면 바로 피 2장 + 새 패 1장</td><td>2</td></tr>
-        <tr><td>보너스 쓰리피 2장</td><td>남색 엽전 ①② · 내면 바로 피 3장 + 새 패 1장</td><td>3</td></tr>
-      </table>
+      <p class="note" style="margin:0 0 6px">각 족보 옆에 <b>실제 화투패 그림</b>을 함께 두었습니다 — 어떤 패를 모으면 그 족보인지 그림만 보고 바로 알 수 있습니다.</p>
+      <div class="yakuBoard" id="yakuBoard"></div>
       <h3>특수</h3>
       <table class="tbl two">
         <tr><th>상황</th><th>처리</th></tr>
@@ -936,13 +995,17 @@ body.embed .lobbyNote{display:none}
       <table class="tbl">
         <tr><th>고</th><th>더해지는 점수</th><th>배수</th></tr>
         <tr><td>스톱</td><td>0</td><td>×1</td></tr>
-        <tr><td>1고</td><td>+1</td><td>×1</td></tr>
-        <tr><td>2고</td><td>+2</td><td>×1</td></tr>
-        <tr><td>3고</td><td>+3</td><td>×2</td></tr>
-        <tr><td>4고</td><td>+4</td><td>×4</td></tr>
+        <tr><td>원고 (1고)</td><td>+1</td><td>×1</td></tr>
+        <tr><td>투고 (2고)</td><td>+2</td><td>×1</td></tr>
+        <tr><td>쓰리고 (3고)</td><td>+3</td><td>×2</td></tr>
+        <tr><td>포고 (4고)</td><td>+4</td><td>×4</td></tr>
+        <tr><td>파이브고 (5고)</td><td>+5</td><td>×8</td></tr>
+        <tr><td>식스고 (6고)</td><td>+6</td><td>×16</td></tr>
+        <tr><td>세븐고 (7고)</td><td>+7</td><td>×32</td></tr>
+        <tr><td>에잇고 (8고)</td><td>+8</td><td>×64</td></tr>
       </table>
       <p class="note">손패는 <b>한 번 누르면 바로</b> 나갑니다 — 2+2 폭탄·3+1 폭탄·흔들기가 걸린 달만 작은 창에서 고릅니다.<br>
-      최종 점수 = (기본 + 고) × 고 배수 × 흔들기 × 폭탄 × 박 × 나가리.<br>
+      최종 점수 = (기본 + 고) × 고 배수 × 흔들기 × 폭탄 × 박 × 나가리. <b>점수·배수·한 판 획득 냥에는 상한이 없습니다.</b><br>
       박: 피박(피 10장↑ &amp; 상대 피 7장↓) · 광박(광 3장↑ &amp; 상대 광 0) · 멍따(열끗 7장↑) · 고박(진 사람이 고를 불렀음).</p>
       <h3>냥</h3>
       <p class="note">냥은 <b>돈이 아닌 무료 점수</b>입니다. 구매·환전·선물 경로는 없습니다.
@@ -2346,11 +2409,74 @@ window.HP.STAGE = 2;
     flush();
     return true;
   };
-  /* 고 — 1고~8고 (ko-KR TTS 가 '일고·이고·삼고…' 로 읽는다) */
-  V.go = function (n) {
-    var k = Math.max(1, Math.min(9, n || 1));
-    return V.say(k + '고!', { pri: 2, rate: 1.02, pitch: 1.12 });
+  /* =========================================================
+     전라도 사투리 멘트 — 구수하고 찰진 외침
+     · 고(Go)는 원고·투고·쓰리고·포고·파이브고·식스고·세븐고·에잇고
+     · 고가 올라갈수록 rate·pitch 와 추임새 텐션을 단계적으로 올린다
+     ========================================================= */
+  var GO = [
+    null,
+    { name: '원고', t: '원고여~ 가보자고!', rate: 1.03, pitch: 1.06 },
+    { name: '투고', t: '투고다잉! 슬슬 달아오르네!', rate: 1.08, pitch: 1.12 },
+    { name: '쓰리고', t: '쓰리고! 아따 판 커진다잉!', rate: 1.13, pitch: 1.18 },
+    { name: '포고', t: '포고!! 미쳤당께!', rate: 1.18, pitch: 1.24 },
+    { name: '파이브고', t: '파이브고!! 오늘 다 쓸어묵자잉!', rate: 1.22, pitch: 1.30 },
+    { name: '식스고', t: '식스고!! 난리났네 난리났어!', rate: 1.25, pitch: 1.34 },
+    { name: '세븐고', t: '세븐고!! 멈추면 반칙이여!', rate: 1.27, pitch: 1.37 },
+    { name: '에잇고', t: '에잇고!! 전설 썼당께!!', rate: 1.30, pitch: 1.40 }
+  ];
+  /* 그 밖의 외침 — 이름난 족보·특수·박까지 전라도 사투리로 */
+  var LINES = {
+    bbeok: { t: '아따 쌌다잉!', rate: 1.06, pitch: 1.14 },
+    bbeokFirst: { t: '첫뻑이여~!', rate: 1.10, pitch: 1.20 },
+    selfBbeok: { t: '자뻑이다잉!', rate: 1.08, pitch: 1.18 },
+    bomb: { t: '폭탄이다! 다 비켜잉!', rate: 1.12, pitch: 1.24 },
+    ddadak: { t: '따닥이여~!', rate: 1.10, pitch: 1.20 },
+    jjok: { t: '쪽이다잉!', rate: 1.10, pitch: 1.20 },
+    sweep: { t: '쓸었당께!', rate: 1.10, pitch: 1.22 },
+    shake: { t: '흔들었당께!', rate: 1.08, pitch: 1.18 },
+    stop: { t: '스톱이여! 돈 내놔!', rate: 1.10, pitch: 1.22 },
+    bonus: { t: '보너스여~!', rate: 1.08, pitch: 1.16 },
+    '고도리': { t: '고도리여~!', rate: 1.10, pitch: 1.22 },
+    '청단': { t: '청단이다잉!', rate: 1.10, pitch: 1.20 },
+    '홍단': { t: '홍단이다잉!', rate: 1.10, pitch: 1.20 },
+    '초단': { t: '초단이다잉!', rate: 1.10, pitch: 1.20 },
+    '삼광': { t: '삼광이여!', rate: 1.10, pitch: 1.22 },
+    '비삼광': { t: '비삼광이여!', rate: 1.08, pitch: 1.20 },
+    '사광': { t: '사광이다잉!', rate: 1.14, pitch: 1.26 },
+    '오광': { t: '오광이여! 대박났네!', rate: 1.18, pitch: 1.32 },
+    parkPi: { t: '피박이여!', rate: 1.10, pitch: 1.22 },
+    parkGwang: { t: '광박이다잉!', rate: 1.10, pitch: 1.22 },
+    mangtta: { t: '멍따여!', rate: 1.12, pitch: 1.24 },
+    gobak: { t: '고박이여!', rate: 1.10, pitch: 1.22 }
   };
+  HP.VOICE = { go: GO, lines: LINES };
+  /* 8고를 넘어도 텐션은 계속 올린다 (멈추지 않는다) */
+  V.goLine = function (n) {
+    var k = Math.max(1, Math.min(8, Math.round(n || 1)));
+    var g = GO[k];
+    var extra = Math.max(0, (Math.round(n || 1)) - 8);
+    return {
+      n: k, name: g.name, text: extra ? '에잇고!! 전설 썼당께!!' : g.t,
+      rate: Math.min(1.45, g.rate + extra * 0.02),
+      pitch: Math.min(1.55, g.pitch + extra * 0.02)
+    };
+  };
+  /* 고 — 원고·투고·쓰리고 … 에잇고 (pronunciation: 원고/투고/쓰리고/포고/파이브고/식스고/세븐고/에잇고) */
+  V.go = function (n) {
+    var g = V.goLine(n);
+    V.lastGo = g;
+    return V.say(g.text, { pri: 2, rate: g.rate, pitch: g.pitch });
+  };
+  /* 사투리 외침 한 줄 — key: LINES 의 키 또는 족보 이름 */
+  V.cue = function (key, opts) {
+    var L = LINES[key];
+    if (!L) L = LINES[String(key)] || null;
+    if (!L) return false;
+    opts = opts || {};
+    return V.say(L.t, { pri: opts.pri || 2, rate: opts.rate || L.rate, pitch: opts.pitch || L.pitch });
+  };
+  V.line = function (key) { return (LINES[key] && LINES[key].t) || ''; };
 
   HP.speak = V.say;
   HP.setMuted = function (m) {
@@ -2758,7 +2884,8 @@ window.HP.STAGE = 2;
       } else if (e.t === 'shake') {
         banners.push(['흔들기<i>!</i>', '이기면 ×2', 'gold', 'kick']);
       } else if (e.t === 'go') {
-        banners.push([e.count + '고<i>!</i>', '한 번 더 간다', 'blue', 'kick']);
+        var gn = (HP.VOICE && HP.VOICE.goLine) ? HP.VOICE.goLine(e.count).name : (e.count + '고');
+        banners.push([gn + '<i>!</i>', e.count + '고 · 한 번 더 간다', 'blue', 'kick']);
       }
     });
     if (banners.length) {
@@ -2860,6 +2987,16 @@ window.HP.STAGE = 2;
   }
   HP.toast = toast;
 
+  /* ---------- 내 보유 냥 — 홈·플레이 화면 금색 배지 ---------- */
+  function setMyNyang(n) {
+    var v = fmt(Math.max(0, n || 0));
+    var g = $('myNyang');
+    if (g) { g.textContent = v; g.classList.toggle('big', String(v).length >= 7); }
+    var h = $('homeNyang');
+    if (h) h.textContent = v;
+  }
+  HP.setMyNyang = setMyNyang;
+
   /* ---------- 배경 현상(reveal) ---------- */
   function setReveal(score) {
     var p = HP.clamp(score / 7, 0, 1);
@@ -2888,6 +3025,7 @@ window.HP.STAGE = 2;
   function renderHome() {
     var d = APP.data;
     $('homeNyang').textContent = fmt(d.nyang);
+    setMyNyang(d.nyang);
     $('btnSoundHome').textContent = d.sound ? '🔊' : '🔇';
     var ch = HP.clamp(d.challenge, 1, 20);
     $('challengeNo').textContent = ch;
@@ -3079,6 +3217,7 @@ window.HP.STAGE = 2;
     $('oppName').textContent = on ? (S.foeName || '상대') : L.name;
     $('turnDot').classList.toggle('on', S.turn === 'p2' && !S.over);
     $('oppBal').textContent = on ? '온라인 대전' : '냥 ' + fmt(Math.max(0, APP.data.aiBal));
+    setMyNyang(APP.data.nyang);
     $('oppHandN').textContent = '손패 ' + HP.handSize(S, 'p2');
     $('oppGo').textContent = (S.go.p2 ? S.go.p2 + '고' : '0고');
     var sp = $('starterPill');
@@ -3345,7 +3484,7 @@ window.HP.STAGE = 2;
     afterAction(r, pid, g);
   }
   function doDecide(pid, a) {
-    if (a === 'stop' && pid === 'p1' && HP.speak) HP.speak('스톱!', { pri: 2 });
+    if (a === 'stop' && pid === 'p1') shout('stop', '스톱!');
     var g = snapshot();
     var r = HP.decide(APP.S, pid, a);
     afterAction(r, pid, g);
@@ -3427,8 +3566,8 @@ window.HP.STAGE = 2;
     }, delay || 500);
   }
 
-  /* 족보 이름 → 외침 (새로 완성된 것만, 핵심 1~2개) */
-  var PART_ORDER = ['오광', '사광', '삼광', '고도리', '홍단', '청단', '초단'];
+  /* 족보 이름 → 외침 (새로 완성된 것만, 핵심 1~2개) — 전라도 사투리 */
+  var PART_ORDER = ['오광', '사광', '삼광', '비삼광', '고도리', '홍단', '청단', '초단'];
   function speakParts(ev, pid) {
     if (!APP.lastParts) APP.lastParts = { p1: [], p2: [] };
     var prev = APP.lastParts[pid] || [];
@@ -3436,10 +3575,17 @@ window.HP.STAGE = 2;
       return PART_ORDER.indexOf(p.name) >= 0 && prev.indexOf(p.name) < 0;
     });
     fresh.sort(function (a, b) { return PART_ORDER.indexOf(a.name) - PART_ORDER.indexOf(b.name); });
-    fresh.slice(0, 2).forEach(function (p, i) {
-      if (HP.speak) HP.speak(p.name + '!', { pri: i === 0 ? 1 : 1 });
+    fresh.slice(0, 2).forEach(function (p) {
+      if (HP.voice && HP.voice.cue) HP.voice.cue(p.name, { pri: 1 });
+      else if (HP.speak) HP.speak(p.name + '!', { pri: 1 });
     });
     APP.lastParts[pid] = (ev.parts || []).map(function (p) { return p.name; });
+  }
+  /* 사투리 외침 — 막히면 예전 문구로라도 말한다 */
+  function shout(key, fallback, opts) {
+    if (HP.voice && HP.voice.cue && HP.voice.cue(key, opts)) return true;
+    if (fallback && HP.speak) HP.speak(fallback, opts || {});
+    return false;
   }
 
   function handleEvents(ev, pid) {
@@ -3448,29 +3594,30 @@ window.HP.STAGE = 2;
     (ev || []).forEach(function (e) {
       if (e.t === 'bonus') {
         toast('보너스! ' + btxt + (mine ? '' : ' (상대)'));
-        if (HP.speak) HP.speak('보너스!', { pri: 1 });
+        shout('bonus', '보너스!', { pri: 1 });
       } else if (e.t === 'bbeok') {
-        toast(e.firstTurn ? '첫뻑! ' + e.month + '월 3장이 묶였습니다' : '쌌다! ' + e.month + '월 3장이 묶였습니다');
-        if (HP.speak) HP.speak(e.firstTurn ? '첫뻑!' : '쌌다!', { pri: 2, pitch: 1.0 });
+        toast(e.firstTurn ? '첫뻑! ' + e.month + '월 3장이 묶였습니다' : '아따 쌌다잉! ' + e.month + '월 3장이 묶였습니다');
+        shout(e.firstTurn ? 'bbeokFirst' : 'bbeok', e.firstTurn ? '첫뻑!' : '쌌다!');
       } else if (e.t === 'bbeokPick') {
         toast(e.self ? '자뻑! 피 2장' : '뻑 회수! 피 1장');
-        if (e.self && HP.speak) HP.speak('자뻑!', { pri: 2 });
+        if (e.self) shout('selfBbeok', '자뻑!');
       } else if (e.t === 'special') {
-        if (e.name === '쪽') { toast('쪽! 피 1장'); if (HP.speak) HP.speak('쪽!', { pri: 2, pitch: 1.18 }); }
-        if (e.name === '따닥') { toast('따닥! 피 1장'); if (HP.speak) HP.speak('따닥!', { pri: 2, pitch: 1.16 }); }
-        if (e.name === '쓸') { toast('쓸! 바닥을 다 먹었습니다'); if (HP.speak) HP.speak('쓸!', { pri: 2 }); }
+        if (e.name === '쪽') { toast('쪽! 피 1장'); shout('jjok', '쪽!'); }
+        if (e.name === '따닥') { toast('따닥! 피 1장'); shout('ddadak', '따닥!'); }
+        if (e.name === '쓸') { toast('쓸! 바닥을 다 먹었습니다'); shout('sweep', '쓸!'); }
       } else if (e.t === 'go') {
-        if (mine) toast(e.count + '고!');
+        var g = HP.voice && HP.voice.goLine ? HP.voice.goLine(e.count) : null;
+        if (mine) toast((g ? g.name + '! ' : '') + e.count + '고!');
         if (HP.voice && HP.voice.go) HP.voice.go(e.count);
       }
       else if (e.t === 'bomb') {
         toast(e.kind === 'bomb2' ? '폭탄! ' + e.month + '월 4장(2+2) · 폭탄패 1장' : '폭탄! ' + e.month + '월 4장 · 폭탄패 2장');
-        if (HP.speak) HP.speak('폭탄!', { pri: 2, pitch: 1.0, rate: 1.0 });
+        shout('bomb', '폭탄!');
       }
       else if (e.t === 'bombTokenPlay') toast('폭탄패! 더미 1장을 뒤집습니다');
       else if (e.t === 'shake') {
-        toast('흔들기! 이기면 ×2');
-        if (HP.speak) HP.speak('흔들기!', { pri: 2 });
+        toast('흔들었당께! 이기면 ×2');
+        shout('shake', '흔들기!');
       }
       else if (e.t === 'guk') {
         toast('국진(9월 열끗) — ' + (e.mode === 'pi' ? '쌍피 2장' : '열끗 1장') + '으로 셉니다' +
@@ -3518,7 +3665,7 @@ window.HP.STAGE = 2;
     function decide(a) {
       clearInterval(tick);
       clearModal();
-      if (a === 'stop' && HP.speak) HP.speak('스톱!', { pri: 2 });
+      if (a === 'stop') shout('stop', '스톱!');
       HP.ACT.decide(a);
     }
     $('gsGo').addEventListener('click', function () { decide('go'); });
@@ -3557,7 +3704,7 @@ window.HP.STAGE = 2;
     scrim(clearModal);
     var box = document.createElement('div');
     box.className = 'center';
-    var list = sc.parts.length ? sc.parts.map(function (p) { return '<div class="srow"><span>' + p.name + '</span><b>+' + p.pts + '</b></div>'; }).join('')
+    var list = sc.parts.length ? sc.parts.map(function (p) { return yakuRowHTML(p.name, p.pts, S.taken.p1, p.zone); }).join('')
       : '<div class="centertxt">아직 족보가 없습니다.<br>광 3장 · 열끗 5장 · 띠 5장 · 피 10장부터 점수</div>';
     var guk = HP.hasGuk(S.taken.p1)
       ? '<div class="centertxt" style="margin-top:4px">국진(9월 열끗)은 <b>' + (HP.gukMode(S, 'p1') === 'pi' ? '쌍피 2장' : '열끗 1장') + '</b>으로 세고 있습니다</div>' : '';
@@ -3669,7 +3816,87 @@ window.HP.STAGE = 2;
     toast('국진 — ' + (next === 'pi' ? '쌍피 2장' : '열끗 1장') + '으로 바꿨습니다');
   }
 
+  /* ---------- 족보별 실제 화투패 그림 (규칙판 · 점수현황 · 정산) ---------- */
+  var YAKU = [
+    { name: '삼광', pts: '3', cond: '비광(12월) 뺀 광 3장', cards: ['1-gwang-0', '3-gwang-0', '8-gwang-0'] },
+    { name: '비삼광', pts: '2', cond: '비광(12월) 낀 광 3장', cards: ['12-gwang-0', '1-gwang-0', '8-gwang-0'] },
+    { name: '사광', pts: '4', cond: '광 4장', cards: ['1-gwang-0', '3-gwang-0', '8-gwang-0', '11-gwang-0'] },
+    { name: '오광', pts: '15', cond: '광 5장 전부', cards: ['1-gwang-0', '3-gwang-0', '8-gwang-0', '11-gwang-0', '12-gwang-0'] },
+    { name: '고도리', pts: '5', cond: '2·4·8월 새 3장', cards: ['2-yeol-0', '4-yeol-0', '8-yeol-1'] },
+    { name: '홍단', pts: '3', cond: '1·2·3월 홍띠', cards: ['1-tti-1', '2-tti-1', '3-tti-1'] },
+    { name: '청단', pts: '3', cond: '6·9·10월 청띠', cards: ['6-tti-1', '9-tti-1', '10-tti-1'] },
+    { name: '초단', pts: '3', cond: '4·5·7월 초띠', cards: ['4-tti-1', '5-tti-1', '7-tti-1'] },
+    { name: '열끗', pts: '1~', cond: '5장부터 1장마다 +1', cards: ['2-yeol-0', '4-yeol-0', '5-yeol-0', '8-yeol-1', '9-yeol-0'] },
+    { name: '띠', pts: '1~', cond: '5장부터 1장마다 +1', cards: ['1-tti-1', '2-tti-1', '3-tti-1', '4-tti-1', '5-tti-1'] },
+    { name: '피', pts: '1~', cond: '10장부터 (쌍피 2 · 쓰리피 3)', cards: ['1-pi-2', '1-pi-3', '2-pi-2', '2-pi-3', '3-pi-2'] },
+    { name: '쌍피', pts: '2', cond: '11·12월 쌍피', cards: ['11-ssang-3', '12-ssang-3'] },
+    { name: '보너스 쌍피', pts: '2', cond: '붉은 비단 ①② · 내면 피 2 + 새 패', cards: ['11-ssang-b1', '11-ssang-b2'] },
+    { name: '보너스 쓰리피', pts: '3', cond: '남색 엽전 ①② · 내면 피 3 + 새 패', cards: ['12-ssang-b3', '12-ssang-b4'] },
+    { name: '국진', pts: '1 or 2', cond: '9월 열끗 — 열끗 1장 ↔ 쌍피 2장', cards: ['9-yeol-0'] }
+  ];
+  var YAKU_BY_NAME = {};
+  YAKU.forEach(function (y) { YAKU_BY_NAME[y.name] = y; });
+  HP.YAKU = YAKU;
+
+  function yakuThumbs(ids, cls) {
+    if (!ids || !ids.length) return '';
+    return '<span class="ycards ' + (cls || '') + '">' + ids.map(function (id) {
+      return '<i class="ycard" data-card="' + id + '" title="' + id + '">' + HP.spriteUse(id) + '</i>';
+    }).join('') + '</span>';
+  }
+  HP.yakuThumbs = yakuThumbs;
+
+  /* 먹은 패에서 이 족보에 실제로 쓰인 카드 id — 없으면 규칙판의 예시 카드 */
+  function yakuCardsOf(name, cards, zone) {
+    var y = YAKU_BY_NAME[name];
+    var list = (cards || []).filter(function (c) { return c && !c.isBombToken; });
+    var ZONE_EXAMPLE = {
+      gwang: ['1-gwang-0', '3-gwang-0', '8-gwang-0'],
+      yeol: ['2-yeol-0', '4-yeol-0', '5-yeol-0', '8-yeol-1', '9-yeol-0'],
+      tti: ['1-tti-1', '2-tti-1', '3-tti-1'],
+      pi: ['1-pi-2', '1-pi-3', '2-pi-2']
+    };
+    function pick(pred, n) {
+      return list.filter(pred).slice(0, n).map(function (c) { return c.id; });
+    }
+    if (!list.length) return y ? y.cards.slice() : (ZONE_EXAMPLE[zone] || []);
+    if (name === '고도리') return pick(function (c) { return c.kind === 'yeol' && [2, 4, 8].indexOf(c.month) >= 0; }, 3);
+    if (name === '홍단' || name === '청단' || name === '초단') {
+      var b = name === '홍단' ? 'hong' : name === '청단' ? 'cheong' : 'cho';
+      return pick(function (c) { return c.kind === 'tti' && c.band === b; }, 3);
+    }
+    if (zone === 'gwang') return pick(function (c) { return c.kind === 'gwang'; }, 5);
+    if (zone === 'yeol') return pick(function (c) { return c.kind === 'yeol'; }, 6);
+    if (zone === 'tti') return pick(function (c) { return c.kind === 'tti'; }, 6);
+    if (zone === 'pi') return pick(function (c) { return c.kind === 'pi' || c.kind === 'ssang'; }, 6);
+    return y ? y.cards.slice() : [];
+  }
+  HP.yakuCardsOf = yakuCardsOf;
+  /* 정산·점수현황 한 줄 — 족보 이름 + 실제 화투패 그림 + 점수 */
+  function yakuRowHTML(name, pts, cards, zone) {
+    return '<div class="srow yrow"><span class="sMain"><b class="sn">' + name + '</b>' +
+      yakuThumbs(yakuCardsOf(name, cards, zone)) + '</span><b class="sp">+' + pts + '</b></div>';
+  }
+  HP.yakuRowHTML = yakuRowHTML;
+
+  function renderYakuBoard() {
+    var box = $('yakuBoard');
+    if (!box) return;
+    box.innerHTML = YAKU.map(function (y) {
+      return '<div class="yakuRow" data-yaku="' + y.name + '">' +
+        yakuThumbs(y.cards) +
+        '<div class="yInfo"><b>' + y.name + '</b><em>' + y.cond + '</em></div>' +
+        '<div class="yPts"><b>' + y.pts + '</b><small>점</small></div></div>';
+    }).join('');
+  }
+  HP.renderYakuBoard = renderYakuBoard;
+
   /* ---------- 정산 ---------- */
+  function goLabel(n) {
+    var g = (HP.VOICE && HP.VOICE.goLine) ? HP.VOICE.goLine(n) : null;
+    return (g ? g.name + ' ' : '') + n + '고';
+  }
+
   function onGameOver() {
     var S = APP.S, d = APP.data, res = S && S.result;
     if (!S || !res) return;
@@ -3679,9 +3906,11 @@ window.HP.STAGE = 2;
     if (S.online && HP.online && HP.online.onGameOver) { HP.online.onGameOver(S); return; }
     speakParks(res);
     d.stats.games++;
-    var payout = 0, allin = false;
+    var payout = 0, allin = false, reward = null, points = 0, factor = 0;
     if (res.winner) {
-      var factor = HP.clamp(Math.round((res.settle ? res.settle.total : res.base) / 7), 1, 4);
+      /* 한 판 획득 냥 — 점수 상한 없음: (기본+고)×배수 총점을 그대로 판돈 배율로 바꿔 준다 */
+      points = res.settle ? res.settle.total : res.base;
+      factor = Math.max(1, Math.round(points / 7));
       payout = Math.round(S.stake * factor);
       if (res.winner === 'p1') {
         d.nyang += payout;
@@ -3695,7 +3924,7 @@ window.HP.STAGE = 2;
         HP.play('lose');
       }
       d.nagariNext = false;
-      if (d.aiBal <= 0) allin = true;
+      if (d.aiBal <= 0) allin = true;      // AI 잔액이 0 이하 — 올인 처리(여기만 안전하게 막는다)
     } else {
       d.nagariNext = true;
       HP.play('lose');
@@ -3703,28 +3932,41 @@ window.HP.STAGE = 2;
     /* 승자가 다음 판 선 — 나가리면 직전 선 유지 */
     d.nextStarter = HP.nextStarter(S, d.nextStarter || S.starter);
     if (allin) {
+      /* ① 배경 즉시 해금·저장 → ② 다음 사진(배경 N+1)·새 상대 잔액까지 이 자리에서 확정 */
       var ch = HP.clamp(d.challenge, 1, 20);
-      if (d.unlocked.indexOf(ch) < 0) { d.unlocked.push(ch); d.fresh = [ch]; d.rewardBonus = 0; }
+      var newly = d.unlocked.indexOf(ch) < 0;
+      if (newly) { d.unlocked.push(ch); d.fresh = [ch]; d.rewardBonus = 0; }
       else { d.nyang += 1000; d.rewardBonus = 1000; }
       d.stats.allins++;
+      var nextCh = Math.min(20, ch + (newly ? 1 : 0));
+      d.challenge = nextCh;
+      d.aiBal = AI_START;               // 새 도전자 잔액 2,000냥
+      d.nextStarter = 'p1';             // 새 도전자전은 내가 선
+      reward = { ch: ch, next: nextCh, newly: newly, bonus: d.rewardBonus || 0, all: d.unlocked.length >= 20 };
+      d.lastReward = reward;
+      save();                           // 해금·도전 진행을 즉시 localStorage 에 남긴다
+    } else {
+      d.lastReward = null;
     }
     save();
-    showSettle(res, payout, allin);
+    showSettle(res, payout, allin, reward, points, factor);
     renderHome();
   }
 
-  /* 정산에서 걸린 박 — 피박 · 광박 · 멍따 */
+  /* 정산에서 걸린 박 — 피박 · 광박 · 멍따 (전라도 사투리) */
   function speakParks(res) {
-    if (!HP.speak) return;
     var mults = (res && res.settle && res.settle.mults) || [];
     var names = mults.map(function (m) { return m.name; });
     var said = 0;
-    ['피박', '광박', '멍따'].forEach(function (n) {
-      if (names.indexOf(n) >= 0 && said < 2) { HP.speak(n + '!', { pri: said === 0 ? 2 : 1 }); said++; }
+    [[ '피박', 'parkPi'], ['광박', 'parkGwang'], ['멍따', 'mangtta']].forEach(function (pair) {
+      if (names.indexOf(pair[0]) >= 0 && said < 2) {
+        shout(pair[1], pair[0] + '!', { pri: said === 0 ? 2 : 1 });
+        said++;
+      }
     });
   }
 
-  function showSettle(res, payout, allin) {
+  function showSettle(res, payout, allin, reward, points, factor) {
     var S = APP.S, d = APP.data;
     clearModal();
     var sheet = document.createElement('div');
@@ -3736,9 +3978,9 @@ window.HP.STAGE = 2;
     if (res.reason === 'nagari') title = '나가리 — 패가 다 떨어졌습니다';
     if (res.winner && res.settle) {
       var st = res.settle;
-      var parts = st.parts.map(function (p) { return '<div class="srow"><span>' + p.name + '</span><b>+' + p.pts + '</b></div>'; }).join('');
+      var parts = st.parts.map(function (p) { return yakuRowHTML(p.name, p.pts, S.taken[res.winner], p.zone); }).join('');
       rows += parts || '<div class="srow"><span>족보</span><b>없음</b></div>';
-      if (st.go) rows += '<div class="srow"><span>' + st.go + '고</span><b>+' + st.go + '</b></div>';
+      if (st.go) rows += '<div class="srow"><span>' + goLabel(st.go) + '</span><b>+' + st.go + '</b></div>';
       st.mults.forEach(function (m) { rows += '<div class="srow mults"><span>' + m.name + '</span><b>×' + m.v + '</b></div>'; });
       rows += '<div class="srow total"><span>합계</span><b>' + st.total + '점</b></div>';
     } else {
@@ -3747,22 +3989,34 @@ window.HP.STAGE = 2;
     var payRow = '';
     if (payout) {
       payRow = '<div class="srow total" style="color:' + (res.winner === 'p1' ? 'var(--green)' : 'var(--red)') + '">' +
-        '<span>' + (res.winner === 'p1' ? '받은 냥' : '잃은 냥') + '</span><b>' + (res.winner === 'p1' ? '+' : '−') + fmt(payout) + '냥</b></div>';
+        '<span>' + (res.winner === 'p1' ? '받은 냥' : '잃은 냥') + (factor ? ' <small>(' + fmt(points) + '점 × ' + factor + ')</small>' : '') + '</span>' +
+        '<b>' + (res.winner === 'p1' ? '+' : '−') + fmt(payout) + '냥</b></div>';
     }
-    if (allin) payRow += '<div class="srow" style="color:var(--red)"><span>올인 성공!</span><b>' +
-      (d.unlocked.length >= 20 && d.unlocked.indexOf(HP.clamp(d.challenge, 1, 20)) >= 0 ? '모두 획득 · 보너스 1,000냥' : '배경 ' + HP.clamp(d.challenge, 1, 20) + ' 획득') + '</b></div>';
+    var allinBox = '';
+    if (allin && reward) {
+      allinBox = '<div class="allinBox">' +
+        '<div class="abTitle">올인 성공! <b>배경 ' + reward.ch + '</b> 획득</div>' +
+        '<div class="abSub">' + (reward.newly ? '갤러리에 저장했습니다' : '이미 가진 배경 · 보너스 1,000냥') +
+        ' · 다음 도전 <b>배경 ' + reward.next + '</b> · 새 상대 잔액 <b>' + fmt(AI_START) + '냥</b></div>' +
+        '<div class="abThumb"><img src="' + HP.BG[reward.ch - 1] + '" alt="획득한 배경 ' + reward.ch + '"></div></div>';
+    }
+    var btns = allin
+      ? '<div class="btnrow"><button class="btn go" id="stNext">' +
+        (reward && reward.next > reward.ch ? '다음 사진 도전 · 배경 ' + reward.next : '다시 한 판') + '</button></div>' +
+        '<div class="btnrow"><button class="btn stop" id="stReward">배경 ' + (reward ? reward.ch : HP.clamp(d.challenge, 1, 20)) + ' 보기</button>' +
+        '<button class="btn ghost" id="stHome">홈</button></div>'
+      : '<div class="btnrow"><button class="btn stop" id="stAgain">다시 하기</button>' +
+        '<button class="btn ghost" id="stHome">홈</button></div>';
     sheet.innerHTML = '<h2>' + title + '</h2>' +
       '<div class="sub">' + (res.winner === 'p1' ? 'AI를 이겼습니다' : res.winner === 'p2' ? 'AI가 이겼습니다' : '판돈은 오가지 않습니다') + '</div>' +
-      '<div class="settleRows">' + rows + payRow + '</div>' +
-      '<div class="btnrow">' +
-      (allin ? '<button class="btn go" id="stReward">배경 보기</button>' : '') +
-      '<button class="btn stop" id="stAgain">다시 하기</button>' +
-      '<button class="btn ghost" id="stHome">홈</button></div>';
+      '<div class="settleRows">' + rows + payRow + '</div>' + allinBox +
+      btns;
     clearModal();
     scrim();
     $('modalRoot').appendChild(sheet);
+    if (allin) $('stNext').addEventListener('click', function () { startNextChallenge(); });
     if (allin) $('stReward').addEventListener('click', function () { clearModal(); showReward(); });
-    $('stAgain').addEventListener('click', function () {
+    if (!allin) $('stAgain').addEventListener('click', function () {
       clearModal();
       if (HP.fs) HP.fs.request();
       setTimeout(startGame, 80);
@@ -3772,19 +4026,37 @@ window.HP.STAGE = 2;
     });
   }
 
+  /* 올인 뒤 — 새 도전자(배경 N+1 · 잔액 2,000냥)와 바로 한 판 시작 */
+  function startNextChallenge() {
+    var d = APP.data;
+    clearModal();
+    APP.S = null;
+    APP.settledFor = null;
+    if (HP.fs) HP.fs.request();
+    renderHome();
+    toast('다음 사진 도전 — 배경 ' + HP.clamp(d.challenge, 1, 20) + ' · 새 상대 ' + fmt(AI_START) + '냥');
+    setTimeout(startGame, 90);
+  }
+  HP.startNextChallenge = startNextChallenge;
+
   function showReward() {
     var d = APP.data;
     var ch = HP.clamp(d.challenge, 1, 20);
-    var dup = !d.rewardBonus;
+    var rw = d.lastReward || { ch: Math.max(1, ch - 1), next: ch, newly: true, bonus: 0 };
+    var isNew = !!rw.newly;
+    var more = rw.next > rw.ch;
     clearModal();
     HP.play('unlock');
     var box = document.createElement('div');
     box.className = 'center';
     box.innerHTML = '<div class="reward">' +
-      '<div class="rewardTitle">' + (dup ? '배경 ' + ch + ' 획득!' : '모두 모았습니다!') + '</div>' +
-      '<img class="rewardImg" src="' + HP.BG[ch - 1] + '" alt="획득한 배경">' +
-      '<div class="rewardSub">' + (dup ? 'AI를 올인시켰습니다 · 갤러리에 저장되었습니다' : '20장을 모두 모았습니다 · 보너스 1,000냥') + '</div>' +
-      '<div class="btnrow"><button class="btn stop" id="rwNext">' + (dup ? '다음 도전자' : '홈으로') + '</button></div></div>' +
+      '<div class="rewardTitle">' + (isNew ? '배경 ' + rw.ch + ' 획득!' : '배경 ' + rw.ch + ' · 보너스 1,000냥') + '</div>' +
+      '<img class="rewardImg" src="' + HP.BG[rw.ch - 1] + '" alt="획득한 배경">' +
+      '<div class="rewardSub">' + (isNew ? 'AI를 올인시켰습니다 · 갤러리에 저장되었습니다' : '이미 가진 배경입니다 · 1,000냥을 받았습니다') +
+      (more ? '<br>다음 도전 <b>배경 ' + rw.next + '</b> · 새 상대 잔액 <b>' + fmt(AI_START) + '냥</b>' : '') + '</div>' +
+      '<div class="btnrow"><button class="btn go" id="rwNext">' +
+      (more ? '다음 사진 도전 · 배경 ' + rw.next : '다시 한 판') + '</button></div>' +
+      '<div class="btnrow"><button class="btn ghost" id="rwHome">홈</button></div></div>' +
       '<div class="confetti" id="cf"></div>';
     $('modalRoot').appendChild(box);
     var cf = $('cf');
@@ -3796,13 +4068,9 @@ window.HP.STAGE = 2;
       s.style.animationDelay = (Math.random() * .6) + 's';
       cf.appendChild(s);
     }
-    $('rwNext').addEventListener('click', function () {
+    $('rwNext').addEventListener('click', function () { startNextChallenge(); });
+    $('rwHome').addEventListener('click', function () {
       clearModal();
-      d.challenge = Math.min(20, ch + (dup ? 1 : 0));
-      d.aiBal = AI_START;
-      d.nextStarter = 'p1';   // 새 도전자는 내가 선
-      d.selected = ch;
-      save();
       show('home'); renderHome(); APP.S = null;
     });
   }
@@ -3918,6 +4186,7 @@ window.HP.STAGE = 2;
 
   /* ---------- 이벤트 연결 ---------- */
   function bind() {
+    renderYakuBoard();
     document.addEventListener('touchstart', function once() {
       HP.unlockAudio();
       document.removeEventListener('touchstart', once);
@@ -4001,10 +4270,10 @@ window.HP.STAGE = 2;
   HP.startGame = HP.startGame || startGame;
   HP.__debug = {
     app: APP, show: show, startGame: startGame, gameOver: onGameOver, settle: showSettle,
-    reward: showReward, renderTable: renderTable, renderHome: renderHome, renderGallery: renderGallery,
+    reward: showReward, nextChallenge: startNextChallenge, renderTable: renderTable, renderHome: renderHome, renderGallery: renderGallery,
     openViewer: openViewer, setReveal: setReveal, showGoStop: showGoStop, showFloorChoice: showFloorChoice,
     showParts: showParts, snapshot: snapshot, showGukChoice: showGukChoice, showBomb2Choice: showBomb2Choice,
-    renderTaken: renderTaken, scheduleAI: scheduleAI,
+    renderTaken: renderTaken, scheduleAI: scheduleAI, renderYakuBoard: renderYakuBoard,
     playDealEvents: playDealEvents
   };
   HP.LEVELS = LEVELS;
@@ -5562,13 +5831,16 @@ window.HP.STAGE = 2;
     }
     OL.deadline = 0;
     setTimerText('');
-    if (HP.speak) {
-      var names = ((S.result.settle && S.result.settle.mults) || []).map(function (m) { return m.name; });
-      var said = 0;
-      ['피박', '광박', '멍따'].forEach(function (n) {
-        if (names.indexOf(n) >= 0 && said < 2) { HP.speak(n + '!', { pri: said === 0 ? 2 : 1 }); said++; }
-      });
-    }
+    var names = ((S.result.settle && S.result.settle.mults) || []).map(function (m) { return m.name; });
+    var said = 0;
+    [['피박', 'parkPi'], ['광박', 'parkGwang'], ['멍따', 'mangtta']].forEach(function (pair) {
+      if (names.indexOf(pair[0]) >= 0 && said < 2) {
+        if (!(HP.voice && HP.voice.cue && HP.voice.cue(pair[1], { pri: said === 0 ? 2 : 1 })) && HP.speak) {
+          HP.speak(pair[0] + '!', { pri: said === 0 ? 2 : 1 });
+        }
+        said++;
+      }
+    });
     showOnlineSettle(S.result, me.total, op.total);
     if (OL.embed) HP.yang.end(S.result, me.total, op.total);
   }
