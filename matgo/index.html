@@ -2945,6 +2945,7 @@ window.HP.STAGE = 2;
       }
     } catch (e) { }
     APP.data = d;
+    if (normalizeProgress()) save();
     HP.setMuted(!d.sound);
     return d;
   }
@@ -2952,6 +2953,48 @@ window.HP.STAGE = 2;
     try { localStorage.setItem(KEY, JSON.stringify(APP.data)); } catch (e) { }
   }
   HP.loadStore = load; HP.saveStore = save;
+
+  /* ---------- 저장 상태 정규화(마이그레이션) ----------
+     v9 에서 올인한 저장 상태는 배경만 열리고(unlocked: [1]) 도전 번호(challenge: 1)와
+     상대 잔액(aiBal: 0)이 그대로 남아, 홈이 '배경 1 · 상대 잔액 0냥'에 갇힌다.
+     이미 가진 배경을 도전 중이거나 상대 잔액이 0이면 아직 없는 가장 작은 배경과
+     새 도전자 잔액(2,000냥)으로 되돌려 다음 판이 막히지 않게 한다. */
+  function normalizeProgress() {
+    var d = APP.data;
+    if (!d) return false;
+    var changed = false;
+    /* unlocked — 1~20 정수만, 중복 없이 오름차순 */
+    var un = [];
+    (Array.isArray(d.unlocked) ? d.unlocked : []).forEach(function (n) {
+      n = parseInt(n, 10);
+      if (n >= 1 && n <= 20 && un.indexOf(n) < 0) un.push(n);
+    });
+    un.sort(function (a, b) { return a - b; });
+    var same = Array.isArray(d.unlocked) && un.length === d.unlocked.length &&
+      un.every(function (n, i) { return d.unlocked[i] === n; });
+    if (!same) { d.unlocked = un; changed = true; }
+    /* challenge — 1~20 */
+    var ch = parseInt(d.challenge, 10);
+    if (!(ch >= 1 && ch <= 20)) { ch = 1; }
+    if (ch !== d.challenge) { d.challenge = ch; changed = true; }
+    /* aiBal — 0 이상 정수 */
+    var bal = parseInt(d.aiBal, 10);
+    if (!(bal >= 0)) { bal = 0; d.aiBal = 0; changed = true; }
+    if (d.unlocked.length >= 20) {
+      /* 20장 모두 획득 — 판마다 새 상대를 불러 계속할 수 있게 잔액만 채운다 */
+      if (bal <= 0) { d.aiBal = AI_START; d.nextStarter = 'p1'; changed = true; }
+    } else if (d.unlocked.indexOf(ch) >= 0 || bal <= 0) {
+      /* 이미 가진 배경을 도전 중이거나 상대 잔액이 바닥 — 다음 미획득 배경으로 */
+      var next = 1;
+      while (next <= 20 && d.unlocked.indexOf(next) >= 0) next++;
+      d.challenge = next <= 20 ? next : ch;
+      d.aiBal = AI_START;
+      d.nextStarter = 'p1';
+      changed = true;
+    }
+    return changed;
+  }
+  HP.normalizeProgress = normalizeProgress;
 
   function today() { var t = new Date(); return t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate(); }
   function refillsLeft() {
@@ -3023,6 +3066,7 @@ window.HP.STAGE = 2;
 
   /* ---------- 홈 ---------- */
   function renderHome() {
+    if (normalizeProgress()) save();   // 옛 저장 상태로 홈이 0냥·1/20 에 멈추지 않게
     var d = APP.data;
     $('homeNyang').textContent = fmt(d.nyang);
     setMyNyang(d.nyang);
@@ -4126,6 +4170,7 @@ window.HP.STAGE = 2;
 
   /* ---------- 게임 시작 ---------- */
   function startGame() {
+    if (normalizeProgress()) save();   // 도전·상대 잔액이 비어 있으면 여기서 먼저 되살린다
     var d = APP.data;
     var st = Math.min(stakeNow(), Math.max(0, d.aiBal));
     if (d.nyang < st || st <= 0) {
