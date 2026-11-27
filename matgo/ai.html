@@ -677,6 +677,21 @@ body.embed .lobbyNote{display:none}
   .chip.goldWallet{padding:4px 10px 4px 8px}
 }
 .iconbtn.on{background:linear-gradient(160deg,#F2D489,#C9962F);color:#2a1d07;border-color:rgba(255,235,180,.85)}
+/* 애니메이션 속도 — 홈 상단 작은 칩 (지금 속도를 그대로 보여 준다) */
+.chip.speedChip{display:inline-flex;align-items:center;gap:3px;padding:6px 10px;font-size:11.5px;
+  color:#F2D489;border-color:rgba(235,198,106,.42);background:rgba(10,16,11,.5)}
+.chip.speedChip .spdPrefix{font-size:10px;font-weight:700;color:rgba(251,244,228,.72);letter-spacing:-.3px;line-height:1}
+.chip.speedChip .spdTxt{font-size:11.5px;font-weight:800;line-height:1;color:#F2D489}
+@media (max-width:360px){ .chip.speedChip{padding:6px 9px} .chip.speedChip .spdPrefix{display:none} }
+/* 규칙 화면·나가기 창의 속도 설정 줄 */
+.speedRow{display:flex;gap:7px;margin:2px 0 10px}
+.speedOpt{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:9px 4px;border-radius:12px;font-size:12.5px;font-weight:700;color:#3a2c18;
+  background:rgba(58,42,24,.06);border:1px solid rgba(58,42,24,.16)}
+.speedOpt small{font-size:9.5px;font-weight:600;color:rgba(58,42,24,.6)}
+.speedOpt.on{background:linear-gradient(160deg,#F5D98F,#C9962F);color:#2a1d07;border-color:#C9962F;
+  box-shadow:0 5px 14px rgba(201,150,47,.3)}
+.speedOpt.on small{color:rgba(42,29,7,.78)}
 
 /* ================= 가로 모드 (모바일 가로 · 짧은 화면) ================= */
 @media (orientation: landscape) and (max-height: 620px){
@@ -806,6 +821,7 @@ body.embed .lobbyNote{display:none}
       <div class="brand"><span class="logo">花</span> 한판 맞고</div>
       <div class="topright">
         <button class="chip nyang goldWallet" id="btnNyang" aria-label="내 보유 냥"><span class="wLabel">냥</span><b id="homeNyang">10,000</b></button>
+        <button class="chip speedChip" id="btnSpeedHome" aria-label="애니메이션 속도"><span class="spdPrefix">속도</span><b class="spdTxt">보통</b></button>
         <button class="iconbtn" id="btnSoundHome" aria-label="소리">🔊</button>
       </div>
     </header>
@@ -975,6 +991,14 @@ body.embed .lobbyNote{display:none}
       <p class="note">냥은 <b>돈이 아닌 무료 점수</b>입니다. 구매·환전·선물 경로는 없습니다.
       잔액이 모자라면 무료 충전(2,000냥, 하루 5회)을 쓰세요.<br>
       AI 상대의 냥을 0으로 만들면(올인) 도전 중인 배경을 획득합니다.</p>
+      <h3>화면 · 애니메이션 속도</h3>
+      <p class="note" style="margin:0 0 6px">패가 손에서 바닥으로, 바닥에서 먹은 패로 날아가고 더미가 뒤집히는 시간입니다.
+      느릴수록 <b>무슨 패가 나가고 먹혔는지</b> 또렷이 보입니다. 홈 화면 상단 버튼에서도 바꿀 수 있습니다.</p>
+      <div class="speedRow" id="speedRow" role="radiogroup" aria-label="애니메이션 속도">
+        <button data-speed="slow" class="speedOpt" role="radio">느림<small>×2.1</small></button>
+        <button data-speed="normal" class="speedOpt" role="radio">보통<small>×1.55 · 기본</small></button>
+        <button data-speed="fast" class="speedOpt" role="radio">빠름<small>×1 · 예전</small></button>
+      </div>
     </div>
   </section>
 </main>
@@ -1670,6 +1694,19 @@ window.HP.STAGE = 1;
     ev.push({ t: 'pi', pid: pid, from: from, n: given.length, value: sum, reason: reason, cards: given });
   }
 
+  /* 바닥에 같은 달 패가 두 장일 때, 두 패의 실질적인 값이 완전히 같으면(예: 8월 피 2장)
+     고르게 하지 않고 첫 장과 먹는다. 광/열끗/띠/피가 다르거나, 쌍피 ↔ 일반 피처럼
+     값(piVal)이 다르거나, 띠 종류(홍단·청단·초단)가 다르면 예전처럼 선택 창을 띄운다. */
+  function sameWorth(a, b) {
+    if (!a || !b) return false;
+    if (!!a.bonus !== !!b.bonus) return false;
+    if (a.kind !== b.kind) return false;
+    if (HP.piVal(a) !== HP.piVal(b)) return false;
+    if (!!a.bi !== !!b.bi) return false;
+    return (a.band || '') === (b.band || '');
+  }
+  HP.sameWorth = sameWorth;
+
   function resolveWithCard(S, ctx, card, ev) {
     var pid = ctx.pid;
     var floorSame = S.floor.filter(function (f) { return f.month === card.month; });
@@ -1693,6 +1730,13 @@ window.HP.STAGE = 1;
       return 'took';
     }
     if (floorSame.length === 2) {
+      /* 값이 같은 두 장이면 고르게 하지 않는다 — 어느 쪽을 먹어도 결과가 같다 */
+      if (sameWorth(floorSame[0], floorSame[1])) {
+        take(S, ctx, [floorSame[0], card], ev, 'take');
+        ctx.handPair = true;
+        ev.push({ t: 'autoPick', pid: pid, month: card.month, stage: 'hand', ids: floorSame.map(function (c) { return c.id; }) });
+        return 'took';
+      }
       S.pending = { kind: 'floor', stage: 'hand', pid: pid, month: card.month, held: card, options: floorSame.map(function (c) { return c.id; }) };
       ev.push({ t: 'choose', pid: pid, month: card.month, stage: 'hand' });
       return 'pending';
@@ -1743,6 +1787,20 @@ window.HP.STAGE = 1;
       return;
     }
     if (same.length === 2) {
+      /* 값이 같은 두 장이면 자동으로 한 장을 먹는다 (쪽·따닥 판정은 한 장일 때와 같게) */
+      if (sameWorth(same[0], same[1])) {
+        var pick = same[0];
+        if (ctx.placed) {
+          for (var s2i = 0; s2i < same.length; s2i++) if (same[s2i].id === ctx.placed.id) pick = same[s2i];
+        }
+        var jjA = !!(ctx.placed && ctx.placed.id === pick.id);
+        var ddA = !jjA && ctx.took.some(function (x) { return x.month === c.month; });
+        take(S, ctx, [pick, c], ev, 'take');
+        if (jjA) { ctx.flags.jjok = true; ev.push({ t: 'special', name: '쪽', pid: pid }); awardPi(S, ctx, pid, 1, ev, '쪽'); }
+        else if (ddA) { ctx.flags.ddadak = true; ev.push({ t: 'special', name: '따닥', pid: pid }); awardPi(S, ctx, pid, 1, ev, '따닥'); }
+        ev.push({ t: 'autoPick', pid: pid, month: c.month, stage: 'flip', ids: same.map(function (x) { return x.id; }) });
+        return;
+      }
       S.pending = { kind: 'floor', stage: 'flip', pid: pid, month: c.month, held: c, options: same.map(function (x) { return x.id; }) };
       ev.push({ t: 'choose', pid: pid, month: c.month, stage: 'flip' });
       return;
@@ -2650,11 +2708,28 @@ window.HP.STAGE = 1;
 (function () {
   'use strict';
   var HP = window.HP;
-  var FX = { instant: false, layer: null, speed: 1 };
+  /* 속도 — slow · normal · fast. normal 이 예전보다 1.55배 여유 있는 기본 속도.
+     FX.speed 가 모든 연출 시간(dur)과 AI 대기(FX.ms)에 곱해진다. */
+  var SPEEDS = { slow: 2.15, normal: 1.55, fast: 1.0 };
+  var ANIM_KEY = 'hanpan1.anim';
+  var FX = { instant: false, layer: null, speed: SPEEDS.normal, level: 'normal', LEVELS: SPEEDS };
   HP.fx = FX;
+  FX.setLevel = function (name) {
+    if (!SPEEDS[name]) name = 'normal';
+    FX.level = name;
+    FX.speed = SPEEDS[name];
+    try { localStorage.setItem(ANIM_KEY, name); } catch (e) { }
+    return name;
+  };
+  try {
+    var savedSpeed = localStorage.getItem(ANIM_KEY);
+    if (savedSpeed && SPEEDS[savedSpeed]) FX.setLevel(savedSpeed);
+  } catch (e) { }
 
   function L() { return FX.layer || (FX.layer = document.getElementById('fx')); }
   function dur(ms) { return FX.instant ? 0 : Math.round(ms * FX.speed); }
+  /* AI 차례 대기 등 애니메이션과 같은 속도로 늘어나야 하는 시간 */
+  FX.ms = function (ms) { return dur(ms || 0); };
   function rectOf(el) {
     if (!el) return { x: 0, y: 0, w: 0, h: 0, cx: innerWidth / 2, cy: innerHeight / 2 };
     var r = el.getBoundingClientRect();
@@ -2765,7 +2840,7 @@ window.HP.STAGE = 1;
     d.style.left = rect.x + 'px'; d.style.top = rect.y + 'px';
     d.style.width = rect.w + 'px'; d.style.height = rect.h + 'px';
     L().appendChild(d);
-    var m = ms || 220;
+    var m = dur(ms || 220);
     return anim(d, [
       { transform: 'scale(1)', opacity: .95 },
       { transform: 'scale(1.22)', opacity: 0 }
@@ -2778,7 +2853,7 @@ window.HP.STAGE = 1;
     d.className = 'fxflash';
     document.body.appendChild(d);
     requestAnimationFrame(function () { d.classList.add('on'); });
-    setTimeout(function () { d.remove(); }, 560);
+    setTimeout(function () { d.remove(); }, dur(560));
   };
 
   FX.shake = function (soft) {
@@ -2789,7 +2864,7 @@ window.HP.STAGE = 1;
     void app.offsetWidth;
     app.classList.add('fx-shake');
     if (soft) app.classList.add('soft');
-    setTimeout(function () { app.classList.remove('fx-shake'); app.classList.remove('soft'); }, 520);
+    setTimeout(function () { app.classList.remove('fx-shake'); app.classList.remove('soft'); }, dur(520));
   };
 
   FX.banner = function (text, sub, tone, hold) {
@@ -2799,8 +2874,9 @@ window.HP.STAGE = 1;
     d.className = 'banner ' + (tone || '');
     d.innerHTML = '<div class="big">' + text + '</div>' + (sub ? '<div class="sub">' + sub + '</div>' : '');
     root.appendChild(d);
-    setTimeout(function () { d.classList.add('out'); }, hold || 880);
-    setTimeout(function () { if (d.parentNode) d.remove(); }, (hold || 880) + 340);
+    var h = dur(hold || 880);
+    setTimeout(function () { d.classList.add('out'); }, h);
+    setTimeout(function () { if (d.parentNode) d.remove(); }, h + dur(340));
   };
 
   FX.clearBanners = function () {
@@ -2859,7 +2935,7 @@ window.HP.STAGE = 1;
       if (!el) return;
       el.classList.remove('hide');
       el.classList.add('landed');
-      setTimeout(function () { el.classList.remove('landed'); }, 340);
+      setTimeout(function () { el.classList.remove('landed'); }, dur(340));
     }
     function zoneOf(p) { return p === 'p1' ? geom.myZone : geom.oppZone; }
 
@@ -2989,9 +3065,9 @@ window.HP.STAGE = 1;
         if (pe) {
           pe.classList.remove('hide');
           pe.classList.add('in');
-          setTimeout(function () { pe.classList.remove('in'); }, 560);
+          setTimeout(function () { pe.classList.remove('in'); }, dur(560));
         }
-        return sleep(40);
+        return sleep(dur(40));
       });
     }
 
@@ -3061,12 +3137,12 @@ window.HP.STAGE = 1;
             FX.banner(b[0], b[1], b[2], b[3] === 'big' ? 980 : 820);
             FX.shake(b[3] !== 'big');
             FX.flash();
-          }, i * 260);
+          }, dur(i * 260));
         });
-      }, FX.instant ? 0 : 160);
+      }, FX.instant ? 0 : dur(160));
     }
 
-    return q.then(function () { return sleep(20); });
+    return q.then(function () { return sleep(dur(20)); });
   };
 })();
 
@@ -3677,6 +3753,7 @@ window.HP.STAGE = 1;
     renderTable();
     handleEvents(r.events, pid);
     if (HP.online && HP.online.onLocalAction) HP.online.onLocalAction(r, pid);
+    resumeAfterGuk();            // 멈춰 둔 상대 차례를 이어 간다
   }
   function doShake(pid, month) {
     var g = snapshot();
@@ -3731,27 +3808,51 @@ window.HP.STAGE = 1;
     HP.fx.play(ev, pid, geom, cue).then(function () {
       if (APP.S !== S) { APP.busy = false; return; }   // 새 판이 시작됐으면 옛 연출은 버린다
       APP.busy = false;
-      if (S.over) { setTimeout(onGameOver, 260); return; }
+      if (S.over) { setTimeout(onGameOver, aiDelay(260)); return; }
       if (S.pending) {
         if (S.pending.pid === 'p1') { showFloorChoice(); return; }
-        if (!S.online) scheduleAI(300);
+        if (!S.online) scheduleAI(aiDelay(300));
         return;
       }
       if (S.awaitDecision) {
         if (S.awaitDecision === 'p1') { showGoStop(); return; }
-        if (!S.online) scheduleAI(340);
+        if (!S.online) scheduleAI(aiDelay(340));
         return;
       }
-      if (APP.gukAsk) { APP.gukAsk = false; showGukChoice(); }
-      if (S.turn === 'p2' && !S.online) scheduleAI(420);
+      /* 국진 선택 창은 여기서 열리고, 창이 닫힌 뒤에야(resumeAfterGuk) AI 차례가 이어진다 */
+      if (APP.gukAsk) { APP.gukAsk = false; if (showGukChoice()) return; }
+      if (S.turn === 'p2' && !S.online) scheduleAI(aiDelay(420));
     });
   }
+  /* 애니메이션 속도 설정을 반영한 대기 시간 */
+  function aiDelay(ms) {
+    if (HP.fx && HP.fx.ms) return HP.fx.ms(ms);
+    return ms;
+  }
+  HP.aiDelay = aiDelay;
+
+  /* 국진 선택 창이 열려 있는가 — 이 동안에는 AI·자동 진행을 절대 시작하지 않는다 */
+  function gukSheetOpen() {
+    return !!document.querySelector('#modalRoot .gukSheet');
+  }
+
+  /* 국진 선택이 끝났거나 창을 닫았다 — 멈춰 두었던 상대(AI) 차례를 이어 간다 */
+  function resumeAfterGuk() {
+    var S = APP.S;
+    APP.gukAsk = false;
+    if (!S || APP.busy || S.over) return;
+    if (S.pending || S.awaitDecision) return;       // 그 창이 이미 떠 있으면 그쪽이 이어진다
+    if (S.turn === 'p2' && !S.online) scheduleAI(aiDelay(420));
+  }
+  HP.resumeAfterGuk = resumeAfterGuk;
 
   function scheduleAI(delay) {
     clearTimeout(APP.timer);
     APP.timer = setTimeout(function () {
       var S = APP.S;
       if (!S || S.over) return;
+      /* 국진 선택 창이 떠 있는 동안에는 상대 차례를 진행하지 않는다 */
+      if (APP.gukAsk || gukSheetOpen()) return;
       var pid = S.awaitDecision || (S.pending ? S.pending.pid : S.turn);
       if (pid !== 'p2') return;
       var act = HP.aiNext(S, 'p2');
@@ -3770,12 +3871,12 @@ window.HP.STAGE = 1;
         handleEvents(e.events, 'p2');
         renderTable();
         HP.fx.play(e.events, 'p2', g, cue);
-        scheduleAI(420);
+        scheduleAI(aiDelay(420));
         return;
       }
-      if (!r) { renderTable(); scheduleAI(500); return; }
+      if (!r) { renderTable(); scheduleAI(aiDelay(500)); return; }
       afterAction(r, 'p2', g);
-    }, delay || 500);
+    }, delay || aiDelay(500));
   }
 
   /* 족보 이름 → 외침 (새로 완성된 것만, 핵심 1~2개) — 전라도 사투리 */
@@ -4025,14 +4126,14 @@ window.HP.STAGE = 1;
   /* ---------- 국진(9월 열끗) — 열끗 / 쌍피 선택 ---------- */
   function showGukChoice() {
     var S = APP.S;
-    if (!S || S.over) return;
-    if (!HP.hasGuk(S.taken.p1)) return;
+    if (!S || S.over) return false;
+    if (!HP.hasGuk(S.taken.p1)) return false;
     var cur = HP.gukMode(S, 'p1');
     var a = HP.scoreWith(S.taken.p1, 'yeol');
     var b = HP.scoreWith(S.taken.p1, 'pi');
     var now = function (m) { return cur === m ? ' on' : ''; };
     clearModal();
-    scrim(clearModal);
+    scrim(function () { clearModal(); resumeAfterGuk(); });   // 바깥을 눌러 닫아도 차례는 이어진다
     var sheet = document.createElement('div');
     sheet.className = 'sheet gukSheet';
     sheet.innerHTML = '<h2>국진(9월 열끗)을 어떻게 쓸까요?</h2>' +
@@ -4046,8 +4147,55 @@ window.HP.STAGE = 1;
     $('modalRoot').appendChild(sheet);
     $('gukYeol').addEventListener('click', function () { HP.ACT.guk('yeol'); });
     $('gukPi').addEventListener('click', function () { HP.ACT.guk('pi'); });
+    return true;
   }
   HP.showGukChoice = showGukChoice;
+
+  /* ---------- 애니메이션 속도 (느림 / 보통 / 빠름) ---------- */
+  var SPEED_LABEL = { slow: '느림', normal: '보통', fast: '빠름' };
+  function speedLabel() { return SPEED_LABEL[(HP.fx && HP.fx.level) || 'normal'] || '보통'; }
+  function renderSpeedLabels() {
+    var lvl = (HP.fx && HP.fx.level) || 'normal';
+    var l = SPEED_LABEL[lvl] || '보통';
+    var hb = $('btnSpeedHome');
+    if (hb) {
+      var tx = hb.querySelector('.spdTxt');
+      if (tx) tx.textContent = l;
+      hb.setAttribute('aria-label', '애니메이션 속도 — ' + l);
+      hb.title = '애니메이션 속도 — ' + l;
+    }
+    [].forEach.call(document.querySelectorAll('.speedOpt'), function (b) {
+      var on = b.dataset.speed === lvl;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+  }
+  HP.renderSpeedLabels = renderSpeedLabels;
+  function showSpeedChoice() {
+    var cur = (HP.fx && HP.fx.level) || 'normal';
+    clearModal();
+    scrim(clearModal);
+    var sheet = document.createElement('div');
+    sheet.className = 'sheet speedSheet';
+    var rows = [['slow', '느림', '하나하나 또렷이', '×2.1'], ['normal', '보통', '기본 (권장)', '×1.55'], ['fast', '빠름', '예전 속도', '×1']];
+    sheet.innerHTML = '<h2>애니메이션 속도</h2>' +
+      '<div class="sub">패가 날아가고 뒤집히는 시간입니다 — 느릴수록 무엇이 나가고 먹혔는지 잘 보입니다</div>' +
+      '<div class="optRow">' + rows.map(function (r) {
+        return '<button class="gukBtn' + (cur === r[0] ? ' on' : '') + '" id="spd_' + r[0] + '">' +
+          '<b>' + r[1] + '</b><small>' + r[2] + '</small><em>' + r[3] + '</em></button>';
+      }).join('') + '</div>';
+    $('modalRoot').appendChild(sheet);
+    rows.forEach(function (r) {
+      $('spd_' + r[0]).addEventListener('click', function () {
+        if (HP.fx && HP.fx.setLevel) HP.fx.setLevel(r[0]);
+        renderSpeedLabels();
+        clearModal();
+        HP.play('click');
+        toast('애니 속도 — ' + r[1]);
+      });
+    });
+  }
+  HP.showSpeedChoice = showSpeedChoice;
   HP.showBomb2Choice = showBomb2Choice;
   function toggleGuk() {
     var S = APP.S;
@@ -4403,6 +4551,7 @@ window.HP.STAGE = 1;
     APP.busy = false;
     APP._rv = 0;
     APP.gukAsk = false;
+    clearModal();
     APP.lastParts = { p1: [], p2: [] };
     HP.fx.clearBanners();
     show('table');
@@ -4415,8 +4564,8 @@ window.HP.STAGE = 1;
       if (!APP.S) return;
       playDealEvents(S);
       if (S.over) { onGameOver(); return; }
-      if (S.turn === 'p2') scheduleAI(800);
-    }, 260);
+      if (S.turn === 'p2') scheduleAI(aiDelay(800));
+    }, aiDelay(260));
   }
   /* 배분 직후 — 바닥에 깔린 보너스패가 선에게 귀속된 결과를 알린다 */
   function playDealEvents(S) {
@@ -4477,6 +4626,18 @@ window.HP.STAGE = 1;
     $('btnRulesBack').addEventListener('click', function () { show('home'); renderHome(); });
     $('btnSoundHome').addEventListener('click', toggleSound);
     $('btnSoundGame').addEventListener('click', toggleSound);
+    /* 애니메이션 속도 — 홈 상단 버튼(선택 창) · 규칙 화면 / 나가기 창의 세 버튼 */
+    var spb = $('btnSpeedHome');
+    if (spb) spb.addEventListener('click', function () { HP.play('click'); showSpeedChoice(); });
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.speedOpt') : null;
+      if (!b) return;
+      if (HP.fx && HP.fx.setLevel) HP.fx.setLevel(b.dataset.speed);
+      renderSpeedLabels();
+      HP.play('click');
+      toast('애니 속도 — ' + speedLabel());
+    });
+    renderSpeedLabels();
     $('btnRefill').addEventListener('click', doRefill);
     $('challengeReset').addEventListener('click', function () {
       APP.data.aiBal = AI_START; APP.data.nextStarter = 'p1'; save(); renderHome();
@@ -4518,8 +4679,13 @@ window.HP.STAGE = 1;
     var box = document.createElement('div');
     box.className = 'center';
     box.innerHTML = '<h2>판을 나갈까요?</h2><div class="sub">지금 나가면 이번 판은 기록되지 않습니다</div>' +
+      '<div class="speedRow leaveSpeed" role="radiogroup" aria-label="애니메이션 속도">' +
+      [['slow', '느림', '×2.1'], ['normal', '보통', '×1.55'], ['fast', '빠름', '×1']].map(function (r) {
+        return '<button class="speedOpt" data-speed="' + r[0] + '" role="radio">' + r[1] + '<small>' + r[2] + '</small></button>';
+      }).join('') + '</div>' +
       '<div class="btnrow"><button class="btn go" id="lvOut">나가기</button><button class="btn ghost" id="lvStay">계속</button></div>';
     $('modalRoot').appendChild(box);
+    renderSpeedLabels();
     $('lvStay').addEventListener('click', clearModal);
     $('lvOut').addEventListener('click', function () {
       clearModal(); APP.S = null; show('home'); renderHome();
