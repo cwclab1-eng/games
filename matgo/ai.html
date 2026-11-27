@@ -1800,7 +1800,10 @@ window.HP.STAGE = 1;
     return afterHand(S, ctx, ev);
   };
   function afterHand(S, ctx, ev) {
-    sweepCheck(S, ctx, ev);
+    /* 「쓸」 은 여기서 보지 않는다 (v16).
+       손패로 바닥의 마지막 패를 먹어 바닥이 잠깐 0장이 돼도, 이어서 더미에서 뒤집은 패가
+       바닥에 깔리면(1장 남음) 쓸이 아니다. 더미 뒤집기까지 끝난 뒤 finishTurn 에서
+       최종 바닥이 0장일 때만 쓸을 선언한다. */
     if (S.deck.length) flipOne(S, ctx, ev);
     if (S.pending) return { events: ev, pending: S.pending };
     return finishTurn(S, ctx, ev);
@@ -1955,10 +1958,22 @@ window.HP.STAGE = 1;
     if (S.bbeokCount[pid] >= 3) return win(S, pid, '3뻑', 7, ev);
     if (S.bbeokCount[other(pid)] >= 3) return win(S, other(pid), '3뻑', 7, ev);
 
-    var bothEmpty = HP.realHandCount(S, 'p1') === 0 && HP.realHandCount(S, 'p2') === 0;
-    if (S.deck.length === 0 && bothEmpty) return endGame(S, ev, 'exhausted');
+    /* 남은 패가 없으면 고/스톱을 물을 수 없다 — 그 자리에서 정산한다 (v16).
+       ① 내가 마지막 패를 낸 상태(손에 실제 패도 가상 폭탄패도 없음)
+       ② 양쪽 다 낼 패가 없는 상태 — 더미가 남아 있어도 더 진행할 수 없다 */
+    var mineEmpty = (S.hands[pid] || []).length === 0;
+    var bothEmpty = (S.hands.p1 || []).length === 0 && (S.hands.p2 || []).length === 0;
+    var realBothEmpty = HP.realHandCount(S, 'p1') === 0 && HP.realHandCount(S, 'p2') === 0;
+    var canGo = sc.total >= 7 && sc.total > S.goBase[pid];
+    if (canGo && (mineEmpty || bothEmpty)) {
+      ev.push({ t: 'autoStop', pid: pid, score: sc.total, lastCard: mineEmpty, noCards: bothEmpty });
+      return win(S, pid, 'stop', Math.max(sc.total, 7), ev);
+    }
+    if (bothEmpty) return endGame(S, ev, 'exhausted');
+    /* 실제 패는 양쪽 다 없고 더미도 바닥났다 — 가상 폭탄패만으로는 더 진행할 수 없다 */
+    if (realBothEmpty && S.deck.length === 0) return endGame(S, ev, 'exhausted');
 
-    if (sc.total >= 7 && sc.total > S.goBase[pid]) {
+    if (canGo) {
       S.awaitDecision = pid;
       ev.push({ t: 'decision', pid: pid, score: sc.total });
       return { events: ev, decision: pid };
@@ -1983,7 +1998,7 @@ window.HP.STAGE = 1;
       S.turnNo++;
       nextTurn(S);
       var r = { events: ev };
-      if (S.deck.length === 0 && HP.realHandCount(S, 'p1') === 0 && HP.realHandCount(S, 'p2') === 0) return endGame(S, ev, 'exhausted');
+      if ((S.hands.p1 || []).length === 0 && (S.hands.p2 || []).length === 0) return endGame(S, ev, 'exhausted');
       return r;
     }
     var s2 = HP.scoreFor(S, pid);
@@ -3009,6 +3024,8 @@ window.HP.STAGE = 1;
         banners.push(['폭탄패<i>!</i>', '더미 1장만 뒤집는다', 'gold', 'kick']);
       } else if (e.t === 'shake') {
         banners.push(['흔들기<i>!</i>', '이기면 ×2', 'gold', 'kick']);
+      } else if (e.t === 'autoStop') {
+        banners.push(['스톱<i>!</i>', '마지막 패 · ' + e.score + '점', 'gold', 'big']);
       } else if (e.t === 'go') {
         var gn = (HP.VOICE && HP.VOICE.goLine) ? HP.VOICE.goLine(e.count).name : (e.count + '고');
         banners.push([gn + '<i>!</i>', e.count + '고 · 한 번 더 간다', 'blue', 'kick']);
@@ -3821,6 +3838,10 @@ window.HP.STAGE = 1;
         toast('국진(9월 열끗) — ' + (e.mode === 'pi' ? '쌍피 2장' : '열끗 1장') + '으로 셉니다' +
           (mine ? (e.ask ? ' · 눌러서 바꿀 수 있습니다' : '') : ' (상대)'));
         if (mine && e.ask) APP.gukAsk = true;
+      }
+      else if (e.t === 'autoStop') {
+        toast('마지막 패! ' + (mine ? '내가 스톱' : '상대 스톱') + ' — ' + e.score + '점');
+        shout('stop', '스톱!', { pri: 2 });
       }
       else if (e.t === 'score') speakParts(e, e.pid);
     });
