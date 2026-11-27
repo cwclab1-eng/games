@@ -1324,7 +1324,10 @@ window.HP.STAGE = 1;
   HP.FIRST_BBEOK_MONEY = 1000;
 
   function sortHand(arr) {
-    arr.sort(function (a, b) { return a.month - b.month || (a.kind > b.kind ? 1 : a.kind < b.kind ? -1 : 0); });
+    arr.sort(function (a, b) {
+      if (!a || !b) return 0;          // 빈 칸이 섮여도 터지지 않게
+      return a.month - b.month || (a.kind > b.kind ? 1 : a.kind < b.kind ? -1 : 0);
+    });
     return arr;
   }
   HP.sortHand = sortHand;
@@ -1499,8 +1502,9 @@ window.HP.STAGE = 1;
       return { events: ev, error: 'not-bonus' };
     }
     attributeBonus(S, pid, card, 'hand', ev, null);
-    if (S.deck.length) {
-      S.hands[pid].push(S.deck.pop());
+    var draw = S.deck.length ? S.deck.pop() : null;
+    if (draw && !draw.phantom) {               // 게스트가 받은 더미는 자리표시카드다 — 손패에 넣지 않는다
+      S.hands[pid].push(draw);
       sortHand(S.hands[pid]);
       ev.push({ t: 'bonusDraw', pid: pid, to: 'hand' });      // 새 패의 정체는 감춘다(온라인)
     } else {
@@ -1750,7 +1754,7 @@ window.HP.STAGE = 1;
     var guard = 0;
     while (S.deck.length && guard++ < 40) {
       var c = S.deck.pop();
-      if (!c) break;                     // 게스트는 더미를 장수로만 들고 있다
+      if (!c || c.phantom) { S.deck = S.deck.filter(function (x) { return x && !x.phantom; }); break; }  // 장수만 아는 더미
       ev.push({ t: 'flip', pid: ctx.pid, card: c });
       if (c.bonus) {                     // 뒤집힌 보너스패 — 턴 주인에게 귀속, 한 장 더 뒤집는다
         attributeBonus(S, ctx.pid, c, 'flip', ev, ctx);
@@ -1909,10 +1913,12 @@ window.HP.STAGE = 1;
     return { events: ev };
   };
 
-  HP.chooseFloor = function (S, cardId) {
+  HP.chooseFloor = function (S, cardId, pid) {
     var ev = [];
     var p = S.pending;
     if (!p) return { events: ev, error: 'no-pending' };
+    /* 고르는 사람은 그 선택의 주인뿐 — 늦게 도착한 다른 사람의 선택이 끼어들지 못하게 */
+    if (pid && p.pid && p.pid !== pid) return { events: ev, error: 'not-yours' };
     var picked = S.floor.filter(function (f) { return f.id === cardId; })[0];
     if (!picked) return { events: ev, error: 'bad-choice' };
     var ctx = S.ctx;
@@ -3568,7 +3574,7 @@ window.HP.STAGE = 1;
     if (!S || S.over || APP.busy) return;
     if (S.pending || S.awaitDecision) return;
     if (S.turn !== 'p1') return;
-    var c = (S.hands.p1 || []).filter(function (x) { return x.id === id; })[0];
+    var c = (S.hands.p1 || []).filter(function (x) { return x && x.id === id; })[0];
     if (!c) return;
     APP.selected = null;
     if (c.isBombToken) { HP.ACT.bombToken(id); return; }   // 폭탄 가상패 — 더미 1장만 뒤집고 턴 종료
@@ -3584,7 +3590,7 @@ window.HP.STAGE = 1;
     var S = APP.S;
     if (!S || APP.busy) return;
     APP.selected = null;
-    var c = (S.hands.p1 || []).filter(function (x) { return x.id === id; })[0];
+    var c = (S.hands.p1 || []).filter(function (x) { return x && x.id === id; })[0];
     if (c && c.isBombToken) { doBombToken('p1', id); return; }
     if (c && c.bonus) { doBonus('p1', id); return; }
     var g = snapshot();
@@ -3644,7 +3650,7 @@ window.HP.STAGE = 1;
   }
   function doChoose(pid, id) {
     var g = snapshot();
-    var r = HP.chooseFloor(APP.S, id);
+    var r = HP.chooseFloor(APP.S, id, pid);
     afterAction(r, pid, g);
   }
   function doDecide(pid, a) {

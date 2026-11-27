@@ -1367,7 +1367,10 @@ window.HP.STAGE = 2;
   HP.FIRST_BBEOK_MONEY = 1000;
 
   function sortHand(arr) {
-    arr.sort(function (a, b) { return a.month - b.month || (a.kind > b.kind ? 1 : a.kind < b.kind ? -1 : 0); });
+    arr.sort(function (a, b) {
+      if (!a || !b) return 0;          // 빈 칸이 섮여도 터지지 않게
+      return a.month - b.month || (a.kind > b.kind ? 1 : a.kind < b.kind ? -1 : 0);
+    });
     return arr;
   }
   HP.sortHand = sortHand;
@@ -1542,8 +1545,9 @@ window.HP.STAGE = 2;
       return { events: ev, error: 'not-bonus' };
     }
     attributeBonus(S, pid, card, 'hand', ev, null);
-    if (S.deck.length) {
-      S.hands[pid].push(S.deck.pop());
+    var draw = S.deck.length ? S.deck.pop() : null;
+    if (draw && !draw.phantom) {               // 게스트가 받은 더미는 자리표시카드다 — 손패에 넣지 않는다
+      S.hands[pid].push(draw);
       sortHand(S.hands[pid]);
       ev.push({ t: 'bonusDraw', pid: pid, to: 'hand' });      // 새 패의 정체는 감춘다(온라인)
     } else {
@@ -1793,7 +1797,7 @@ window.HP.STAGE = 2;
     var guard = 0;
     while (S.deck.length && guard++ < 40) {
       var c = S.deck.pop();
-      if (!c) break;                     // 게스트는 더미를 장수로만 들고 있다
+      if (!c || c.phantom) { S.deck = S.deck.filter(function (x) { return x && !x.phantom; }); break; }  // 장수만 아는 더미
       ev.push({ t: 'flip', pid: ctx.pid, card: c });
       if (c.bonus) {                     // 뒤집힌 보너스패 — 턴 주인에게 귀속, 한 장 더 뒤집는다
         attributeBonus(S, ctx.pid, c, 'flip', ev, ctx);
@@ -1952,10 +1956,12 @@ window.HP.STAGE = 2;
     return { events: ev };
   };
 
-  HP.chooseFloor = function (S, cardId) {
+  HP.chooseFloor = function (S, cardId, pid) {
     var ev = [];
     var p = S.pending;
     if (!p) return { events: ev, error: 'no-pending' };
+    /* 고르는 사람은 그 선택의 주인뿐 — 늦게 도착한 다른 사람의 선택이 끼어들지 못하게 */
+    if (pid && p.pid && p.pid !== pid) return { events: ev, error: 'not-yours' };
     var picked = S.floor.filter(function (f) { return f.id === cardId; })[0];
     if (!picked) return { events: ev, error: 'bad-choice' };
     var ctx = S.ctx;
@@ -3611,7 +3617,7 @@ window.HP.STAGE = 2;
     if (!S || S.over || APP.busy) return;
     if (S.pending || S.awaitDecision) return;
     if (S.turn !== 'p1') return;
-    var c = (S.hands.p1 || []).filter(function (x) { return x.id === id; })[0];
+    var c = (S.hands.p1 || []).filter(function (x) { return x && x.id === id; })[0];
     if (!c) return;
     APP.selected = null;
     if (c.isBombToken) { HP.ACT.bombToken(id); return; }   // 폭탄 가상패 — 더미 1장만 뒤집고 턴 종료
@@ -3627,7 +3633,7 @@ window.HP.STAGE = 2;
     var S = APP.S;
     if (!S || APP.busy) return;
     APP.selected = null;
-    var c = (S.hands.p1 || []).filter(function (x) { return x.id === id; })[0];
+    var c = (S.hands.p1 || []).filter(function (x) { return x && x.id === id; })[0];
     if (c && c.isBombToken) { doBombToken('p1', id); return; }
     if (c && c.bonus) { doBonus('p1', id); return; }
     var g = snapshot();
@@ -3687,7 +3693,7 @@ window.HP.STAGE = 2;
   }
   function doChoose(pid, id) {
     var g = snapshot();
-    var r = HP.chooseFloor(APP.S, id);
+    var r = HP.chooseFloor(APP.S, id, pid);
     afterAction(r, pid, g);
   }
   function doDecide(pid, a) {
@@ -5278,6 +5284,7 @@ window.HP.STAGE = 2;
      ═════════════════════════════════════════════════════════ */
   function BcLink(room) {
     this.room = room;
+    this.sid = 'b' + netUid();      // 방장·손님을 가르는 식별자 (중계 없이도 두 방장을 정리하려면 필요)
     this.ch = null;
     this.connected = false;
     this.joinTimer = null;
@@ -5580,8 +5587,21 @@ window.HP.STAGE = 2;
   var HP = window.HP;
   function $(id) { return document.getElementById(id); }
   function NET() { return HP.net.NET; }
-  function ids(a) { return (a || []).map(function (c) { return c.id; }); }
+  function ids(a) {
+    /* 빈 칸(undefined)이 섮여 있어도 절대 터지지 않게 — 예전에는 여기서 TypeError 가 나
+       중계가 통째로 멈추었다(상대 화면이 그 자리에 얼어붙는 '바닥 사라짐' 증상). */
+    return (a || []).map(function (c) { return c && c.id; }).filter(Boolean);
+  }
   function cards(list) { return (list || []).map(function (id) { return HP.byId(id); }).filter(Boolean); }
+  /* 장수만 아는 자리(상대 손패·게스트가 받은 더미)를 '빈 칸'이 아니라
+     진짜 자리표시 카드로 채운다 — undefined 를 읽다가 나는 오류를 막는다. */
+  function phantom(n, tag) {
+    var out = [];
+    n = Math.max(0, n | 0);
+    for (var i = 0; i < n; i++) out.push({ id: 'ph-' + tag + '-' + i, month: 0, kind: 'back', phantom: true, bonus: false });
+    return out;
+  }
+  HP.onlinePhantom = phantom;
   function sw(p) { return p === 'p1' ? 'p2' : (p === 'p2' ? 'p1' : p); }
 
   var OL = {
@@ -5674,12 +5694,23 @@ window.HP.STAGE = 2;
   }
   OL.closeNet = closeNet;
 
+  /* 초대 링크는 반드시 '손님(게스트)' 링크여야 한다.
+     예전에는 방장용 링크(?r=CODE&host=1)를 그대로 복사해 줘서, 링크를 받은 사람이
+     같은 방 코드의 '두 번째 방장'이 되어 서로의 상태를 덮어썼다(손패 0 · 바닥 멈춤의 원인).
+     방장 재입장용 링크는 화면에 내보내지 않고 따로 보관만 한다. */
   function showCode(code) {
     OL.code = code;
     var c = $('roomCode'); if (c) c.textContent = code;
-    var l = $('roomLink'); if (l) l.value = HP.net.roomLink(code, true);
+    OL.hostLink = HP.net.roomLink(code, true);          // 방장 본인 재입장용(복사·공유 금지)
+    var l = $('roomLink'); if (l) l.value = HP.net.roomLink(code, false);
     $('createWait').className = 'waitLine on';
     $('createWait').textContent = '상대를 기다리는 중…';
+  }
+
+  /* 이 방의 방장·손님을 가르는 내 식별자 (중계 연결마다 다른 값) */
+  function mySid() {
+    var l = OL.room && OL.room.link;
+    return (l && l.sid) || '';
   }
 
   function createRoom(code) {
@@ -5779,8 +5810,10 @@ window.HP.STAGE = 2;
       if (OL.S) { OL.S.foeName = OL.peerName; HP.renderTable(); }
     });
 
-    r.on('start', function (m) { guestStart(m); });
-    r.on('st', function (m) { ackStart(); guestState(m); });
+    r.on('start', function (m) { onStart(m); });
+    /* 상태(st)는 손님만 받는다 — 방장이 남의 상태를 받아 자기 판을 덮어쓰면
+       손패·바닥이 사라지고 더미가 빈 칸이 되어 판이 멈춘다. */
+    r.on('st', function (m) { if (OL.role !== 'guest') return; ackStart(); guestState(m); });
     r.on('act', function (m) { ackStart(); hostAct(m); });
     r.on('sync', function () { ackStart(); if (OL.role === 'host') broadcast([], null); });
     r.on('ready', function () { ackStart(); });
@@ -5853,7 +5886,8 @@ window.HP.STAGE = 2;
       guk: { me: S.guk ? S.guk[me] : 'auto', opp: S.guk ? S.guk[op] : 'auto' },
       pending: S.pending ? {
         kind: S.pending.kind, stage: S.pending.stage, pid: sw(S.pending.pid),
-        month: S.pending.month, options: (S.pending.options || []).slice()
+        month: S.pending.month, options: (S.pending.options || []).slice(),
+        held: (S.pending.held && S.pending.held.id) || null   // 고르는 중인 패도 장수에 세도록
       } : null,
       awaitDecision: S.awaitDecision ? sw(S.awaitDecision) : null,
       stake: S.stake || 300, foe: OL.peerName || '상대',
@@ -5865,7 +5899,7 @@ window.HP.STAGE = 2;
     var S = {
       online: true, seed: 0, level: 'mid', stake: p.stake || 300,
       starter: p.starter, turn: p.turn, foeName: p.foe || OL.peerName || '상대',
-      deck: new Array(p.deck), hands: { p1: cards(p.hand), p2: new Array(p.oppN) },
+      deck: phantom(p.deck, 'deck'), hands: { p1: cards(p.hand), p2: phantom(p.oppN, 'p2') },
       floor: cards(p.floor), taken: { p1: cards(p.taken), p2: cards(p.oppTaken) },
       bbeok: (p.bbeok || []).map(function (b) { return { month: b.m, cards: cards(b.c), by: b.by }; }),
       shake: { p1: p.shake.me, p2: p.shake.opp }, bomb: { p1: p.bomb.me, p2: p.bomb.opp },
@@ -5878,7 +5912,8 @@ window.HP.STAGE = 2;
       dealEvents: p.dealEv || []
     };
     if (p.pending) {
-      S.pending = { kind: p.pending.kind, stage: p.pending.stage, pid: p.pending.pid, month: p.pending.month, held: null, options: p.pending.options || [] };
+      S.pending = { kind: p.pending.kind, stage: p.pending.stage, pid: p.pending.pid, month: p.pending.month,
+        held: p.pending.held ? HP.byId(p.pending.held) : null, options: p.pending.options || [] };
     }
     return S;
   }
@@ -5954,7 +5989,7 @@ window.HP.STAGE = 2;
     OL.paused = false;
     OL.room.inMatch = true;
     newTable(S);
-    var payload = { st: pack(S), dl: NET().turnMs, round: OL.round };
+    var payload = { st: pack(S), dl: NET().turnMs, round: OL.round, sid: mySid() };
     OL.room.send('start', payload);
     resendStart(payload);
     S.dealEvents = [];            // 배분 연출은 첫 상태에만 담는다
@@ -5962,8 +5997,37 @@ window.HP.STAGE = 2;
     if (S.over) onGameOver(S);
   }
 
+  /* ── 'start' 수신 ─────────────────────────────────────────
+     손님이면 그대로 시작. 방장인데 다른 방장의 start 가 왔다면
+     같은 방 코드에 방장이 둘(초대 링크를 방장용으로 보낸 경우 등)이라는 뜻이므로,
+     한쪽만 방장으로 남기고(내 sid 가 크면 내가 손님으로 내려간다) 게스트로 들어간다. */
+  function onStart(m) {
+    if (!m || !m.st) return;
+    if (OL.role === 'guest') { guestStart(m); return; }
+    if (OL.role !== 'host') return;
+    var mine = mySid(), theirs = m.sid || '';
+    if (!mine || !theirs || mine === theirs) return;         // 비교 불가 — 그대로 방장 유지
+    if (mine < theirs) return;                               // 내가 이 방의 방장으로 남는다
+    demoteToGuest(m);
+  }
+
+  function demoteToGuest(m) {
+    if (OL.role !== 'host') return;
+    if (OL.startResend) { clearInterval(OL.startResend); OL.startResend = null; }
+    stopTick();
+    OL.role = 'guest';
+    OL.round = (m && m.round) || 1;
+    OL.S = null;
+    HP.APP.S = null;
+    HP.APP.busy = false;
+    installGuestActs();
+    HP.toast('이미 방장이 있는 방입니다 — 게스트로 들어갑니다');
+    guestStart(m);
+  }
+
   function guestStart(m) {
     if (!m || !m.st) return;
+    if (OL.role !== 'guest') return;      // 방장은 손님 상태로 자기 판을 갈아치우지 않는다
     /* 같은 판의 'start' 재전송 — 이미 시작한 판이면 처음부터 다시 그리지 않는다 */
     if (OL.S && typeof m.round === 'number' && m.round === OL.round) {
       if (OL.room) OL.room.send('ready', { round: OL.round });
@@ -5983,6 +6047,7 @@ window.HP.STAGE = 2;
 
   function guestState(m) {
     if (!OL.S || !OL.room) return;
+    if (OL.role !== 'guest') return;      // 손님만 상태를 받는다
     var geom = HP.snapshot();
     var S = hydrate(m.st);
     OL.S = S;
@@ -6047,7 +6112,7 @@ window.HP.STAGE = 2;
     if (m.a === 'play') r = HP.playHand(S, pid, m.id);
     else if (m.a === 'bonus') r = HP.playBonus(S, pid, m.id);
     else if (m.a === 'bombToken') r = HP.playBombToken(S, pid, m.id);
-    else if (m.a === 'choose') r = HP.chooseFloor(S, m.id);
+    else if (m.a === 'choose') r = HP.chooseFloor(S, m.id, pid);
     else if (m.a === 'flip') r = HP.flipOnly(S, pid);
     else if (m.a === 'bomb') r = HP.playBomb(S, pid, m.month);
     else if (m.a === 'bomb2') r = HP.playBomb2(S, pid, m.month);
@@ -6076,7 +6141,33 @@ window.HP.STAGE = 2;
   OL.onLocalAction = function (r, pid) {
     if (!OL.on || OL.role !== 'host') return;
     broadcast((r && r.events) || [], pid || 'p1');
+    guardState();
   };
+
+  /* ── 판 상태 점검 ──
+     정상이면 한 판의 52장이 항상 보존된다(더미 + 양쪽 손패 + 바닥 + 먹은 패 + 뻑).
+     어떤 이유로든 이 숫자가 깨지면(예: 손패가 비었는데 더미가 16장 남음) 그 판은
+     '손패가 없습니다 — 더미를 뒤집으세요'에서 영원히 멈추므로 그 판을 나가리로 끝내고
+     새 판을 시작한다. 절대 멈춘 화면을 남기지 않는다. */
+  function guardState() {
+    var S = OL.S;
+    if (!OL.on || OL.role !== 'host' || !S || S.over) return false;
+    var lost = HP.totalCards(S) !== HP.DECK_SIZE;
+    var noHands = HP.realHandCount(S, 'p1') === 0 && HP.realHandCount(S, 'p2') === 0;
+    var hollow = (S.deck || []).some(function (c) { return !c || c.phantom; }) ||
+      (S.hands.p1 || []).some(function (c) { return !c || c.phantom; });
+    /* 방아쇠 — 제보된 '양쪽 손패 0 · 더미가 남음' 또는 장수만 있는 빈 더미/손패가 된 경우만.
+       정상적인 늦은 판(손패 0 · 더미 몇 장)은 52장이 그대로라 여기 걸리지 않는다. */
+    if (!(lost && (noHands || hollow))) return false;
+    if (window.console) console.warn('[online] 판 상태가 어긋납니다 — 카드 ' + HP.totalCards(S) + '/52, 새 판을 시작합니다');
+    HP.toast('판 상태가 어긋나 새 판을 시작합니다');
+    OL.prevStarter = HP.nextStarter(S, S.starter);
+    OL.nagariNext = true;
+    stopTick();
+    setTimeout(function () { if (OL.on && OL.role === 'host') startHostRound(false); }, 60);
+    return true;
+  }
+  OL.guardState = guardState;
 
   function actorOf() {
     var S = OL.S;
@@ -6108,7 +6199,7 @@ window.HP.STAGE = 2;
     var g = HP.snapshot(), r = null;
     if (S.pending) {
       if (S.pending.pid !== pid) return;
-      r = HP.chooseFloor(S, S.pending.options[0]);
+      r = HP.chooseFloor(S, S.pending.options[0], pid);
     } else if (S.awaitDecision) {
       if (S.awaitDecision !== pid) return;
       r = HP.decide(S, pid, 'stop');
