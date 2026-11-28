@@ -3079,9 +3079,10 @@ window.HP.STAGE = 2;
   }
 
   /* ---------- IndexedDB (없으면 localStorage) ---------- */
+  function hasIDB() { try { return !!window.indexedDB; } catch (e) { idbBad = true; return false; } }
   function openDB() {
     return new Promise(function (res) {
-      if (idb || idbBad || !window.indexedDB) { res(idb); return; }
+      if (idb || idbBad || !hasIDB()) { res(idb); return; }
       var req;
       try { req = window.indexedDB.open(DB_NAME, DB_VER); } catch (e) { idbBad = true; res(null); return; }
       req.onupgradeneeded = function () {
@@ -3129,7 +3130,9 @@ window.HP.STAGE = 2;
       if (idbBad || !idb) r.clips = p.clips || {};
       return r;
     });
-    try { localStorage.setItem(LS_KEY, JSON.stringify(o)); } catch (e) { }
+    try { localStorage.setItem(LS_KEY, JSON.stringify(o)); } catch (e) {
+      if (!ST._quota && HP.toast) { ST._quota = true; HP.toast('저장 공간이 부족해 팩을 다 담지 못했어요 — 팩을 하나 지워 주세요'); }
+    }
   }
   function savePack(p) {
     p.n = countClips(p);
