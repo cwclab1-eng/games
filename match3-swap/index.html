@@ -427,6 +427,124 @@
         transition:opacity .3s ease}
     .gallery-modal.admire .gm-hint.show{opacity:1}
     .gallery-modal .save-note{bottom:calc(80px + env(safe-area-inset-bottom))}
+
+    /* =========================================================
+       온라인 1:1 대전 · 콤보 잠금 블록 공격
+       ========================================================= */
+    .hidden{display:none!important}
+
+    /* ---------- 대전 HUD ---------- */
+    .battle-hud{display:none;flex:0 0 auto;padding:8px 10px 9px}
+    body.online .battle-hud{display:block}
+    body.online .hud,
+    body.online .gallery,
+    body.online .goal-row{display:none}
+    /* 대전 중에는 일시정지·다시 시작을 감춘다 (대전 HUD의 ← 로 나간다) */
+    body.online #btnPause,
+    body.online #btnRestart{display:none}
+    body.online .controls{grid-template-columns:repeat(auto-fit,minmax(56px,1fr))}
+    .bh-top{display:flex;align-items:center;gap:7px}
+    .bh-back{width:28px;height:28px;flex:0 0 auto;padding:0;border-radius:9px;cursor:pointer;
+        background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+        color:#dfe8ff;font-family:inherit;font-size:14px;font-weight:800}
+    .bh-back:active{transform:scale(.94)}
+    .bh-side{display:flex;flex-direction:column;align-items:center;line-height:1.05;min-width:0;flex:1 1 0}
+    .bh-side .bh-name{font-size:9.5px;font-weight:800;letter-spacing:.4px;color:#8ea3c9;
+        max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bh-side b{font-size:20px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;
+        text-shadow:0 0 16px rgba(120,160,255,.45)}
+    .bh-side.opp b{background:linear-gradient(180deg,#ffd7e2,#ff9fb6);-webkit-background-clip:text;
+        background-clip:text;color:transparent}
+    .bh-mid{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;padding:0 4px}
+    .bh-time{font-size:15px;font-weight:900;color:#eaf1ff;font-variant-numeric:tabular-nums}
+    .bh-time.low{color:#ff7d94;animation:pulseDot 1s infinite}
+    .bh-vs{font-size:8.5px;font-weight:900;letter-spacing:1.5px;color:#7c8bb0}
+    .net-pill{padding:3px 7px;border-radius:999px;font-size:9px;font-weight:800;white-space:nowrap;flex:0 0 auto;
+        background:rgba(95,227,161,.16);border:1px solid rgba(95,227,161,.34);color:#b6f5d4}
+    .net-pill.warn{background:rgba(255,206,120,.18);border-color:rgba(255,206,120,.4);color:#ffe6b0}
+    .net-pill.off{background:rgba(255,90,120,.18);border-color:rgba(255,120,150,.4);color:#ffc3cf}
+    .bh-info{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:6px}
+    .bh-tag{padding:3px 8px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:-.1px;
+        color:#bcd8f5;background:rgba(120,180,255,.12);border:1px solid rgba(140,190,255,.26);
+        white-space:nowrap}
+    .bh-tag b{color:#fff;font-size:10.5px;font-variant-numeric:tabular-nums}
+    .bh-tag.hot{color:#ffe6a8;background:rgba(255,203,77,.16);border-color:rgba(255,203,77,.34)}
+    .bh-tag.hot b{color:#fff}
+
+    /* ---------- 잠금 공격 알림 · 콤보 배너 ---------- */
+    .atk-notice{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%) scale(.7);opacity:0;
+        font-size:15px;font-weight:900;letter-spacing:.3px;color:#fff;pointer-events:none;z-index:4;
+        padding:6px 15px;border-radius:999px;white-space:nowrap;
+        background:linear-gradient(180deg,rgba(30,70,130,.94),rgba(12,30,64,.94));
+        border:1px solid rgba(150,215,255,.62);
+        box-shadow:0 8px 24px rgba(0,0,0,.5), 0 0 28px rgba(90,180,255,.55);
+        text-shadow:0 0 16px rgba(150,220,255,.95),0 2px 0 rgba(0,0,0,.4)}
+    .atk-notice.show{animation:atkPop 1.15s ease-out}
+    @keyframes atkPop{
+        0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+        16%{opacity:1;transform:translate(-50%,-50%) scale(1.14)}
+        30%{transform:translate(-50%,-50%) scale(1)}
+        76%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+        100%{opacity:0;transform:translate(-50%,-80%) scale(.94)}
+    }
+
+    /* ---------- 로비 ---------- */
+    .lobby .card{max-width:min(94vw,420px);max-height:88dvh;overflow:auto}
+    .lobby-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+    .lobby-top h2{margin:0;font-size:16px;flex:1 1 auto;text-align:left}
+    .icobtn{width:30px;height:30px;border-radius:10px;border:1px solid rgba(255,255,255,.14);
+        background:rgba(255,255,255,.06);color:#dfe8ff;font-size:15px;font-weight:800;cursor:pointer;flex:0 0 auto}
+    .net-badge{padding:3px 8px;border-radius:999px;font-size:9.5px;font-weight:800;white-space:nowrap;
+        background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#cdd9f5}
+    .net-badge.on{background:rgba(95,227,161,.18);border-color:rgba(95,227,161,.4);color:#b6f5d4}
+    .net-badge.warn{background:rgba(255,206,120,.18);border-color:rgba(255,206,120,.42);color:#ffe6b0}
+    .net-badge.off{background:rgba(255,90,120,.18);border-color:rgba(255,120,150,.4);color:#ffc3cf}
+    .nick-row{display:flex;align-items:center;gap:8px;margin:8px 0 10px;font-size:11px;color:#9aa7c6;font-weight:700}
+    .nick-row input{flex:1 1 auto;min-width:0;padding:8px 10px;border-radius:11px;color:#fff;font:inherit;font-size:13px;
+        background:rgba(8,12,24,.6);border:1px solid rgba(255,255,255,.15)}
+    .seg{display:flex;gap:4px;padding:3px;border-radius:12px;background:rgba(8,12,24,.55);
+        border:1px solid rgba(255,255,255,.10);margin-bottom:10px}
+    .seg button{flex:1 1 0;padding:8px 6px;border-radius:9px;border:0;background:transparent;color:#9aa7c6;
+        font:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:background .18s,color .18s}
+    .seg button.on{background:linear-gradient(180deg,rgba(120,150,255,.34),rgba(90,110,220,.18));color:#fff;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+    .room-box{margin-top:10px;padding:10px;border-radius:14px;background:rgba(8,12,24,.55);
+        border:1px solid rgba(255,255,255,.10);display:flex;flex-direction:column;gap:6px}
+    .room-lbl{font-size:10px;letter-spacing:.6px;color:#93a2c2;font-weight:800}
+    .room-code{font-size:34px;font-weight:900;letter-spacing:9px;color:#fff;text-align:center;
+        text-shadow:0 0 24px rgba(120,160,255,.55);font-variant-numeric:tabular-nums}
+    .room-hint{font-size:10.5px;color:#8b98b8;line-height:1.45}
+    .room-link{width:100%;padding:8px 9px;border-radius:10px;font-size:10.5px;color:#bcd4ff;
+        background:rgba(120,150,255,.10);border:1px solid rgba(150,175,255,.24)}
+    .share-bar{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+    .share-bar .share-btn{display:flex;align-items:center;justify-content:center;gap:5px;
+        padding:9px 6px;border-radius:10px;font-size:12px;font-weight:800;white-space:nowrap;
+        text-decoration:none;letter-spacing:-.2px;box-shadow:none}
+    .share-bar .share-btn.sms{color:#c9ffe8;background:rgba(52,211,153,.13);border:1px solid rgba(52,211,153,.34)}
+    .share-bar .share-btn.kakao{color:#ffeaa8;background:rgba(255,214,102,.14);border:1px solid rgba(255,214,102,.36)}
+    .share-bar .share-btn:active{transform:scale(.985)}
+    .wait-line{font-size:11px;color:#bcd4ff;display:flex;align-items:center;gap:6px;min-height:16px}
+    .wait-line.hot{color:#ffd76a}
+    .code-input{width:100%;text-align:center;font-size:28px;font-weight:900;letter-spacing:10px;padding:10px;
+        border-radius:14px;color:#fff;background:rgba(8,12,24,.62);border:1px solid rgba(150,175,255,.30);
+        font-variant-numeric:tabular-nums;font-family:inherit}
+    .lobby-note{margin-top:10px;font-size:11px;line-height:1.5;color:#9fb0d4;min-height:14px}
+    .lobby-note.err{color:#ff9fb0}
+    .spin{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;
+        border:2px solid rgba(255,255,255,.25);border-top-color:#cfe0ff;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .online-btn{margin-top:0}
+    .rule-line{margin-top:10px;padding:8px 12px;border-radius:12px;font-size:10.5px;line-height:1.55;
+        color:#bfe0ff;background:rgba(70,150,255,.10);border:1px solid rgba(110,180,255,.26);text-align:left}
+
+    /* ---------- 카운트다운 ---------- */
+    #cdOverlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+        background:rgba(4,7,16,.55);backdrop-filter:blur(3px)}
+    #cdOverlay.show{display:flex}
+    #cdNum{font-size:96px;font-weight:900;color:#fff;text-shadow:0 0 40px rgba(120,160,255,.85);
+        font-variant-numeric:tabular-nums}
+    #cdNum.pop{animation:cdPop .6s cubic-bezier(.2,1.5,.4,1)}
+    @keyframes cdPop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -448,11 +566,36 @@
         </button>
     </header>
 
+    <section class="battle-hud glass" id="battleHud">
+        <div class="bh-top">
+            <button class="bh-back" id="btnBattleBack" aria-label="대전 나가기" title="대전 나가기">←</button>
+            <div class="bh-side">
+                <span class="bh-name">나</span>
+                <b id="bhMyScore">0</b>
+            </div>
+            <div class="bh-mid">
+                <span class="bh-time" id="bhTime">3:00</span>
+                <span class="bh-vs">VS</span>
+            </div>
+            <div class="bh-side opp">
+                <span class="bh-name" id="bhOppName">상대</span>
+                <b id="bhOppScore">0</b>
+            </div>
+            <span class="net-pill" id="netPill">🟢 연결</span>
+        </div>
+        <div class="bh-info">
+            <span class="bh-tag">🔒 상대 보드 <b id="bhOppLocks">0</b></span>
+            <span class="bh-tag">🔒 내 보드 <b id="bhLocks">0</b></span>
+            <span class="bh-tag">⚔️ 보냄 <b id="bhSent">0</b> · 받음 <b id="bhRecv">0</b></span>
+        </div>
+    </section>
+
     <main class="board-wrap" id="boardWrap">
         <div class="puzzle-layer" id="puzzleLayer" aria-hidden="true"></div>
         <div class="board-frame" id="boardFrame">
             <canvas id="board" width="360" height="360"></canvas>
             <div class="combo" id="combo"></div>
+            <div class="atk-notice" id="atkNotice"></div>
             <div class="toast" id="toast"></div>
         </div>
         <div class="puzzle-done" id="puzzleDone">배경 완성!</div>
@@ -512,7 +655,11 @@
         <p style="font-size:12px;color:#ffd76a;margin-top:10px">스테이지마다 목표 점수가 달라요<br>1스테이지 <b style="color:#fff">1,300점</b> → 60스테이지 <b style="color:#fff">5,500점</b><br>10스테이지마다 보스 · 25·35·45·55는 숨 고르기</p>
         <p style="font-size:11.5px;color:#8494b5;margin-top:6px">180초로 시작 · 스테이지 클리어마다 <b style="color:#bcd4ff">+100초</b> 보너스(최대 6분)<br>배경 60장 · 60스테이지 완주가 목표</p>
         <button class="btn" id="btnStart" disabled>불러오는 중…</button>
-        <div class="btn-row"><button class="btn ghost" id="btnGoalOpen">🎯 스테이지 목표 보기</button></div>
+        <div class="btn-row">
+            <button class="btn ghost online-btn" id="btnOnline">⚔️ 온라인 1:1 대전</button>
+            <button class="btn ghost" id="btnGoalOpen">🎯 스테이지 목표 보기</button>
+        </div>
+        <div class="rule-line">⚔️ 친구와 <b>180초</b> 동시 대전 — 콤보가 터지면 상대 보드에 <b>🔒 잠금 블록</b>을 보냅니다. 잠긴 블록은 옆 칸을 맞춰 지워야 풀립니다.</div>
     </div>
 </div>
 
@@ -619,9 +766,1210 @@
     <div class="save-note" id="gmSaveNote"></div>
 </div>
 
+<!-- 온라인 로비 -->
+<div class="overlay lobby" id="lobbyOverlay">
+    <div class="card">
+        <div class="lobby-top">
+            <button class="icobtn" id="lobbyBack" aria-label="뒤로">←</button>
+            <h2>⚔️ 온라인 1:1 대전</h2>
+            <span class="net-badge off" id="netBadge">⚪ 대기</span>
+        </div>
+        <label class="nick-row">닉네임 <input id="nickInput" maxlength="8" placeholder="플레이어" autocomplete="off" spellcheck="false"></label>
+        <div class="seg" id="lobbyTab">
+            <button data-tab="create" class="on">방 만들기</button>
+            <button data-tab="join">코드로 입장</button>
+        </div>
+        <div id="createPane">
+            <button class="btn" id="btnCreate">방 코드 만들기</button>
+            <div class="room-box hidden" id="roomBox">
+                <div class="room-lbl">방 코드</div>
+                <div class="room-code" id="roomCode">----</div>
+                <div class="room-hint">친구에게 이 코드나 초대 링크를 보내세요</div>
+                <input class="room-link" id="roomLinkInput" readonly>
+                <button class="btn ghost" id="btnCopyLink">🔗 초대 링크 복사</button>
+                <div class="share-bar" id="shareBar">
+                    <a class="btn ghost share-btn sms" id="btnSms" href="#" role="button">✉️ 문자(SMS)</a>
+                    <button class="btn ghost share-btn kakao" id="btnShare" type="button">💬 카톡/공유</button>
+                </div>
+                <div class="wait-line" id="waitLine"></div>
+            </div>
+        </div>
+        <div id="joinPane" class="hidden">
+            <input class="code-input" id="codeInput" maxlength="4" placeholder="ABCD" inputmode="text"
+                   autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="방 코드 4자리">
+            <button class="btn" id="btnJoin" style="margin-top:8px">입장하기</button>
+            <div class="room-hint" style="margin-top:6px">방장이 알려 준 4자리 코드를 입력하세요 (0·O·1·I는 쓰지 않습니다)</div>
+        </div>
+        <div class="lobby-note" id="lobbyNote"></div>
+    </div>
+</div>
+
+<div id="cdOverlay"><div id="cdNum">3</div></div>
+
+<!-- 대전 결과 -->
+<div class="overlay" id="battleEndOverlay">
+    <div class="card">
+        <h2 id="battleEndTitle">승리!</h2>
+        <p id="battleEndMsg"></p>
+        <div class="stat-row">
+            <div class="stat"><span>나</span><b id="beMy">0</b></div>
+            <div class="stat"><span>상대</span><b id="beOpp">0</b></div>
+            <div class="stat"><span>최대 콤보</span><b id="beCombo">-</b></div>
+        </div>
+        <div class="stat-row" style="border-top:none;padding-top:0;margin-top:6px">
+            <div class="stat"><span>보낸 잠금</span><b id="beSent">0</b></div>
+            <div class="stat"><span>받은 잠금</span><b id="beRecv">0</b></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn" id="btnRematch">재대전</button>
+            <button class="btn ghost" id="btnBattleLobby">로비로</button>
+            <button class="btn ghost" id="btnBattleSolo">솔로 플레이</button>
+        </div>
+    </div>
+</div>
+
 <audio id="matchSound" src="./mp3/match-sound.wav" preload="auto"></audio>
 <div class="app-hint" id="appHint"></div>
 
+<script>
+'use strict';
+/* ─────────────────────────────────────────────────────────────
+   매치3 스왑형 — 온라인 1:1 대전 통신
+   낙하형(work/match3_drop/net2.js)에서 실전 검증한 구조를 그대로 이식했다.
+
+   · 1순위: WSS 중계 — 공개 MQTT 브로커 4곳(443포트 demo.tbmq.io 포함)에 동시 접속
+   · 2순위: PeerJS WebRTC P2P (TURN 포함) — 중계 서버에 못 붙는 망에서만
+   · 3순위: BroadcastChannel — 같은 브라우저 두 탭(테스트/최후 폴백)
+   · 토픽·접두사는 match3swap-v1- 로 분리해 다른 게임과 섞이지 않는다.
+   ───────────────────────────────────────────────────────────── */
+(function () {
+const NET = {
+  version: 1,
+  prefix: 'match3swap-v1-',         // PeerJS ID 접두사 (다른 게임과 분리)
+  bcPrefix: 'match3swap-v1-',       // BroadcastChannel 이름 접두사
+  topicBase: 'match3swap/v1/',      // WSS 중계 토픽 네임스페이스 → match3swap/v1/{ROOM_CODE}
+  alphabet: 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',   // 0·O·1·I 제외 32자
+  codeLen: 4,
+  syncMs: 1000,                     // 보드 요약 전송 주기
+  graceMs: 10000,                   // 끊김 재연결 유예
+  pingMs: 2500,
+  relay: {
+    // 공개 MQTT over WSS 브로커 — 여러 곳에 동시에 붙어 하나라도 통하면 연결된다.
+    // 3번은 표준 443 포트(웹 방화벽이 443만 열어 둔 망 대비).
+    brokers: [
+      { name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt' },
+      { name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt' },
+      { name: 'TBMQ', url: 'wss://demo.tbmq.io/mqtt', user: 'demo' },
+      { name: 'Mosquitto', url: 'wss://test.mosquitto.org:8081/mqtt' }
+    ],
+    connectMs: 7000,                // 브로커 한 곳 접속 제한 시간
+    joinMs: 9000,                   // 게스트가 방장 신호를 기다리는 시간
+    joinEveryMs: 500,
+    beatMs: 2000,                   // 존재 알림(하트비트) 주기
+    deadMs: 15000,                  // 상대 신호가 이만큼 없으면 끊김 판정
+    keepaliveS: 45,
+    only: null                      // 테스트용: 특정 브로커만 (인덱스)
+  },
+  cdn: [
+    'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
+    'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'
+  ],
+  ice: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' },
+      // 무료 공용 TURN (대칭 NAT 대비) — P2P 보조 경로에서만 쓴다
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+    ]
+  }
+};
+
+/* ── 방 코드 ───────────────────────────────────────────── */
+function netNewCode() {
+  let s = '';
+  let buf = null;
+  try {
+    if (window.crypto && window.crypto.getRandomValues) {
+      buf = new Uint32Array(NET.codeLen);
+      window.crypto.getRandomValues(buf);
+    }
+  } catch (e) { buf = null; }
+  for (let i = 0; i < NET.codeLen; i++) {
+    const v = buf ? buf[i] : Math.floor(Math.random() * 4294967296);
+    s += NET.alphabet.charAt(v % NET.alphabet.length);
+  }
+  return s;
+}
+
+function netNormalizeCode(v) {
+  if (!v) return '';
+  const up = String(v).toUpperCase();
+  let out = '';
+  for (let i = 0; i < up.length && out.length < NET.codeLen; i++) {
+    const c = up.charAt(i);
+    if (NET.alphabet.indexOf(c) >= 0) out += c;
+  }
+  return out;
+}
+
+function netRoomLink(code) {
+  const base = location.href.split('#')[0].split('?')[0];
+  return base + '?r=' + code;
+}
+
+function netNewSeed() {
+  return (Date.now() % 1000003) + Math.floor(Math.random() * 99991) + 1;
+}
+
+function netErr(type, cause) {
+  const e = new Error(String(type));
+  e.type = type;
+  if (cause) e.cause = cause;
+  return e;
+}
+
+function netUid() {
+  let s = '';
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let buf = null;
+  try {
+    if (window.crypto && window.crypto.getRandomValues) {
+      buf = new Uint32Array(10);
+      window.crypto.getRandomValues(buf);
+    }
+  } catch (e) { buf = null; }
+  for (let i = 0; i < 10; i++) {
+    const v = buf ? buf[i] : Math.floor(Math.random() * 4294967296);
+    s += chars.charAt(v % chars.length);
+  }
+  return s;
+}
+
+/* ── PeerJS 라이브러리 (CDN, P2P 보조 경로 전용) ───────── */
+function netLoadPeerJS() {
+  if (window.Peer) return Promise.resolve(true);
+  const load = function (url, ms) {
+    return new Promise(function (resolve, reject) {
+      const s = document.createElement('script');
+      let done = false;
+      const t = setTimeout(function () {
+        if (done) return;
+        done = true; s.remove(); reject(netErr('cdn-timeout'));
+      }, ms);
+      s.src = url;
+      s.async = true;
+      s.onload = function () {
+        if (done) return;
+        done = true; clearTimeout(t); resolve(true);
+      };
+      s.onerror = function () {
+        if (done) return;
+        done = true; clearTimeout(t); s.remove(); reject(netErr('cdn-blocked'));
+      };
+      document.head.appendChild(s);
+    });
+  };
+  let chain = Promise.reject(netErr('cdn-blocked'));
+  for (let i = 0; i < NET.cdn.length; i++) {
+    (function (url) {
+      chain = chain.catch(function () { return load(url, 7000); });
+    })(NET.cdn[i]);
+  }
+  return chain.then(function () {
+    if (window.Peer) return true;
+    throw netErr('no-peerjs');
+  });
+}
+
+/* ═════════════════════════════════════════════════════════
+   전송 계층 1 — WSS 중계 (MQTT 3.1.1 over WebSocket)
+
+   외부 라이브러리를 쓰지 않고 필요한 패킷만 직접 만든다
+   (CDN이 막힌 카톡 인앱 브라우저에서도 그대로 동작).
+   ═════════════════════════════════════════════════════════ */
+const NET_TXT = new TextDecoder ? new TextDecoder('utf-8') : null;
+
+function netBytes(s) {
+  const enc = new TextEncoder ? new TextEncoder() : null;
+  const arr = enc ? enc.encode(s) : (function () {
+    const out = [];
+    const esc = unescape(encodeURIComponent(s));
+    for (let i = 0; i < esc.length; i++) out.push(esc.charCodeAt(i));
+    return out;
+  })();
+  return Array.prototype.slice.call(arr);
+}
+
+/* MQTT 문자열: 2바이트 길이 + UTF-8 */
+function netMqttStr(s) {
+  const b = netBytes(s);
+  return [b.length >> 8, b.length & 0xff].concat(b);
+}
+
+/* 남은 길이(varint) */
+function netMqttLen(n) {
+  const out = [];
+  do {
+    let d = n % 128;
+    n = Math.floor(n / 128);
+    if (n > 0) d |= 0x80;
+    out.push(d);
+  } while (n > 0);
+  return out;
+}
+
+/* 고정 헤더 + 본문 */
+function netMqttPacket(type, flags, body) {
+  const rl = netMqttLen(body.length);
+  const out = new Uint8Array(1 + rl.length + body.length);
+  out[0] = (type << 4) | (flags & 0x0f);
+  out.set(rl, 1);
+  out.set(body, 1 + rl.length);
+  return out;
+}
+
+class MqttWs {
+  constructor(opt) {
+    this.url = opt.url;
+    this.clientId = opt.clientId;
+    this.username = opt.username || '';
+    this.onPacket = opt.onPacket || function () {};
+    this.onClose = opt.onClose || function () {};
+    this.ws = null;
+    this.buf = new Uint8Array(0);
+    this.ready = false;
+    this.wasReady = false;
+    this._dead = false;
+    this.pid = 1;
+    this.waiters = {};
+    this.kaTimer = null;
+    this._connack = null;
+  }
+
+  connect(ms) {
+    const self = this;
+    const limit = ms || NET.relay.connectMs;
+    return new Promise(function (resolve, reject) {
+      let settled = false;
+      const fin = function (fn, v) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        fn(v);
+      };
+      const timer = setTimeout(function () {
+        fin(reject, netErr('relay-timeout'));
+        self.close();
+      }, limit);
+      let ws;
+      try { ws = new WebSocket(self.url, 'mqtt'); }
+      catch (e) { fin(reject, netErr('relay-blocked', e)); return; }
+      self.ws = ws;
+      try { ws.binaryType = 'arraybuffer'; } catch (e) {}
+      self._connack = function (code) {
+        if (code === 0) {
+          self.ready = true;
+          self.wasReady = true;
+          fin(resolve, true);
+          self._startKeepalive();
+        } else {
+          fin(reject, netErr('relay-refused'));
+          self.close();
+        }
+      };
+      ws.onopen = function () {
+        try { ws.send(self._connectPacket()); }
+        catch (e) { fin(reject, netErr('relay-send', e)); }
+      };
+      ws.onmessage = function (ev) { self._feed(ev.data); };
+      ws.onerror = function () { fin(reject, netErr('relay-error')); };
+      ws.onclose = function () {
+        fin(reject, netErr('relay-closed'));
+        self._down();
+      };
+    });
+  }
+
+  _connectPacket() {
+    const flags = 0x02 | (this.username ? 0x80 : 0);   // clean session (+ username)
+    const body = [0, 4, 77, 81, 84, 84, 4, flags]        // 'MQTT', level 4
+      .concat([(NET.relay.keepaliveS >> 8) & 0xff, NET.relay.keepaliveS & 0xff])
+      .concat(netMqttStr(this.clientId));
+    if (this.username) Array.prototype.push.apply(body, netMqttStr(this.username));
+    return netMqttPacket(1, 0, body);
+  }
+
+  subscribe(topic) {
+    const self = this;
+    return new Promise(function (resolve, reject) {
+      if (!self.ready || !self.ws) { reject(netErr('relay-not-ready')); return; }
+      const id = self.pid++;
+      if (self.pid > 60000) self.pid = 1;
+      self.waiters[id] = { resolve: resolve, reject: reject };
+      const body = [id >> 8, id & 0xff].concat(netMqttStr(topic)).concat([0]);
+      try { self.ws.send(netMqttPacket(8, 2, body)); }
+      catch (e) { delete self.waiters[id]; reject(netErr('relay-send', e)); return; }
+      setTimeout(function () {
+        if (!self.waiters[id]) return;
+        delete self.waiters[id];
+        reject(netErr('relay-suback'));
+      }, 6000);
+    });
+  }
+
+  publish(topic, text) {
+    if (!this.ready || !this.ws || this.ws.readyState !== 1) return false;
+    const body = netMqttStr(topic).concat(netBytes(text));
+    try { this.ws.send(netMqttPacket(3, 0, body)); return true; }
+    catch (e) { return false; }
+  }
+
+  _startKeepalive() {
+    const self = this;
+    this._stopKeepalive();
+    this.kaTimer = setInterval(function () {
+      if (!self.ready || !self.ws || self.ws.readyState !== 1) return;
+      try { self.ws.send(new Uint8Array([0xc0, 0x00])); } catch (e) {}
+    }, 20000);
+  }
+
+  _stopKeepalive() {
+    if (this.kaTimer) { clearInterval(this.kaTimer); this.kaTimer = null; }
+  }
+
+  _feed(data) {
+    let chunk;
+    if (data && typeof data === 'string') chunk = netBytes(data);
+    else if (data && data.byteLength != null) chunk = new Uint8Array(data);
+    else return;
+    if (this.buf.length) {
+      const merged = new Uint8Array(this.buf.length + chunk.length);
+      merged.set(this.buf, 0);
+      merged.set(chunk, this.buf.length);
+      this.buf = merged;
+    } else {
+      this.buf = chunk;
+    }
+    let off = 0;
+    while (this.buf.length - off >= 2) {
+      let mult = 1, len = 0, i = off + 1, ok = false;
+      for (let k = 0; k < 4 && i < this.buf.length; k++) {
+        const d = this.buf[i++];
+        len += (d & 0x7f) * mult;
+        mult *= 128;
+        if ((d & 0x80) === 0) { ok = true; break; }
+      }
+      if (!ok || this.buf.length < i + len) break;
+      const type = this.buf[off] >> 4;
+      const body = this.buf.subarray(i, i + len);
+      off = i + len;
+      this._packet(type, body);
+    }
+    if (off > 0) this.buf = this.buf.slice(off);
+  }
+
+  _packet(type, body) {
+    if (type === 2) {                                  // CONNACK
+      const code = body.length > 1 ? body[1] : 255;
+      const f = this._connack;
+      this._connack = null;
+      if (f) f(code);
+      return;
+    }
+    if (type === 9) {                                  // SUBACK
+      const id = (body[0] << 8) | body[1];
+      const w = this.waiters[id];
+      if (!w) return;
+      delete this.waiters[id];
+      if (body[2] === 0x80) w.reject(netErr('relay-subfail'));
+      else w.resolve(true);
+      return;
+    }
+    if (type === 3) {                                  // PUBLISH (QoS 0)
+      if (body.length < 2) return;
+      const tl = (body[0] << 8) | body[1];
+      if (body.length < 2 + tl) return;
+      let topic = '';
+      try {
+        topic = NET_TXT ? NET_TXT.decode(body.subarray(2, 2 + tl))
+          : decodeURIComponent(escape(String.fromCharCode.apply(null, body.subarray(2, 2 + tl))));
+      } catch (e) { topic = ''; }
+      let text = '';
+      try {
+        text = NET_TXT ? NET_TXT.decode(body.subarray(2 + tl))
+          : decodeURIComponent(escape(String.fromCharCode.apply(null, body.subarray(2 + tl))));
+      } catch (e) { text = ''; }
+      if (text) this.onPacket(topic, text);
+      return;
+    }
+  }
+
+  _down() {
+    const was = this.wasReady;
+    this.ready = false;
+    this._stopKeepalive();
+    for (const k in this.waiters) {
+      try { this.waiters[k].reject(netErr('relay-closed')); } catch (e) {}
+    }
+    this.waiters = {};
+    if (was && !this._dead) this.onClose();
+  }
+
+  close() {
+    this._dead = true;
+    this.ready = false;
+    this._stopKeepalive();
+    try { if (this.ws) this.ws.close(); } catch (e) {}
+    this.ws = null;
+  }
+}
+
+class RelayLink {
+  constructor(room) {
+    this.room = room;
+    this.code = room.code;
+    this.topic = NET.topicBase + room.code;
+    this.sid = 'u' + netUid();
+    this.clients = [];              // 브로커별 { mq, ready }
+    this.connected = false;
+    this.main = -1;                 // 상대 신호가 보인 브로커(가장 앞 번호)
+    this.peerSeen = {};
+    this.lastPeer = 0;
+    this._dead = false;
+    this._busy = false;
+    this._ok = null;
+    this._err = null;
+    this.beatTimer = null;
+    this.watchTimer = null;
+    this.joinTimer = null;
+    this.joinStopTimer = null;
+  }
+
+  /* ── 열기 ─────────────────────────────────────────────── */
+  open() {
+    const self = this;
+    const room = this.room;
+    return this._connectAll().then(function (any) {
+      if (!any) throw netErr('relay-unreachable');
+      self._startBeat();
+      self._startWatch();
+      self._beat();
+      if (room.role === 'host') {
+        room.onLinkWaiting();
+        return true;
+      }
+      return self._waitHost().then(function () { return true; });
+    });
+  }
+
+  _idxs() {
+    const out = [];
+    for (let i = 0; i < NET.relay.brokers.length; i++) {
+      if (NET.relay.only == null || NET.relay.only === i) out.push(i);
+    }
+    return out;
+  }
+
+  _connectAll() {
+    const self = this;
+    const idxs = this._idxs();
+    if (!idxs.length) return Promise.resolve(false);
+    return new Promise(function (resolve) {
+      let left = idxs.length;
+      let done = false;
+      const finish = function (v) { if (!done) { done = true; resolve(v); } };
+      idxs.forEach(function (i) {
+        self._connectOne(i).then(function () { finish(true); }, function () {})
+          .then(function () { if (--left === 0) finish(false); });
+      });
+    });
+  }
+
+  _connectOne(i) {
+    const self = this;
+    const b = NET.relay.brokers[i];
+    const cur = this.clients[i];
+    if (cur && cur.ready) return Promise.resolve(true);
+    const mq = new MqttWs({
+      url: b.url,
+      username: b.user || '',
+      clientId: 'm3s' + this.sid + i,
+      onPacket: function (topic, text) { self._onPacket(i, text); },
+      onClose: function () { self._onClientDown(i); }
+    });
+    this.clients[i] = { mq: mq, ready: false };
+    return mq.connect(NET.relay.connectMs).then(function () {
+      return mq.subscribe(self.topic);
+    }).then(function () {
+      if (self.clients[i]) self.clients[i].ready = true;
+      self._beatOne(i);
+      return true;
+    }, function (e) {
+      if (self.clients[i]) self.clients[i].ready = false;
+      try { mq.close(); } catch (err) {}
+      throw e;
+    });
+  }
+
+  /* ── 존재 알림(하트비트) ───────────────────────────────── */
+  _presence() {
+    return JSON.stringify({
+      s: this.sid,
+      k: this.room.role === 'host' ? 'h' : 'j',
+      n: String(this.room.name || '').slice(0, 10)
+    });
+  }
+
+  _beatOne(i) {
+    const c = this.clients[i];
+    if (c && c.ready) c.mq.publish(this.topic, this._presence());
+  }
+
+  _beat() {
+    for (let i = 0; i < this.clients.length; i++) this._beatOne(i);
+  }
+
+  _startBeat() {
+    const self = this;
+    if (this.beatTimer) return;
+    this.beatTimer = setInterval(function () { if (!self._dead) self._beat(); }, NET.relay.beatMs);
+  }
+
+  /* ── 수신 ─────────────────────────────────────────────── */
+  _onPacket(i, text) {
+    let m = null;
+    try { m = JSON.parse(text); } catch (e) { return; }
+    if (!m || typeof m !== 'object') return;
+    if (m.s === this.sid) return;                    // 내가 보낸 메시지
+    if (m.k === 'h' || m.k === 'j') {
+      const was = this.connected;
+      this._peerHere(i);
+      if (!was) {
+        // 상대가 나를 봤다는 신호에 바로 응답해 준다
+        this._beatOne(i);
+      }
+      this._setConnected();
+      return;
+    }
+    if (!this.lastPeer) return;                      // 아직 상대 신호 전
+    if (m.d && typeof m.d === 'object') this.room.onLinkData(m.d);
+  }
+
+  _peerHere(i) {
+    this.peerSeen[i] = Date.now();
+    this.lastPeer = Date.now();
+    const c = this.clients[this.main];
+    if (this.main < 0 || !c || !c.ready || i < this.main) this._pickMain();
+  }
+
+  _pickMain() {
+    let best = -1;
+    for (let i = 0; i < this.clients.length; i++) {
+      const c = this.clients[i];
+      if (c && c.ready && this.peerSeen[i]) { best = i; break; }
+    }
+    this.main = best;
+  }
+
+  _firstReady(skip) {
+    for (let i = 0; i < this.clients.length; i++) {
+      if (i === skip) continue;
+      if (this.clients[i] && this.clients[i].ready) return i;
+    }
+    return -1;
+  }
+
+  _setConnected() {
+    if (this._dead) return;
+    if (this.connected) return;
+    this.connected = true;
+    const ok = this._ok;
+    this._ok = null; this._err = null;
+    this._stopJoin();
+    if (ok) ok(true);
+    this.room.onLinkOpen();
+  }
+
+  /* ── 게스트: 방장 찾기 ────────────────────────────────── */
+  _waitHost() {
+    const self = this;
+    return new Promise(function (resolve, reject) {
+      if (self.connected) { resolve(true); return; }
+      self._ok = resolve;
+      self._err = reject;
+      self._joinOnce();
+      self.joinTimer = setInterval(function () { self._joinOnce(); }, NET.relay.joinEveryMs);
+      self.joinStopTimer = setTimeout(function () {
+        if (self.connected) return;
+        self._stopJoin();
+        const rej = self._err;
+        self._ok = null; self._err = null;
+        if (rej) rej(netErr('room-not-found'));
+        self.close();
+      }, NET.relay.joinMs);
+    });
+  }
+
+  _joinOnce() {
+    for (let i = 0; i < this.clients.length; i++) this._beatOne(i);
+  }
+
+  _stopJoin() {
+    if (this.joinTimer) { clearInterval(this.joinTimer); this.joinTimer = null; }
+    if (this.joinStopTimer) { clearTimeout(this.joinStopTimer); this.joinStopTimer = null; }
+  }
+
+  /* ── 감시·복구 ────────────────────────────────────────── */
+  _startWatch() {
+    const self = this;
+    if (this.watchTimer) return;
+    this.watchTimer = setInterval(function () {
+      if (self._dead) return;
+      // 배경 탭에서는 타이머가 느려지므로 끊김 판정을 미룬다
+      if (typeof document !== 'undefined' && document.hidden) {
+        self.lastPeer = Date.now();
+        return;
+      }
+      let ready = 0;
+      for (let i = 0; i < self.clients.length; i++) if (self.clients[i] && self.clients[i].ready) ready++;
+      if (!ready) self._recover();
+      // 상대가 떠난 브로커는 후보에서 뺀다(보낼 곳이 살아있는 브로커로 옮겨 가도록)
+      const now = Date.now();
+      let aged = false;
+      for (const k in self.peerSeen) {
+        if (now - self.peerSeen[k] > NET.relay.deadMs) { delete self.peerSeen[k]; aged = true; }
+      }
+      if (aged) self._pickMain();
+      if (self.connected && Date.now() - self.lastPeer > NET.relay.deadMs) {
+        self.connected = false;
+        self.room.onLinkClose();
+      }
+    }, 1000);
+  }
+
+  _recover() {
+    if (this._busy || this._dead) return;
+    const self = this;
+    this._busy = true;
+    this._connectAll().then(function (any) {
+      self._busy = false;
+      if (!any || self._dead) return;
+      self._beat();
+    }, function () { self._busy = false; });
+  }
+
+  _onClientDown(i) {
+    const c = this.clients[i];
+    if (c) c.ready = false;
+    delete this.peerSeen[i];
+    if (this.main === i) { this.main = -1; this._pickMain(); }
+  }
+
+  reconnect() {
+    if (this._dead) return false;
+    let ready = 0;
+    for (let i = 0; i < this.clients.length; i++) if (this.clients[i] && this.clients[i].ready) ready++;
+    if (ready) { this._beat(); return true; }
+    this._recover();
+    return true;
+  }
+
+  /* ── 송신 ─────────────────────────────────────────────── */
+  send(obj) {
+    if (this._dead) return false;
+    const text = JSON.stringify({ s: this.sid, d: obj });
+    let i = this.main;
+    if (i < 0 || !this.clients[i] || !this.clients[i].ready) i = this._firstReady(-1);
+    if (i < 0) return false;
+    if (this.clients[i].mq.publish(this.topic, text)) return true;
+    const alt = this._firstReady(i);
+    if (alt < 0) return false;
+    return this.clients[alt].mq.publish(this.topic, text);
+  }
+
+  close() {
+    this._dead = true;
+    this._stopJoin();
+    if (this.beatTimer) { clearInterval(this.beatTimer); this.beatTimer = null; }
+    if (this.watchTimer) { clearInterval(this.watchTimer); this.watchTimer = null; }
+    for (let i = 0; i < this.clients.length; i++) {
+      const c = this.clients[i];
+      if (c && c.mq) { try { c.mq.close(); } catch (e) {} }
+    }
+    this.clients = [];
+    this.connected = false;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════
+   전송 계층 2 — PeerJS (P2P, 중계 서버를 못 쓸 때만)
+   ═════════════════════════════════════════════════════════ */
+class PeerLink {
+  constructor(room) {
+    this.room = room;
+    this.peer = null;
+    this.conn = null;
+    this.connected = false;
+    this._ok = null;
+    this._err = null;
+  }
+
+  open() {
+    const self = this;
+    const room = this.room;
+    return netLoadPeerJS().then(function () {
+      return new Promise(function (resolve, reject) {
+        let settled = false;
+        const ok = function () {
+          if (settled) return;
+          settled = true; clearTimeout(timer);
+          self._ok = null; self._err = null; resolve(true);
+        };
+        const bad = function (err) {
+          if (settled) return;
+          settled = true; clearTimeout(timer);
+          reject(err);
+        };
+        self._ok = ok;
+        self._err = bad;
+        const timer = setTimeout(function () {
+          bad(netErr(self.conn ? 'ice-timeout' : 'signal-timeout'));
+        }, 12000);
+
+        let peer;
+        try {
+          peer = (room.role === 'host')
+            ? new window.Peer(NET.prefix + room.code, { config: NET.ice, debug: 1 })
+            : new window.Peer({ config: NET.ice, debug: 1 });
+        } catch (e) {
+          bad(netErr('peer-init', e));
+          return;
+        }
+        self.peer = peer;
+
+        peer.on('error', function (err) {
+          const type = (err && err.type) || 'peer-error';
+          if (!self.connected && self._err) { self._err(netErr(type, err)); return; }
+          room.onLinkError(type, err);
+        });
+
+        if (room.role === 'host') {
+          peer.on('open', function () { room.onLinkWaiting(); ok(); });
+          peer.on('connection', function (conn) { self.attach(conn); });
+        } else {
+          peer.on('open', function () {
+            let conn;
+            try {
+              conn = peer.connect(NET.prefix + room.code, { reliable: true });
+            } catch (e) { if (self._err) self._err(netErr('connect-init', e)); return; }
+            self.attach(conn);
+          });
+          peer.on('disconnected', function () {
+            if (self._dead) return;
+            try { peer.reconnect(); } catch (e) {}
+          });
+        }
+      });
+    });
+  }
+
+  attach(conn) {
+    const self = this;
+    const room = this.room;
+    if (this.conn && this.conn !== conn) { try { this.conn.close(); } catch (e) {} }
+    this.conn = conn;
+    conn.on('open', function () {
+      self.connected = true;
+      const ok = self._ok;
+      self._ok = null; self._err = null;
+      if (ok) ok();
+      room.onLinkOpen();
+    });
+    conn.on('data', function (d) { room.onLinkData(d); });
+    conn.on('close', function () {
+      if (self.connected || self.conn === conn) {
+        self.connected = false;
+        room.onLinkClose();
+      }
+    });
+    conn.on('error', function (e) { room.onLinkError('conn-error', e); });
+  }
+
+  send(obj) {
+    if (this.conn && this.connected) {
+      try { this.conn.send(obj); return true; } catch (e) { return false; }
+    }
+    return false;
+  }
+
+  reconnect() {
+    if (this._dead || !this.peer) return false;
+    const self = this;
+    const go = function () {
+      try {
+        const conn = self.peer.connect(NET.prefix + self.room.code, { reliable: true });
+        self.attach(conn);
+        return true;
+      } catch (e) { return false; }
+    };
+    if (this.peer.destroyed) return false;
+    if (this.peer.disconnected) {
+      try {
+        this.peer.once('open', go);
+        this.peer.reconnect();
+        return true;
+      } catch (e) { return false; }
+    }
+    return go();
+  }
+
+  close() {
+    this._dead = true;
+    try { if (this.conn) this.conn.close(); } catch (e) {}
+    try { if (this.peer) this.peer.destroy(); } catch (e) {}
+    this.connected = false;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════
+   전송 계층 3 — BroadcastChannel (같은 브라우저 탭끼리 테스트/폴백)
+   ═════════════════════════════════════════════════════════ */
+class BcLink {
+  constructor(room) {
+    this.room = room;
+    this.ch = null;
+    this.connected = false;
+    this.joinTimer = null;
+    this.tries = 0;
+    this._dead = false;
+  }
+
+  open() {
+    const self = this;
+    const room = this.room;
+    return new Promise(function (resolve, reject) {
+      if (typeof window.BroadcastChannel !== 'function') { reject(netErr('no-bc')); return; }
+      let ch;
+      try { ch = new BroadcastChannel(NET.bcPrefix + room.code); }
+      catch (e) { reject(netErr('no-bc', e)); return; }
+      self.ch = ch;
+      ch.onmessage = function (ev) {
+        const d = ev.data;
+        if (!d || typeof d !== 'object') return;
+        if (d.t === '__join') {
+          if (room.role === 'host') {
+            if (!self.connected) {
+              self.connected = true;
+              try { ch.postMessage({ t: '__welcome' }); } catch (e) {}
+              room.onLinkOpen();
+            } else {
+              try { ch.postMessage({ t: '__welcome' }); } catch (e) {}
+            }
+          }
+          return;
+        }
+        if (d.t === '__welcome') {
+          if (room.role === 'guest' && !self.connected) {
+            self.connected = true;
+            clearInterval(self.joinTimer);
+            self.joinTimer = null;
+            if (self._pendingResolve) { const f = self._pendingResolve; self._pendingResolve = null; f(true); }
+            room.onLinkOpen();
+          }
+          return;
+        }
+        room.onLinkData(d);
+      };
+
+      if (room.role === 'host') {
+        room.onLinkWaiting();
+        resolve(true);
+        return;
+      }
+      self._pendingResolve = resolve;
+      const ping = function () {
+        if (self.connected || self._dead) return;
+        self.tries++;
+        try { ch.postMessage({ t: '__join' }); } catch (e) {}
+        if (self.tries > 30) {
+          clearInterval(self.joinTimer);
+          self.joinTimer = null;
+          const f = self._pendingResolve;
+          self._pendingResolve = null;
+          if (f) reject(netErr('no-host'));
+        }
+      };
+      ping();
+      self.joinTimer = setInterval(ping, 400);
+    });
+  }
+
+  send(obj) {
+    if (!this.ch || this._dead) return false;
+    try { this.ch.postMessage(obj); return true; } catch (e) { return false; }
+  }
+
+  reconnect() { return false; }
+
+  close() {
+    this._dead = true;
+    clearInterval(this.joinTimer);
+    try { if (this.ch) this.ch.close(); } catch (e) {}
+    this.connected = false;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════
+   방 — 연결 상태 · 프로토콜 라우팅 · 핑
+   ═════════════════════════════════════════════════════════ */
+class NetRoom {
+  constructor(opts) {
+    opts = opts || {};
+    this.role = (opts.role === 'guest') ? 'guest' : 'host';
+    this.code = netNormalizeCode(opts.code) || netNewCode();
+    this.name = String(opts.name || '플레이어').slice(0, 10);
+    this.forceBc = !!opts.forceBc;
+    this.forceRelay = !!opts.forceRelay;
+    this.forcePeer = !!opts.forcePeer;
+    this.mode = null;              // 'relay' | 'peer' | 'bc'
+    this.status = 'idle';          // idle|connecting|waiting|connected|closed|error
+    this.peerName = '';
+    this.connected = false;
+    this.latency = 0;
+    this.match = null;
+    this.link = null;
+    this.handlers = {};
+    this.log = [];
+    this.pingTimer = null;
+    this.graceTimer = null;
+    this.reconnectTimer = null;
+    this.graceLeft = 0;
+    this.lastErr = null;
+    this.bye = false;
+    this.fellBack = false;
+  }
+
+  on(type, fn) { if (typeof fn === 'function') this.handlers[type] = fn; return this; }
+  emit(type, data) {
+    const f = this.handlers[type];
+    if (!f) return;
+    try { f(data || {}); } catch (e) { console.error('[net] handler', type, e); }
+  }
+  setStatus(s, note) {
+    this.status = s;
+    this.emit('status', { status: s, note: note || '' });
+  }
+
+  async open() {
+    this.setStatus('connecting');
+
+    /* 1) WSS 중계 — 어떤 망에서도 먼저 시도한다 */
+    if (!this.forceBc && !this.forcePeer) {
+      try {
+        this.link = new RelayLink(this);
+        this.mode = 'relay';
+        await this.link.open();
+        return true;
+      } catch (e) {
+        this.lastErr = e;
+        try { if (this.link) this.link.close(); } catch (err) {}
+        this.link = null;
+        this.mode = null;
+        const t = e && e.type;
+        if (t === 'room-not-found' || this.forceRelay) {
+          this.setStatus('error');
+          return false;
+        }
+      }
+    }
+
+    /* 2) PeerJS P2P — 중계 서버에 못 붙은 망에서만 */
+    if (!this.forceBc) {
+      if (this.role === 'host') {
+        for (let attempt = 0; attempt < 4; attempt++) {
+          try {
+            this.link = new PeerLink(this);
+            this.mode = 'peer';
+            await this.link.open();
+            return true;
+          } catch (e) {
+            this.lastErr = e;
+            try { if (this.link) this.link.close(); } catch (err) {}
+            this.link = null;
+            this.mode = null;
+            if (e && e.type === 'code-taken') { this.code = netNewCode(); continue; }
+            break;
+          }
+        }
+      } else {
+        try {
+          this.link = new PeerLink(this);
+          this.mode = 'peer';
+          await this.link.open();
+          return true;
+        } catch (e) {
+          this.lastErr = e;
+          try { if (this.link) this.link.close(); } catch (err) {}
+          this.link = null;
+          this.mode = null;
+          const t = e && e.type;
+          if (t === 'peer-unavailable' || t === 'code-taken') {
+            this.setStatus('error');
+            return false;
+          }
+        }
+      }
+    }
+
+    /* 3) 같은 브라우저 탭끼리 */
+    try {
+      this.link = new BcLink(this);
+      await this.link.open();
+      this.mode = 'bc';
+      this.fellBack = !this.forceBc;
+      return true;
+    } catch (e) {
+      this.lastErr = e;
+      this.link = null;
+      this.setStatus('error');
+      return false;
+    }
+  }
+
+  onLinkWaiting() {
+    if (this.status !== 'connected') this.setStatus('waiting');
+  }
+
+  onLinkOpen() {
+    this.connected = true;
+    this.setStatus('connected');
+    this.startPing();
+    this.stopGrace();
+    this.send('hello', { name: this.name, ver: NET.version });
+    this.emit('connected', { mode: this.mode });
+  }
+
+  onLinkClose() {
+    if (this.bye) return;
+    this.connected = false;
+    this.latency = 0;
+    this.stopPing();
+    this.setStatus('closed');
+    this.emit('disconnected', {});
+    if (this.match) this.beginGrace();
+    else this.emit('peerLeft', {});
+  }
+
+  onLinkError(type, err) {
+    this.emit('error', { type: type, err: err });
+    if (type === 'network' || type === 'server-error' || type === 'socket-error' || type === 'socket-closed') {
+      if (!this.connected) this.setStatus('error', type);
+    }
+  }
+
+  onLinkData(d) {
+    if (!d || typeof d !== 'object' || typeof d.t !== 'string') return;
+    const t = d.t;
+    if (t === '__join' || t === '__welcome') return;
+    if (t === 'ping') { this.send('pong', { ts: d.ts }); return; }
+    if (t === 'pong') {
+      const r = Date.now() - (d.ts || 0);
+      if (r >= 0 && r < 60000) this.latency = r;
+      return;
+    }
+    if (t === 'hello') {
+      this.peerName = String(d.name || '상대').slice(0, 10);
+      this.emit('hello', { name: this.peerName });
+      return;
+    }
+    if (t === 'bye') { this.bye = true; this.emit('bye', {}); return; }
+    this.log.push(d);
+    if (this.log.length > 80) this.log.shift();
+    this.emit(t, d);
+  }
+
+  send(t, d) {
+    if (!this.link) return false;
+    const msg = Object.assign({ t: t }, d || {});
+    const ok = this.link.send(msg);
+    if (ok) {
+      this.log.push(msg);
+      if (this.log.length > 80) this.log.shift();
+    }
+    return ok;
+  }
+
+  startPing() {
+    const self = this;
+    this.stopPing();
+    this.pingTimer = setInterval(function () {
+      if (self.connected) self.send('ping', { ts: Date.now() });
+    }, NET.pingMs);
+  }
+  stopPing() {
+    if (this.pingTimer) { clearInterval(this.pingTimer); this.pingTimer = null; }
+  }
+
+  /* ── 끊김 10초 유예 ─────────────────────────────────── */
+  beginGrace() {
+    if (this.graceTimer) return;
+    const self = this;
+    this.graceLeft = Math.round(NET.graceMs / 1000);
+    this.emit('grace', { left: this.graceLeft });
+    this.graceTimer = setInterval(function () {
+      self.graceLeft--;
+      if (self.graceLeft > 0) { self.emit('grace', { left: self.graceLeft }); return; }
+      self.stopGrace();
+      self.emit('graceEnd', {});
+    }, 1000);
+    if (this.link && this.link.reconnect && (this.role === 'guest' || this.mode === 'relay')) {
+      let n = 0;
+      this.reconnectTimer = setInterval(function () {
+        if (self.connected || n++ >= 6) {
+          clearInterval(self.reconnectTimer);
+          self.reconnectTimer = null;
+          return;
+        }
+        try { self.link.reconnect(); } catch (e) {}
+      }, 1800);
+    }
+  }
+  stopGrace() {
+    if (this.graceTimer) { clearInterval(this.graceTimer); this.graceTimer = null; }
+    if (this.reconnectTimer) { clearInterval(this.reconnectTimer); this.reconnectTimer = null; }
+  }
+
+  byeNow() {
+    this.bye = true;
+    this.stopGrace();
+    this.stopPing();
+    this.send('bye', {});
+    this.close();
+  }
+
+  close() {
+    this.stopGrace();
+    this.stopPing();
+    try { if (this.link) this.link.close(); } catch (e) {}
+    this.link = null;
+    this.connected = false;
+    this.setStatus('closed');
+  }
+}
+
+window.M3SwapNet = {
+  NET: NET,
+  NetRoom: NetRoom,
+  newCode: netNewCode,
+  normalizeCode: netNormalizeCode,
+  roomLink: netRoomLink,
+  newSeed: netNewSeed
+};
+})();
+</script>
 <script>
 (function(){
 'use strict';
@@ -3008,12 +4356,1089 @@ function init(){
     applyAppMode();
     registerServiceWorker();
     document.addEventListener('visibilitychange', function(){
-        if (document.hidden && started && state==='IDLE'){
+        if (document.hidden && started && state==='IDLE' && mode!=='online'){
             pausedFrom='IDLE'; state='PAUSED';
             $('pauseOverlay').classList.add('show');
         }
     });
 }
+
+/* =========================================================
+   온라인 1:1 대전 & 콤보 잠금 블록 공격
+   ---------------------------------------------------------
+   · 잠금(이동불가) 블록: 직접 스왑할 수 없고, 상·하·좌·우 옆 칸이
+     매치로 지워질 때 함께 풀린다. 보드 하나에 최대 LOCK_MAX 개.
+   · 콤보 공격: 2연쇄부터 연쇄 한 단계마다 상대 보드에 잠금 1개.
+   · 통신: net_swap.js(window.M3SwapNet)
+       1순위 WSS 중계(공개 MQTT 브로커 4곳) → 2순위 PeerJS → 3순위 BroadcastChannel
+   ========================================================= */
+var MN = window.M3SwapNet || null;
+var mode = 'solo';                 // 'solo' | 'online'
+var BATTLE_TIME = 180000;          // 대전 제한 180초
+var LOCK_MAX = 12;                 // 보드 하나에 동시에 걸리는 잠금 블록 상한
+var ATK_MAX = 6;                   // 한 번에 들어오는 공격 상한
+
+var lockSeq = 0;
+var sentAttacks = 0, recvAttacks = 0, maxCombo = 0;
+var battleEnded = false, battleResultShown = false;
+
+var net = null, netRole = 'host', peerName = '상대';
+var opp = {score:0, locks:0, combo:0};
+var syncLast = 0, battleTick = null, cdTimer = null, atkTimer = null;
+var lobbyBusy = false, lobbyTab = 'create', roomLink = '';
+var forceBc = false, forceRelay = false, forcePeer = false;
+var roundPending = false, peerWantsRematch = false;
+var finTimer = null, oppFin = null;
+var LS_NICK = 'match3swap_nick';
+
+/* ---------------------------------------------------------
+   잠금 블록 — 상태
+   --------------------------------------------------------- */
+function lockedList(){
+    var out = [];
+    for (var r=0;r<G;r++){
+        for (var c=0;c<G;c++){
+            var t = grid[r] && grid[r][c];
+            if (t && t.locked) out.push({r:r, c:c, t:t});
+        }
+    }
+    return out;
+}
+function lockCount(){ return lockedList().length; }
+
+function unlockAllTiles(){
+    for (var r=0;r<G;r++) for (var c=0;c<G;c++){
+        var t = grid[r] && grid[r][c];
+        if (t) { t.locked = false; t.lockAt = 0; }
+    }
+}
+
+/* 상대 공격으로 잠금 블록을 만든다. 상한(LOCK_MAX)을 넘지 않는다. */
+function lockRandomCells(n){
+    var applied = 0, tries = 0;
+    while (applied < n && tries < n*10){
+        tries++;
+        if (lockCount() >= LOCK_MAX) break;
+        var pool = [];
+        for (var r=0;r<G;r++) for (var c=0;c<G;c++){
+            var t = grid[r] && grid[r][c];
+            if (t && !t.locked) pool.push({r:r, c:c, t:t});
+        }
+        if (!pool.length) break;
+        var pick = pool[randInt(pool.length)];
+        pick.t.locked = true;
+        pick.t.lockAt = ++lockSeq;
+        spawnParticles(pick.t.x + TS/2, pick.t.y + TS/2, pick.t.color, 9, 1.2);
+        spawnFloat(pick.t.x + TS/2, pick.t.y + TS/2 - TS*0.30, '🔒', '#bfe6ff', 14);
+        applied++;
+    }
+    return applied;
+}
+
+/* 가장 오래된 잠금부터 하나 푼다 (막힘 방지용) */
+function unlockOldest(){
+    var list = lockedList();
+    if (!list.length) return false;
+    list.sort(function(a,b){ return (a.t.lockAt||0) - (b.t.lockAt||0); });
+    var t = list[0].t;
+    t.locked = false;
+    spawnParticles(t.x + TS/2, t.y + TS/2, t.color, 8, 1.1);
+    return true;
+}
+
+/* 지워지는 칸의 상·하·좌·우에 붙은 잠금 블록을 푼다 */
+function unlockNeighbors(cells){
+    if (!cells || !cells.length) return 0;
+    var done = 0, seen = {};
+    var dd = [[-1,0],[1,0],[0,-1],[0,1]];
+    for (var i=0;i<cells.length;i++){
+        var p = cells[i];
+        if (!p) continue;
+        for (var d=0;d<4;d++){
+            var rr = p.r + dd[d][0], cc = p.c + dd[d][1];
+            if (!inB(rr,cc)) continue;
+            var k = keyOf(rr,cc);
+            if (seen[k]) continue;
+            seen[k] = 1;
+            var t = grid[rr][cc];
+            if (t && t.locked){
+                t.locked = false;
+                done++;
+                spawnParticles(t.x + TS/2, t.y + TS/2, t.color, 8, 1.2);
+                spawnFloat(t.x + TS/2, t.y + TS/2 - TS*0.22, '🔓', '#c9f0ff', 14);
+            }
+        }
+    }
+    if (done){
+        AudioFX.note(784, 0, 0.13, 'sine', 0.07);
+        AudioFX.note(1046.5, 0.05, 0.18, 'sine', 0.05);
+    }
+    return done;
+}
+
+/* 잠금 블록 그림 — 얼음 판 + 자물쇠 */
+function drawLockOverlay(t, now){
+    var size = TS * t.scale;
+    var cx = t.x + TS/2;
+    var cy = t.y + TS/2 + Math.sin(now*0.0018 + t.seed)*0.7;
+    var px = cx - size/2, py = cy - size/2;
+    var rad = Math.max(6, size*0.19);
+    var pulse = 0.5 + 0.5*Math.sin(now*0.004 + (t.lockAt||0)*0.7);
+
+    ctx.save();
+    ctx.globalAlpha = clamp(t.alpha, 0, 1);
+
+    pathRoundRect(ctx, px, py, size, size, rad);
+    var g = ctx.createLinearGradient(px, py, px+size, py+size);
+    g.addColorStop(0,   'rgba(205,240,255,0.58)');
+    g.addColorStop(0.42,'rgba(104,172,255,0.34)');
+    g.addColorStop(1,   'rgba(228,250,255,0.56)');
+    ctx.fillStyle = g;
+    ctx.fill();
+    /* 얼음 결정이 번진 자국 */
+    var fg = ctx.createRadialGradient(cx - size*0.22, cy - size*0.22, size*0.06,
+                                      cx - size*0.22, cy - size*0.22, size*0.78);
+    fg.addColorStop(0, 'rgba(255,255,255,0.55)');
+    fg.addColorStop(0.55, 'rgba(210,245,255,0.14)');
+    fg.addColorStop(1, 'rgba(210,245,255,0)');
+    ctx.fillStyle = fg;
+    ctx.fill();
+
+    ctx.lineWidth = Math.max(2, size*0.062);
+    ctx.strokeStyle = 'rgba(212,246,255,' + (0.80 + 0.20*pulse).toFixed(3) + ')';
+    ctx.shadowColor = 'rgba(110,200,255,0.95)';
+    ctx.shadowBlur = 10 + 10*pulse;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.moveTo(px + size*0.18, py + size*0.82);
+    ctx.lineTo(px + size*0.82, py + size*0.18);
+    ctx.lineWidth = Math.max(1, size*0.024);
+    ctx.strokeStyle = 'rgba(238,252,255,0.55)';
+    ctx.stroke();
+
+    /* 자물쇠 */
+    var s = size*0.54;
+    var ly = cy + s*0.14;
+    ctx.fillStyle = 'rgba(255,255,255,0.99)';
+    pathRoundRect(ctx, cx - s*0.31, ly - s*0.10, s*0.62, s*0.48, s*0.13);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, ly - s*0.12, s*0.21, Math.PI*1.04, Math.PI*1.96);
+    ctx.lineWidth = s*0.105;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,0.99)';
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(22,70,130,0.90)';
+    ctx.beginPath();
+    ctx.arc(cx, ly + s*0.06, s*0.056, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillRect(cx - s*0.022, ly + s*0.06, s*0.044, s*0.10);
+
+    ctx.restore();
+}
+
+/* 타일 그리기를 감싸 잠금 표시를 겹쳐 그린다 */
+var _drawTileShape = drawTileShape;
+drawTileShape = function(t, now){
+    _drawTileShape(t, now);
+    if (t && t.locked) drawLockOverlay(t, now);
+};
+
+/* ---------------------------------------------------------
+   잠금 블록 — 플레이 규칙
+   --------------------------------------------------------- */
+
+/* 잠금을 고려한 '지금 둘 수 있는 수' 찾기 */
+function findMoveLocked(){
+    var m = boardMatrix();
+    var r, c, d, r2, c2, ta, tb;
+    /* 무지개 별은 잠겨 있지 않으면 아무 이웃과 바꿔도 터진다 */
+    for (r=0;r<G;r++) for (c=0;c<G;c++){
+        ta = grid[r][c];
+        if (!ta || ta.locked || ta.special !== 'rainbow') continue;
+        var dd = [[0,1],[1,0],[0,-1],[-1,0]];
+        for (d=0;d<4;d++){
+            r2 = r + dd[d][0]; c2 = c + dd[d][1];
+            if (!inB(r2,c2)) continue;
+            tb = grid[r2][c2];
+            if (tb && !tb.locked) return {a:{r:r,c:c}, b:{r:r2,c:c2}};
+        }
+    }
+    var pairs = [[0,1],[1,0]];
+    for (r=0;r<G;r++) for (c=0;c<G;c++){
+        ta = grid[r][c];
+        if (!ta || ta.locked) continue;
+        for (d=0;d<2;d++){
+            r2 = r + pairs[d][0]; c2 = c + pairs[d][1];
+            if (!inB(r2,c2)) continue;
+            tb = grid[r2][c2];
+            if (!tb || tb.locked) continue;
+            var tmp = m[r][c]; m[r][c] = m[r2][c2]; m[r2][c2] = tmp;
+            var ok = mHasMatch(m);
+            tmp = m[r][c]; m[r][c] = m[r2][c2]; m[r2][c2] = tmp;
+            if (ok) return {a:{r:r,c:c}, b:{r:r2,c:c2}};
+        }
+    }
+    return null;
+}
+var _findMove = findMove;
+findMove = function(){ return findMoveLocked(); };
+
+/* 잠금 때문에 보드가 막히면 가장 오래된 잠금을 1~2개 자동 해제하고 다시 본다
+   (셔플을 되풀이하다 멈추지 않게 하는 안전장치) */
+var _hasValidMove = hasValidMove;
+hasValidMove = function(){
+    if (findMoveLocked()) return true;
+    var freed = 0;
+    while (freed < 2 && unlockOldest()) freed++;
+    if (!freed) return false;
+    var ok = !!findMoveLocked();
+    if (ok && mode === 'online' && started) toast('🔓 둘 곳이 없어 잠금을 풀었어요');
+    return ok;
+};
+
+/* 잠금 블록은 직접 바꿀 수 없다 — 미세 흔들림으로 알려 준다 */
+var _trySwap = trySwap;
+trySwap = async function(a, b){
+    if (inB(a.r,a.c) && inB(b.r,b.c)){
+        var ta = grid[a.r][a.c], tb = grid[b.r][b.c];
+        if ((ta && ta.locked) || (tb && tb.locked)){
+            var lt = (ta && ta.locked) ? ta : tb;
+            shakeMag = Math.max(shakeMag, 3.4);
+            AudioFX.deny();
+            AudioFX.buzz(18);
+            spawnFloat(lt.x + TS/2, lt.y + TS/2 - TS*0.26, '잠김!', '#bfe6ff', 13);
+            toast('🔒 잠긴 블록이에요 — 옆 블록을 맞춰야 풀려요');
+            selection = null;
+            lastAction = performance.now();
+            idleBase = performance.now();
+            return;
+        }
+    }
+    return _trySwap(a,b);
+};
+
+/* 지워지는 칸 옆의 잠금을 풀고, 콤보(2연쇄부터)마다 상대에게 잠금 1개를 보낸다 */
+var _popCells = popCells;
+popCells = async function(cells, chain, gain){
+    if (cells && cells.length) unlockNeighbors(cells);
+    if (chain >= 2){
+        if (chain > maxCombo) maxCombo = chain;
+        if (mode === 'online' && started && !battleEnded) sendLockAttack(1, chain);
+    }
+    return _popCells(cells, chain, gain);
+};
+
+/* ---------------------------------------------------------
+   대전 HUD · 알림
+   --------------------------------------------------------- */
+function setNetPill(kind, text){
+    var p = $('netPill');
+    if (!p) return;
+    p.className = 'net-pill ' + kind;
+    p.textContent = text;
+}
+function updateBattleHud(){
+    if (!$('bhMyScore')) return;
+    $('bhMyScore').textContent = Math.max(0, Math.round(score)).toLocaleString('ko-KR');
+    $('bhOppScore').textContent = Math.max(0, opp.score|0).toLocaleString('ko-KR');
+    $('bhOppLocks').textContent = Math.max(0, opp.locks|0);
+    $('bhLocks').textContent = lockCount();
+    $('bhSent').textContent = sentAttacks;
+    $('bhRecv').textContent = recvAttacks;
+    $('bhOppName').textContent = peerName || '상대';
+    var tag = $('bhOppLocks').parentNode;
+    if (tag) tag.classList.toggle('hot', (opp.locks|0) > 0);
+}
+function showAtkNotice(text){
+    var el = $('atkNotice');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    clearTimeout(atkTimer);
+    atkTimer = setTimeout(function(){ el.classList.remove('show'); }, 1200);
+}
+
+/* 콤보 한 단계 = 상대에게 잠금 1개 */
+function sendLockAttack(n, chain){
+    if (!net || !net.connected) return false;
+    net.send('g', {n:n, cb:chain||0});
+    sentAttacks += n;
+    showAtkNotice('🔥 ' + chain + '콤보! 상대에게 🔒 ' + n + '개 공격!');
+    AudioFX.note(320, 0, 0.20, 'sawtooth', 0.09, 880);
+    AudioFX.note(640, 0.03, 0.12, 'sine', 0.05, 1200);
+    updateBattleHud();
+    return true;
+}
+
+/* 상대 공격 도착 — 내 보드에 잠금 블록 생성 */
+function applyLockAttack(n){
+    n = clamp(n|0, 1, ATK_MAX);
+    var got = lockRandomCells(n);
+    recvAttacks += n;
+    if (got){
+        shakeMag = Math.max(shakeMag, 4.2);
+        AudioFX.noise(0, 0.22, 0.08, 900, 300, 1.2);
+        AudioFX.note(180, 0, 0.22, 'square', 0.10, 90);
+        showAtkNotice('⚠️ 잠금 ' + got + '개!');
+        toast('🔒 잠금 블록 ' + got + '개 — 옆 블록을 맞춰 푸세요');
+    }
+    updateBattleHud();
+}
+
+/* 시간 표시도 대전 HUD에 같이 */
+var _updateTime = updateTime;
+updateTime = function(force){
+    _updateTime(force);
+    var el = $('bhTime');
+    if (el && mode === 'online'){
+        el.textContent = fmtTime(timeLeft);
+        el.classList.toggle('low', timeLeft <= 20000);
+    }
+};
+
+/* 스테이지 목표는 대전 중에 쓰지 않는다 (스테이지 클리어 화면 방지) */
+var _getStageTarget = getStageTarget;
+getStageTarget = function(st){
+    if (mode === 'online') return 1e12;
+    return _getStageTarget(st);
+};
+
+/* 대전 중에는 일시정지 금지 */
+var _togglePause = togglePause;
+togglePause = function(){
+    if (mode === 'online'){
+        if (started) toast('대전 중에는 일시정지할 수 없어요');
+        return;
+    }
+    return _togglePause();
+};
+
+/* 다시 시작 버튼: 대전 중에는 막는다 */
+var _startGame = startGame;
+startGame = function(){
+    if (mode === 'online'){
+        if (started || battleEnded){ toast('온라인 대전 중에는 다시 시작할 수 없어요'); return; }
+        mode = 'solo';
+        document.body.classList.remove('online');
+        stopBattleLoops();
+    }
+    return _startGame();
+};
+
+/* ---------------------------------------------------------
+   시드 — 양쪽이 같은 보드로 시작
+   --------------------------------------------------------- */
+function withSeed(seed, fn){
+    var orig = Math.random;
+    var rnd = mulberry32(((seed >>> 0) || 1));
+    Math.random = function(){ return rnd(); };
+    try { return fn(); } finally { Math.random = orig; }
+}
+
+/* ---------------------------------------------------------
+   라운드 시작 / 종료
+   --------------------------------------------------------- */
+function stopBattleLoops(){
+    if (battleTick){ clearInterval(battleTick); battleTick = null; }
+    clearTimeout(atkTimer); atkTimer = null;
+}
+function startBattleLoops(){
+    stopBattleLoops();
+    battleTick = setInterval(function(){
+        if (mode !== 'online') return;
+        updateBattleHud();
+        if (started && !battleEnded && net && net.connected){
+            var now = performance.now();
+            if (now - syncLast > 900){
+                syncLast = now;
+                net.send('st', {sc: Math.round(score), lk: lockCount(), cb: maxCombo});
+            }
+        }
+    }, 350);
+}
+
+async function startOnlineRound(seed){
+    gameToken++;
+    var tok = gameToken;
+    mode = 'online';
+    document.body.classList.add('online');
+    battleEnded = false;
+    battleResultShown = false;
+    oppFin = null;
+    clearTimeout(finTimer); finTimer = null;
+    sentAttacks = 0; recvAttacks = 0; maxCombo = 0;
+    opp.score = 0; opp.locks = 0; opp.combo = 0;
+    if (net) net.match = {mode:'online'};
+
+    $('lobbyOverlay').classList.remove('show');
+    $('battleEndOverlay').classList.remove('show');
+    $('overOverlay').classList.remove('show');
+    $('startOverlay').classList.remove('show');
+    $('pauseOverlay').classList.remove('show');
+    closeGoalList();
+    closeGallery();
+
+    score = 0; stageScore = 0; stage = 1; timeLeft = BATTLE_TIME;
+    started = true; state = 'IDLE';
+    selection = null; hint = null;
+    ghostTiles.length = 0; particles.length = 0; floats.length = 0; beams.length = 0;
+
+    /* 스테이지 퍼즐 레이어는 대전에서 쓰지 않는다 */
+    clearTimeout(puzzle.timer); puzzle.timer = null;
+    puzzle.queue.length = 0;
+    puzzle.total = 0; puzzle.done = true; puzzle.shown = 0;
+    $('puzzleLayer').classList.remove('show');
+    $('puzzleLayer').classList.remove('done');
+    $('puzzleDone').classList.remove('show');
+
+    layout();
+    unlockAllTiles();
+    updateTime(true);
+    updateBattleHud();
+    startBattleLoops();
+
+    var bseed = (seed >>> 0) || 1;
+    var bp = withSeed(bseed, function(){
+        pickBackground();
+        return buildBoard(true);
+    });
+    await bp;
+    if (tok !== gameToken || !started) return;
+    state = 'IDLE';
+    lastAction = performance.now();
+    idleBase = performance.now();
+    updateBattleHud();
+    if (!hasValidMove()) await shuffleWithToast('이동할 조합이 없어 보드를 섞었어요');
+}
+
+function showCountdown(done){
+    var el = $('cdOverlay'), num = $('cdNum');
+    if (!el || !num){ done(); return; }
+    var n = 3;
+    el.classList.add('show');
+    num.textContent = n;
+    num.classList.remove('pop'); void num.offsetWidth; num.classList.add('pop');
+    AudioFX.note(660, 0, 0.10, 'sine', 0.06);
+    clearInterval(cdTimer);
+    cdTimer = setInterval(function(){
+        n--;
+        if (n <= 0){
+            clearInterval(cdTimer); cdTimer = null;
+            el.classList.remove('show');
+            done();
+            return;
+        }
+        num.textContent = n;
+        num.classList.remove('pop'); void num.offsetWidth; num.classList.add('pop');
+        AudioFX.note(660, 0, 0.10, 'sine', 0.06);
+    }, 620);
+}
+
+function beginRound(seed){
+    if (roundPending || !net || !net.connected) return false;
+    roundPending = true;
+    showCountdown(function(){
+        roundPending = false;
+        startOnlineRound(seed);
+    });
+    return true;
+}
+function hostBeginRound(){
+    if (!net || !net.connected) return;
+    if (roundPending) return;
+    var seed = MN ? MN.newSeed() : (Date.now() % 999983);
+    net.send('start', {seed: seed});
+    beginRound(seed);
+}
+
+/* 시간 종료 → 점수 비교 */
+var _onTimeUp = onTimeUp;
+onTimeUp = function(){
+    if (mode !== 'online'){ _onTimeUp(); return; }
+    if (battleEnded) return;
+    battleEnded = true;
+    started = false;
+    state = 'GAMEOVER';
+    selection = null; hint = null;
+    if (net && net.connected) net.send('fin', {sc: Math.round(score), lk: lockCount(), cb: maxCombo});
+    updateBattleHud();
+    AudioFX.gameOver();
+    clearTimeout(finTimer);
+    finTimer = setTimeout(decideBattle, 1400);
+};
+
+function decideBattle(){
+    if (battleResultShown) return;
+    var my = Math.round(score);
+    var op = (typeof oppFin === 'number') ? oppFin : Math.max(0, opp.score|0);
+    if (my > op) battleResult('🏆 승리!', '상대보다 ' + (my-op).toLocaleString('ko-KR') + '점 앞섰습니다.');
+    else if (my < op) battleResult('아쉬운 패배', '상대보다 ' + (op-my).toLocaleString('ko-KR') + '점 뒤졌습니다.');
+    else battleResult('🤝 무승부', '두 사람의 점수가 같습니다.');
+}
+function battleResult(title, msg){
+    battleResultShown = true;
+    $('battleEndTitle').textContent = title;
+    $('battleEndMsg').textContent = msg;
+    $('beMy').textContent = Math.round(score).toLocaleString('ko-KR');
+    $('beOpp').textContent = ((typeof oppFin === 'number') ? oppFin : Math.max(0, opp.score|0)).toLocaleString('ko-KR');
+    $('beCombo').textContent = maxCombo > 0 ? (maxCombo + '콤보') : '-';
+    $('beSent').textContent = sentAttacks;
+    $('beRecv').textContent = recvAttacks;
+    $('battleEndOverlay').classList.add('show');
+    if (title.indexOf('승리') >= 0) AudioFX.fanfare();
+}
+
+/* 상대가 나갔다 → 기권 처리 */
+function onPeerGone(msg){
+    if (mode !== 'online') return;
+    if (battleResultShown) return;
+    if (started && !battleEnded){
+        battleEnded = true;
+        started = false;
+        state = 'GAMEOVER';
+        battleResult('🏆 승리!', (msg || '상대가 나갔습니다') + ' — 기권 처리입니다.');
+    } else if (battleEnded){
+        battleResultShown = true;
+        $('battleEndTitle').textContent = '상대 연결 종료';
+        $('battleEndMsg').textContent = msg || '상대가 나갔습니다';
+        $('battleEndOverlay').classList.add('show');
+    }
+}
+
+function askRematch(){
+    if (!net || !net.connected){ toast('상대와 연결되어 있지 않습니다'); return; }
+    $('battleEndMsg').textContent = '재대전을 요청했습니다 — 상대 응답을 기다리는 중…';
+    net.send('rm', {});
+    AudioFX.note(700, 0, 0.12, 'sine', 0.06);
+}
+
+function leaveBattle(){
+    try{ if (net) net.byeNow(); }catch(e){}
+    closeNet();
+    stopBattleLoops();
+    mode = 'solo';
+    document.body.classList.remove('online');
+    started = false;
+    state = 'IDLE';
+    battleEnded = false;
+    battleResultShown = false;
+    clearTimeout(finTimer); finTimer = null;
+    $('battleEndOverlay').classList.remove('show');
+    $('pauseOverlay').classList.remove('show');
+    $('overOverlay').classList.remove('show');
+    $('startOverlay').classList.add('show');
+    unlockAllTiles();
+    layout();
+}
+
+/* ---------------------------------------------------------
+   통신 연결
+   --------------------------------------------------------- */
+function closeNet(){
+    if (net){
+        try{ net.close(); }catch(e){}
+        net = null;
+    }
+    roundPending = false;
+}
+function applyOppState(m){
+    if (!m) return;
+    if (typeof m.sc === 'number') opp.score = Math.max(0, m.sc|0);
+    if (typeof m.lk === 'number') opp.locks = Math.max(0, m.lk|0);
+    if (typeof m.cb === 'number') opp.combo = Math.max(opp.combo, m.cb|0);
+    updateBattleHud();
+}
+
+function attachNet(room){
+    net = room;
+    netRole = room.role;
+    peerName = '상대';
+
+    room.on('status', function(s){
+        var k = s && s.status;
+        if (k === 'waiting') setNetBadge('warn', '🟡 상대 대기');
+        else if (k === 'connecting') setNetBadge('warn', '🟡 연결 중');
+        else if (k === 'connected') setNetBadge('on', '🟢 연결됨');
+        else if (k === 'error') setNetBadge('off', '🔴 연결 실패');
+        else if (k === 'closed' && !started) setNetBadge('off', '🔴 끊김');
+    });
+
+    room.on('connected', function(){
+        setNetBadge('on', '🟢 연결됨');
+        setNetPill('', '🟢 연결');
+        var wl = $('waitLine');
+        if (wl && $('lobbyOverlay').classList.contains('show')){
+            wl.className = 'wait-line';
+            wl.innerHTML = '🟢 연결되었습니다 — 곧 시작합니다';
+        }
+        if (started && !battleEnded){
+            toast('다시 연결되었습니다');
+            net.send('st', {sc: Math.round(score), lk: lockCount(), cb: maxCombo});
+        }
+    });
+
+    room.on('hello', function(info){
+        peerName = (info && info.name) || '상대';
+        updateBattleHud();
+        if (wlName()) wlName().textContent = peerName;
+        if (netRole === 'host' && !started && !battleEnded) hostBeginRound();
+    });
+
+    room.on('start', function(m){
+        if (netRole === 'host') return;
+        beginRound((m && m.seed) || 1);
+    });
+
+    room.on('st', applyOppState);
+    room.on('g', function(m){ applyLockAttack((m && m.n) || 1); });
+    room.on('fin', function(m){
+        if (m && typeof m.sc === 'number') oppFin = m.sc|0;
+        if (battleEnded) decideBattle();
+    });
+
+    room.on('rm', function(){
+        peerWantsRematch = true;
+        if (netRole === 'host') hostBeginRound();
+        else { net.send('rmyes', {}); toast('상대가 재대전을 신청했습니다'); }
+    });
+    room.on('rmyes', function(){
+        if (netRole === 'host') hostBeginRound();
+    });
+
+    room.on('bye', function(){ onPeerGone('상대가 나갔습니다'); });
+    room.on('peerLeft', function(){ onPeerGone('상대가 나갔습니다'); });
+
+    room.on('disconnected', function(){
+        if (mode !== 'online') return;
+        setNetPill('off', '🔴 끊김');
+        toast('연결이 끊겼습니다 · 10초 안에 다시 연결합니다');
+    });
+    room.on('grace', function(m){
+        setNetPill('warn', '🟡 재연결 ' + ((m && m.left) || 0) + '초');
+    });
+    room.on('graceEnd', function(){
+        if (mode !== 'online') return;
+        setNetPill('off', '🔴 끊김');
+        onPeerGone('연결이 끊어졌습니다');
+    });
+    room.on('error', function(){});
+}
+function wlName(){ return $('bhOppName'); }
+
+/* ---------------------------------------------------------
+   로비
+   --------------------------------------------------------- */
+function nick(){
+    var v = '';
+    try{ v = localStorage.getItem(LS_NICK) || ''; }catch(e){}
+    return (v || '플레이어').slice(0, 8);
+}
+function loadNick(){ if ($('nickInput')) $('nickInput').value = nick(); }
+function saveNick(){
+    if (!$('nickInput')) return nick();
+    var v = ($('nickInput').value || '').trim().slice(0, 8) || '플레이어';
+    $('nickInput').value = v;
+    try{ localStorage.setItem(LS_NICK, v); }catch(e){}
+    return v;
+}
+function setLobbyNote(html, isErr){
+    var el = $('lobbyNote');
+    if (!el) return;
+    el.innerHTML = html || '';
+    el.classList.toggle('err', !!isErr);
+}
+function setNetBadge(kind, text){
+    var el = $('netBadge');
+    if (!el) return;
+    el.className = 'net-badge ' + kind;
+    el.textContent = text;
+}
+function setLobbyTab(tab){
+    lobbyTab = (tab === 'join') ? 'join' : 'create';
+    var btns = $('lobbyTab').querySelectorAll('button[data-tab]');
+    for (var i=0;i<btns.length;i++) btns[i].classList.toggle('on', btns[i].dataset.tab === lobbyTab);
+    $('createPane').classList.toggle('hidden', lobbyTab !== 'create');
+    $('joinPane').classList.toggle('hidden', lobbyTab !== 'join');
+    if (lobbyTab === 'join'){
+        var el = $('codeInput');
+        setTimeout(function(){ try{ el.focus({preventScroll:true}); }catch(e){} }, 80);
+    }
+}
+function openLobby(tab, code){
+    closeNet();
+    mode = 'solo';
+    started = false;
+    state = 'IDLE';
+    document.body.classList.remove('online');
+    stopBattleLoops();
+    $('overOverlay').classList.remove('show');
+    $('battleEndOverlay').classList.remove('show');
+    $('startOverlay').classList.remove('show');
+    $('lobbyOverlay').classList.add('show');
+    $('roomBox').classList.add('hidden');
+    setLobbyTab(tab || 'create');
+    loadNick();
+    setNetBadge('off', '⚪ 대기');
+    setLobbyNote('');
+    if (code && $('codeInput')){
+        $('codeInput').value = MN ? MN.normalizeCode(code) : code;
+        setLobbyNote('초대 링크로 접속했습니다. 잠시 후 자동으로 입장합니다.');
+    }
+    layout();
+}
+function closeLobby(){
+    closeNet();
+    var lo = $('lobbyOverlay');
+    if (lo) lo.classList.remove('show');
+    if (mode !== 'online') $('startOverlay').classList.add('show');
+    setLobbyNote('');
+    layout();
+}
+
+async function createRoom(){
+    if (lobbyBusy) return;
+    if (!MN){ setLobbyNote('연결 모듈을 불러오지 못했습니다. 페이지를 새로 고침해 주세요.', true); return; }
+    saveNick();
+    closeNet();
+    lobbyBusy = true;
+    $('btnCreate').disabled = true;
+    $('roomBox').classList.add('hidden');
+    setLobbyNote('<span class="spin"></span> 연결을 준비하고 있습니다…');
+    setNetBadge('warn', '🟡 연결 중');
+    var room = new MN.NetRoom({
+        role: 'host', name: nick(),
+        forceBc: forceBc, forceRelay: forceRelay, forcePeer: forcePeer
+    });
+    attachNet(room);
+    var ok = await room.open();
+    lobbyBusy = false;
+    $('btnCreate').disabled = false;
+    if (!ok){ showNetError(room.lastErr); return; }
+    showRoom(room);
+}
+
+function showRoom(room){
+    $('roomBox').classList.remove('hidden');
+    $('roomCode').textContent = room.code;
+    roomLink = MN.roomLink(room.code);
+    try{ $('roomLinkInput').value = decodeURI(roomLink); }catch(e){ $('roomLinkInput').value = roomLink; }
+    syncShareHref();
+    var wl = $('waitLine');
+    if (location.protocol === 'file:'){
+        wl.className = 'wait-line hot';
+        wl.innerHTML = '<span class="spin"></span> 상대 입장을 기다리는 중… (친구는 위 4자리 코드로 입장)';
+        setLobbyNote('지금은 <b>파일로 직접 열린 상태</b>라 초대 링크를 친구에게 보낼 수 없습니다. 같은 파일을 연 친구는 <b>위 4자리 코드</b>로 입장해 주세요. 웹서버용 zip을 https 주소에 올리면 초대 링크가 그대로 동작합니다.');
+    } else if (room.mode === 'bc'){
+        wl.className = 'wait-line hot';
+        wl.innerHTML = '<span class="spin"></span> 같은 기기 모드 — 이 브라우저의 다른 탭에서 접속하세요';
+        setLobbyNote('중계 서버에 접속하지 못해 <b>같은 브라우저 탭끼리</b>만 연결되는 모드입니다.');
+    } else {
+        wl.className = 'wait-line';
+        wl.innerHTML = '<span class="spin"></span> 상대 입장을 기다리는 중…';
+        setLobbyNote('중계 서버를 거쳐 연결되므로 <b>5G·회사망·카톡 인앱 브라우저</b>에서도 그대로 됩니다. 친구가 코드나 초대 링크로 들어오면 바로 시작합니다.');
+    }
+    setNetBadge('warn', '🟡 상대 대기');
+    layout();
+}
+
+async function joinRoom(code){
+    if (!MN){ setLobbyNote('연결 모듈을 불러오지 못했습니다. 페이지를 새로 고침해 주세요.', true); return; }
+    code = MN.normalizeCode(code);
+    if ($('codeInput')) $('codeInput').value = code;
+    if (code.length !== MN.NET.codeLen){ setLobbyNote('4자리 방 코드를 입력해 주세요.', true); return; }
+    if (lobbyBusy) return;
+    saveNick();
+    closeNet();
+    lobbyBusy = true;
+    setLobbyNote('<span class="spin"></span> 방을 찾는 중…');
+    setNetBadge('warn', '🟡 연결 중');
+    var room = new MN.NetRoom({
+        role: 'guest', code: code, name: nick(),
+        forceBc: forceBc, forceRelay: forceRelay, forcePeer: forcePeer
+    });
+    attachNet(room);
+    var ok = await room.open();
+    lobbyBusy = false;
+    if (!ok){ showNetError(room.lastErr); return; }
+    if (room.connected) return;
+    setLobbyNote('<span class="spin"></span> 방장과 연결하는 중… (코드 ' + code + ')');
+}
+
+function showNetError(err){
+    var type = (err && err.type) || '';
+    var msg;
+    if (type === 'room-not-found' || type === 'peer-unavailable'){
+        msg = '그 코드의 방을 찾지 못했습니다. 코드를 다시 확인하고 방장이 아직 대기 중인지 봐 주세요.';
+    } else if (type === 'cdn-blocked' || type === 'cdn-timeout' || type === 'no-peerjs'){
+        msg = '연결 프로그램을 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.<br>(같은 브라우저 탭끼리 시험하려면 주소 끝에 <b>?test=bc</b>)';
+    } else if (type === 'no-host'){
+        msg = '방장이 응답하지 않습니다. 코드를 확인하거나 방을 새로 만들어 주세요.';
+    } else if (type === 'relay-unreachable'){
+        msg = '중계 서버에 접속하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.<br>(같은 브라우저 탭끼리 시험하려면 주소 끝에 <b>?test=bc</b>)';
+    } else if (type === 'ice-timeout'){
+        msg = '방은 찾았지만 두 기기 사이 직접 연결이 막혔습니다. 같은 Wi-Fi나 휴대폰 핫스팟에 연결한 뒤 다시 해 보세요.';
+    } else if (type === 'code-taken'){
+        msg = '방 코드가 겹쳤습니다. 다시 한 번 만들어 주세요.';
+    } else {
+        msg = '연결하지 못했습니다. 잠시 뒤 다시 시도해 주세요.';
+    }
+    setLobbyNote(msg, true);
+    setNetBadge('off', '🔴 연결 실패');
+}
+
+/* ---------------------------------------------------------
+   초대 공유 — 링크 복사 · 문자(SMS) · 카톡/공유
+   --------------------------------------------------------- */
+function copyRoomLink(){
+    var v = roomLink || ($('roomLinkInput') ? $('roomLinkInput').value : '');
+    if (!v){ setLobbyNote('먼저 방을 만들어 주세요', true); return; }
+    var done = function(){ setLobbyNote('초대 링크를 복사했습니다. 카톡·문자로 붙여 넣어 보내세요.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(v).then(done, function(){ fallbackCopy(v, done); });
+    } else {
+        fallbackCopy(v, done);
+    }
+}
+function fallbackCopy(v, cb){
+    try{
+        var t = document.createElement('textarea');
+        t.value = v; t.style.position = 'fixed'; t.style.opacity = '0';
+        document.body.appendChild(t); t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+        cb();
+    }catch(e){
+        $('roomLinkInput').focus(); $('roomLinkInput').select();
+        setLobbyNote('링크를 길게 눌러 직접 복사해 주세요.', true);
+    }
+}
+function copyRawText(txt, cb){
+    var finish = function(ok){ cb(!!ok); };
+    var fallback = function(){
+        try{
+            var t = document.createElement('textarea');
+            t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0';
+            document.body.appendChild(t); t.select();
+            var ok = document.execCommand('copy');
+            document.body.removeChild(t);
+            return ok;
+        }catch(e){ return false; }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(function(){ finish(true); }, function(){ finish(fallback()); });
+        return;
+    }
+    finish(fallback());
+}
+var SHARE_GAME = '매치3 스왑형';
+function inviteCode(){
+    var c = (net && net.code) || ($('roomCode') ? $('roomCode').textContent : '');
+    c = String(c || '').trim().toUpperCase();
+    return /^[A-Z0-9]{4}$/.test(c) ? c : '';
+}
+function inviteText(code){ return '[' + SHARE_GAME + '] 같이 해요! 방 코드 ' + code; }
+function inviteBody(code){ return inviteText(code) + '\n' + roomLink; }
+function isIOSUA(){
+    var ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) return true;
+    return navigator.platform === 'MacIntel' && (navigator.maxTouchPoints||0) > 1;
+}
+function isMobileUA(){
+    var ua = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|iPod|Mobile|SamsungBrowser/i.test(ua)) return true;
+    return (navigator.maxTouchPoints||0) > 1 && /Mac/.test(navigator.platform||'');
+}
+function smsHrefFor(body){
+    return (isIOSUA() ? 'sms:&body=' : 'sms:?body=') + encodeURIComponent(body);
+}
+function syncShareHref(){
+    var a = $('btnSms');
+    if (!a) return;
+    var c = inviteCode();
+    a.setAttribute('href', c ? smsHrefFor(inviteBody(c)) : '#');
+}
+function sendSmsInvite(){
+    var code = inviteCode();
+    if (!code){ setLobbyNote('먼저 방을 만들어 주세요', true); return ''; }
+    var body = inviteBody(code);
+    var href = smsHrefFor(body);
+    if (!isMobileUA()){
+        copyRawText(body, function(ok){
+            setLobbyNote(ok ? 'PC에는 문자 앱이 없어요. 초대 문구를 복사했어요 — 문자·카톡에 붙여넣어 보내세요'
+                            : '초대 문구를 복사하지 못했어요. 초대 링크를 길게 눌러 복사해 주세요', !ok);
+        });
+        return 'copy';
+    }
+    try{ location.href = href; }catch(e){}
+    return href;
+}
+function shareInvite(){
+    var code = inviteCode();
+    if (!code){ setLobbyNote('먼저 방을 만들어 주세요', true); return null; }
+    var text = inviteText(code), link = roomLink;
+    var data = {title: SHARE_GAME, text: text, url: link};
+    var copyFallback = function(){
+        copyRawText(text + '\n' + link, function(ok){
+            setLobbyNote(ok ? '초대 문구를 복사했어요! 카카오톡에 붙여넣어 보내세요'
+                            : '초대 링크를 길게 눌러 복사해 주세요', !ok);
+        });
+    };
+    if (navigator.share){
+        var p = null;
+        try{ p = navigator.share(data); }catch(e){ p = null; }
+        if (p && typeof p.then === 'function'){
+            p.then(function(){}, function(err){
+                if (err && (err.name === 'AbortError' || err.name === 'NotAllowedError')) return;
+                copyFallback();
+            });
+        }
+        return data;
+    }
+    copyFallback();
+    return data;
+}
+
+/* ---------------------------------------------------------
+   주소 쿼리 — ?r=CODE 초대 링크 / ?test=bc|relay|p2p / ?broker=N
+   --------------------------------------------------------- */
+function readSwapQuery(){
+    var q = null;
+    try{ q = new URLSearchParams(location.search); }catch(e){ q = null; }
+    if (!q) return;
+    forceBc = (q.get('test') === 'bc');
+    forceRelay = (q.get('test') === 'relay');
+    forcePeer = (q.get('test') === 'p2p');
+    var br = parseInt(q.get('broker') || '', 10);
+    if (!isNaN(br) && br >= 0 && MN) MN.NET.relay.only = br;
+    var raw = q.get('r') || '';
+    if (!raw || !MN) return;
+    var code = MN.normalizeCode(raw);
+    if (code.length !== MN.NET.codeLen) return;
+    openLobby('join', code);
+    setTimeout(function(){
+        if (!net && lobbyTab === 'join' && $('codeInput') && $('codeInput').value === code) joinRoom(code);
+    }, 900);
+}
+
+/* ---------------------------------------------------------
+   버튼
+   --------------------------------------------------------- */
+if ($('btnOnline')) $('btnOnline').addEventListener('click', function(){
+    AudioFX.resume();
+    openLobby('create');
+});
+if ($('lobbyBack')) $('lobbyBack').addEventListener('click', function(){ closeLobby(); });
+if ($('lobbyTab')) $('lobbyTab').addEventListener('click', function(ev){
+    var b = ev.target && ev.target.closest ? ev.target.closest('button[data-tab]') : null;
+    if (b) setLobbyTab(b.dataset.tab);
+});
+if ($('btnCreate')) $('btnCreate').addEventListener('click', function(){ AudioFX.resume(); createRoom(); });
+if ($('btnJoin')) $('btnJoin').addEventListener('click', function(){ AudioFX.resume(); joinRoom($('codeInput').value); });
+if ($('codeInput')) $('codeInput').addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ e.preventDefault(); joinRoom($('codeInput').value); }
+});
+if ($('codeInput')) $('codeInput').addEventListener('input', function(){
+    if (!MN) return;
+    var v = MN.normalizeCode($('codeInput').value);
+    if ($('codeInput').value !== v) $('codeInput').value = v;
+});
+if ($('btnCopyLink')) $('btnCopyLink').addEventListener('click', function(){ copyRoomLink(); });
+if ($('btnSms')) $('btnSms').addEventListener('click', function(ev){
+    ev.preventDefault();
+    sendSmsInvite();
+});
+if ($('btnShare')) $('btnShare').addEventListener('click', function(){ shareInvite(); });
+if ($('btnRematch')) $('btnRematch').addEventListener('click', function(){ askRematch(); });
+if ($('btnBattleLobby')) $('btnBattleLobby').addEventListener('click', function(){
+    leaveBattle();
+    openLobby('create');
+});
+if ($('btnBattleSolo')) $('btnBattleSolo').addEventListener('click', function(){
+    leaveBattle();
+    startGame();
+});
+if ($('btnBattleBack')) $('btnBattleBack').addEventListener('click', function(){
+    if (net && net.connected && started && !battleEnded){
+        try{ net.byeNow(); }catch(e){}
+    }
+    leaveBattle();
+    openLobby('create');
+});
+
+/* 빈 자리 클릭으로 로비 닫기 */
+if ($('lobbyOverlay')) $('lobbyOverlay').addEventListener('click', function(e){
+    if (e.target === $('lobbyOverlay')) closeLobby();
+});
+
+readSwapQuery();
+
+/* 검증용 핸들 (게임 동작에는 관여하지 않음) */
+window.__m3battle = {
+    get mode(){ return mode; },
+    get net(){
+        return net ? {mode:net.mode, status:net.status, role:net.role,
+                      connected:net.connected, code:net.code, latency:net.latency} : null;
+    },
+    get battle(){
+        return {started:started, ended:battleEnded, result:battleResultShown, state:state,
+                score:Math.round(score), oppScore:opp.score, sent:sentAttacks, recv:recvAttacks,
+                locks:lockCount(), oppLocks:opp.locks, maxCombo:maxCombo,
+                timeLeft:Math.round(timeLeft), peer:peerName,
+                hudMy:$('bhMyScore') ? $('bhMyScore').textContent : null,
+                hudOpp:$('bhOppScore') ? $('bhOppScore').textContent : null,
+                hudLocks:$('bhLocks') ? $('bhLocks').textContent : null};
+    },
+    get lobby(){
+        return {open:$('lobbyOverlay') ? $('lobbyOverlay').classList.contains('show') : false,
+                tab:lobbyTab,
+                badge:$('netBadge') ? $('netBadge').textContent : '',
+                note:$('lobbyNote') ? $('lobbyNote').textContent : '',
+                code:$('roomCode') ? $('roomCode').textContent : '',
+                link:$('roomLinkInput') ? $('roomLinkInput').value : ''};
+    },
+    get lockMax(){ return LOCK_MAX; },
+    lockCount: lockCount,
+    lockedList: function(){ return lockedList().map(function(o){ return {r:o.r, c:o.c}; }); },
+    lockCell: function(r,c){
+        var t = grid[r] && grid[r][c];
+        if (!t || t.locked) return false;
+        t.locked = true; t.lockAt = ++lockSeq;
+        return true;
+    },
+    unlockCell: function(r,c){
+        var t = grid[r] && grid[r][c];
+        if (!t) return false;
+        t.locked = false;
+        return true;
+    },
+    attack: applyLockAttack,
+    popTest: function(list){ return popCells(list, 1, 0); },
+    testCombo: function(chain){ return popCells([], chain, 0); },
+    findMoveLocked: findMoveLocked,
+    hasValidMove: function(){ return hasValidMove(); },
+    startRound: startOnlineRound,
+    beginRound: beginRound,
+    openLobby: openLobby,
+    closeLobby: closeLobby,
+    createRoom: createRoom,
+    joinRoom: joinRoom,
+    leave: leaveBattle,
+    askRematch: askRematch,
+    share: {copy: copyRoomLink, sms: sendSmsInvite, share: shareInvite,
+            text: function(){ var c = inviteCode(); return c ? inviteBody(c) : ''; },
+            href: function(){ return $('btnSms') ? $('btnSms').getAttribute('href') : ''; }},
+    forceTimeUp: function(){ timeLeft = 1; },
+    setOppScore: function(n){ opp.score = n|0; updateBattleHud(); },
+    forceEnd: function(){ onTimeUp(); },
+    normalize: function(c){ return MN ? MN.normalizeCode(c) : c; },
+    newCode: function(){ return MN ? MN.newCode() : ''; },
+    shot: function(){ return {cd:$('cdOverlay') ? $('cdOverlay').classList.contains('show') : false}; }
+};
 
 /* 디버그/검증용 핸들 (게임 동작에는 관여하지 않음) */
 window.__match3 = {
