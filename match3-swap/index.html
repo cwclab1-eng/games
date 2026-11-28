@@ -862,7 +862,7 @@
         <p id="battleEndMsg"></p>
         <div class="stat-row">
             <div class="stat"><span>나</span><b id="beMy">0</b></div>
-            <div class="stat"><span>상대</span><b id="beOpp">0</b></div>
+            <div class="stat"><span id="beOppLabel">상대</span><b id="beOpp">0</b></div>
             <div class="stat"><span>최대 콤보</span><b id="beCombo">-</b></div>
         </div>
         <div class="stat-row" style="border-top:none;padding-top:0;margin-top:6px">
@@ -5922,6 +5922,7 @@ battleResult = function(title, msg){
     if ($('btnBattleDiff')) $('btnBattleDiff').classList.toggle('hidden', !isAi);
     if ($('btnBattleSolo')) $('btnBattleSolo').classList.toggle('hidden', isAi);
     if ($('btnBattleLobby')) $('btnBattleLobby').textContent = isAi ? '나가기' : '로비로';
+    if ($('beOppLabel')) $('beOppLabel').textContent = isAi ? '🤖 AI' : '상대';
 };
 
 /* 재대전 — 같은 난이도로 바로 한 판 더 */
