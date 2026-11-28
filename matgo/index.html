@@ -2145,25 +2145,29 @@ window.HP.STAGE = 2;
        (v16 은 내 손패만 0장이어도 바로 스톱 처리해, 상대 패가 남았는데 판이 끝나는 버그가 있었다.) */
     /* v20 — 턴 주인의 손패가 0장이면 더 낼 패가 없다. 고/스톱을 묻지 않고 그 자리에서 정산한다.
        (정석호 님 2026-11-28 제보 "내 남은패가 없는데 고,스톱 선택창" — v17 은 이 경우에도 창을 띄웠다.)
-       손패가 1장이라도 남아 있으면 예전처럼 고/스톱을 묻는다. */
+       손패가 1장이라도 남아 있으면 예전처럼 고/스톱을 묻는다.
+
+       v21 — 정석호 님 2026-11-28 제보 "상대가 선일때 내패 한장이 남았는데 치기도전에 승패를 결정해버리네".
+       v20 은 턴 주인 혼자 0장이어도 바로 판을 끝내, 선이 10장째를 내고 7점이 안 될 때
+       후공에게 남은 마지막 1장을 칠 차례가 오지 않았다. 판을 끝내는 것은 **양쪽 손패가 모두 0장(bothEmpty)**
+       일 때뿐이고, 상대에게 패가 남아 있으면 차례를 넘겨 그 1장을 치게 한다. */
     var mineEmpty = (S.hands[pid] || []).length === 0;       // 가상 폭탄패까지 포함한 내 손패
+    var bothEmpty = (S.hands.p1 || []).length === 0 && (S.hands.p2 || []).length === 0;   // 가상 폭탄패 포함 양쪽
     var realBothEmpty = HP.realHandCount(S, 'p1') === 0 && HP.realHandCount(S, 'p2') === 0;
-    var canGo = sc.total >= 7 && sc.total > S.goBase[pid];
-    if (mineEmpty) {
-      if (canGo) {
-        ev.push({ t: 'autoStop', pid: pid, score: sc.total, lastCard: true, noCards: true });
-        return win(S, pid, 'stop', Math.max(sc.total, 7), ev);
-      }
-      return endGame(S, ev, 'exhausted');
-    }
     /* 실제 패는 양쪽 다 없고 더미도 바닥났다 — 가상 폭탄패만 남아 더 뒤집을 패가 없다.
        이때 7점 이상이면 고/스톱 창도 승리 정산도 없이 판이 끝나 버리지 않도록 스톱 승리로 정산한다. */
-    if (realBothEmpty && S.deck.length === 0) {
+    var noMoreCards = realBothEmpty && S.deck.length === 0;
+    var canGo = sc.total >= 7 && sc.total > S.goBase[pid];
+    if (mineEmpty || noMoreCards) {
       if (canGo) {
         ev.push({ t: 'autoStop', pid: pid, score: sc.total, lastCard: mineEmpty, noCards: true });
         return win(S, pid, 'stop', Math.max(sc.total, 7), ev);
       }
-      return endGame(S, ev, 'exhausted');
+      /* 양쪽 다 낼 패가 없거나, 실제 패·더미가 다 떨어졌을 때만 판을 끝낸다 */
+      if (bothEmpty || noMoreCards) return endGame(S, ev, 'exhausted');
+      /* 상대(후공)에게 패가 남았다 — 판을 끝내지 않고 차례를 넘겨 그 마지막 1장을 치게 한다 (v21) */
+      advanceTurn(S, ev);
+      return { events: ev };
     }
 
     if (canGo) {
