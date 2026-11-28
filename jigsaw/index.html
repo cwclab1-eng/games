@@ -641,6 +641,53 @@ html.fs #board{background:transparent; box-shadow:none}
 html.fs #scr-play .board-wrap::before{filter:blur(18px) brightness(.8) saturate(1.2); opacity:.95}
 html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 42%, rgba(6,11,22,0) 0%, rgba(6,11,22,.42) 92%)}
 
+/* ================= 2026-11-28: 순차 해금 · 부분 공개(크롭) · 조각 2배 ================= */
+
+/* 난이도 시트 — 잠긴 난이도 / 지금 도전할 난이도 */
+.rank.locked{opacity:.55; background:rgba(255,255,255,.02)}
+.rank.locked .g{background:rgba(255,255,255,.06); color:var(--dim2)}
+.rank.locked .r{color:var(--dim2); font-weight:800}
+.rank.locked:active{background:rgba(255,255,255,.05)}
+.rank .t b .lk{font-size:11px; opacity:.9}
+.rank.auto{border-color:rgba(94,224,208,.62); background:linear-gradient(135deg,rgba(94,224,208,.14),rgba(177,140,255,.1))}
+.rank.auto .g{border-color:rgba(94,224,208,.5)}
+.rank.auto .t b::after{content:" · 다음 도전"; font-size:10.5px; color:var(--aqua); font-weight:800}
+.sheet .rankgo{width:100%; margin-top:6px}
+
+/* 원본의 일부만 보여 주는 상자(난이도 크롭) */
+.cropimg{position:relative; width:100%; height:100%; overflow:hidden; background:#0a1220}
+.cropimg .cimg{position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:cover}
+.detail .cropimg{width:100%; aspect-ratio:1; max-height:52dvh}
+
+/* 결과창: 달인 전에는 전체 사진을 주지 않는다는 안내 */
+.result .lockline{font-size:11.5px; font-weight:800; color:#ffd76f; margin:6px 0 0; line-height:1.45}
+.result .art .cropimg{position:absolute; inset:0}
+
+/* 갤러리: 해금한 영역만 보이고 바깥은 어둡게 */
+.gal .gal-crop{
+  position:absolute; display:block; border:1px solid rgba(255,255,255,.4);
+  box-shadow:0 0 0 999px rgba(3,7,14,.74); pointer-events:none;
+}
+.gal .gal-badge{
+  position:absolute; left:5px; top:5px; padding:2px 6px; border-radius:6px;
+  font-size:9px; font-weight:900; letter-spacing:.02em; color:#ffd76f;
+  background:rgba(6,12,22,.82); border:1px solid rgba(255,203,77,.48);
+}
+.gal .gal-badge.full{color:#0a1220; background:linear-gradient(135deg,#ffd76f,#ffb347); border-color:transparent}
+.gal.full{border-color:rgba(255,203,77,.55)}
+
+/* 갤러리 상세: 지금까지 공개된 비율 */
+.detail .cropstate{font-size:11.5px; font-weight:800; margin-top:6px}
+.detail .cropstate .ok{color:var(--gold)}
+.btn.off{opacity:.62; color:var(--dim)}
+
+/* 초대: 링크 복사 · 문자 · 카톡/공유 (2026-11-28) */
+.ol-invite{display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; justify-content:flex-end}
+.ol-invite .ol-copy{margin-left:0; padding:8px 10px; font-size:11px; white-space:nowrap}
+.ol-invite .ol-copy.kakao{color:#ffe08a; border-color:rgba(255,203,77,.4); background:rgba(255,203,77,.1)}
+.ol-invite .ol-copy.sms{color:#9fe8ff; border-color:rgba(94,224,208,.38); background:rgba(94,224,208,.1)}
+@media (max-width:360px){ .ol-invite .ol-copy{padding:7px 8px; font-size:10.5px} }
+
 </style>
 </head>
 <body>
@@ -651,9 +698,9 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
     <div class="home-hero">
       <div class="brand">🧩 한판 직소</div>
       <h1 class="title">그림 한 장이 <em>조각</em>이 되고,<br>손끝에서 다시 그림이 된다</h1>
-      <p class="lede">해변을 거니는 미소녀와 강아지, 고양이, 만발한 코스모스. 그림 10장을 <b>🧩 클래식 직소</b>와 <b>⚡ 스피드 스왑</b> 두 가지 모드로 맞춰 보세요.</p>
+      <p class="lede">해변을 거니는 미소녀와 강아지, 고양이, 만발한 코스모스. 그림 10장을 <b>🧩 클래식 직소</b>와 <b>⚡ 스피드 스왑</b> 두 가지 모드로 맞춰 보세요.<br><b>초보 → 달인</b> 순서로 열리고, <b>달인</b>을 풀어야 원본 전체 사진을 갖게 됩니다.</p>
       <div class="stats">
-        <div class="stat"><b id="statStars">0<small>/30</small></b><span>모은 별</span></div>
+        <div class="stat"><b id="statStars">0<small>/240</small></b><span>모은 별</span></div>
         <div class="stat"><b id="statClear">0<small>/10</small></b><span>완성한 그림</span></div>
         <div class="stat"><b id="statBest">0<small>개</small></b><span>3별 그림</span></div>
       </div>
@@ -673,8 +720,9 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
     </div>
     <div class="stage-grid" id="stageGrid"></div>
     <div class="foot">
-      <b>🧩 클래식 직소</b> — 조각을 끌어 자석처럼 착 붙이면 그룹으로 합쳐집니다.<br>
-      <b>⚡ 스피드 스왑</b> — 칸을 두 번 터치해 맞바꾸기. 그림을 누르면 모드를 고릅니다.
+      <b>🧩 클래식 직소</b> — 조각을 끌어 자석처럼 착 붙이면 그룹으로 합쳐집니다. (초보 4×6 24조각 ~ 달인 8×12 96조각)<br>
+      <b>⚡ 스피드 스왑</b> — 칸을 두 번 터치해 맞바꾸기. (초보 4×5 20조각 ~ 달인 8×9 72조각)<br>
+      난이도는 초보부터 차례로 열리고, 낮은 난이도는 그림의 일부만 — <b>달인</b>을 풀면 원본 전체를 소장합니다.
     </div>
   </section>
 
@@ -682,7 +730,7 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
   <section id="scr-play" class="screen hidden">
     <div class="topbar">
       <button class="iconbtn" id="btnBack" aria-label="뒤로">‹</button>
-      <div class="topctr"><b id="playTitle">그림</b><small id="playSub">초보 3×3</small></div>
+      <div class="topctr"><b id="playTitle">그림</b><small id="playSub">초보 4×6 · 24조각</small></div>
       <div class="hud">
         <div class="cell"><b id="hudTime">00:00</b><span>시간</span></div>
         <div class="cell"><b id="hudMoves">0</b><span>이동</span></div>
@@ -743,7 +791,7 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
             <button data-f="edge">테두리</button>
             <button data-f="inner">안쪽</button>
           </div>
-          <span class="tray-cnt" id="trayCount">48개</span>
+          <span class="tray-cnt" id="trayCount">24개</span>
           <button class="tray-sort" id="btnSort">모양순</button>
         </div>
         <div class="tray" id="trayScroll"></div>
@@ -787,7 +835,11 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
       <div class="olcard hidden" id="olCardRoom">
         <div class="ol-roomhead">
           <div><small>방 코드</small><b id="olRoomCode">····</b></div>
-          <button class="ol-copy" id="btnCopy">링크 복사</button>
+          <div class="ol-invite">
+            <button class="ol-copy" id="btnCopy">링크 복사</button>
+            <button class="ol-copy sms" id="btnSms">✉️ 문자</button>
+            <button class="ol-copy kakao" id="btnShare">💬 카톡/공유</button>
+          </div>
         </div>
         <div class="ol-peer" id="olPeer"><i class="dot"></i><span id="olPeerTxt">상대를 기다리는 중…</span></div>
         <div class="ol-pick" id="olPick">
@@ -852,20 +904,58 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
   };
 
   /* ---------------- 2. 상수 (기획서 5.2 / 5.4) ---------------- */
+  /* 2026-11-28: 난이도별 조각 수를 두 배로 (9/16/25/36 → 20/36/49/72).
+     조각을 되도록 정사각에 가깝게 두려고 c×r(열×행) 격자를 쓴다 —
+     20(4×5) · 36(6×6) · 49(7×7) · 72(8×9).  n 은 예전 이름(열 수)으로 남겨 둔다. */
   HJ.RANKS = [
-    { key: 'easy',   name: '초보', n: 3, limit: 60  },
-    { key: 'normal', name: '중수', n: 4, limit: 90  },
-    { key: 'hard',   name: '고수', n: 5, limit: 120 },
-    { key: 'master', name: '달인', n: 6, limit: 180 }
+    { key: 'easy',   name: '초보', c: 4, r: 5, pieces: 20, opt: 14, limit: 75  },
+    { key: 'normal', name: '중수', c: 6, r: 6, pieces: 36, opt: 26, limit: 105 },
+    { key: 'hard',   name: '고수', c: 7, r: 7, pieces: 49, opt: 36, limit: 135 },
+    { key: 'master', name: '달인', c: 8, r: 9, pieces: 72, opt: 54, limit: 175 }
   ];
+  // 난이도 순서(초보 → 달인) — 해금 판정·크롭 비율이 이 순서를 따른다
+  HJ.RANK_ORDER = ['easy', 'normal', 'hard', 'master'];
 
-  // 최적 이동 수 상한 (기획서 5.2 표)
-  HJ.OPTIMAL = { 3: 6, 4: 12, 5: 20, 6: 30 };
+  /* 난이도별로 원본에서 잘라 쓰는 영역(정규화 0~1, 그림 가운데 기준).
+     낮은 난이도는 원본의 일부만, 달인은 원본 전체를 쓴다.
+     → 달인을 풀어야 '완벽한 사진'을 갖게 된다. */
+  HJ.CROPS = {
+    easy:   { sw: 0.45, sh: 0.45 },
+    normal: { sw: 0.65, sh: 0.65 },
+    hard:   { sw: 0.82, sh: 0.82 },
+    master: { sw: 1.00, sh: 1.00 }
+  };
+  HJ.cropFor = function (rankKey) {
+    var c = HJ.CROPS[rankKey] || HJ.CROPS.easy;
+    return { sx: (1 - c.sw) / 2, sy: (1 - c.sh) / 2, sw: c.sw, sh: c.sh };
+  };
+  HJ.cropPercent = function (rankKey) {
+    var c = HJ.CROPS[rankKey] || HJ.CROPS.easy;
+    return Math.round(c.sw * 100);
+  };
 
-  HJ.rankOf = function (n) {
-    for (var i = 0; i < HJ.RANKS.length; i++) if (HJ.RANKS[i].n === n) return HJ.RANKS[i];
+  // 최적 이동 수 상한 — 조각 수 기준(기획서 5.2 표를 두 배 조각에 맞춰 확장)
+  HJ.OPTIMAL = { 9: 6, 16: 12, 20: 14, 25: 20, 36: 26, 49: 36, 64: 44, 72: 54 };
+  HJ.optFor = function (pieces) {
+    var p = pieces | 0;
+    if (HJ.OPTIMAL[p]) return HJ.OPTIMAL[p];
+    return Math.max(4, Math.round(p * 0.72));
+  };
+
+  HJ.rankByKey = function (k) {
+    for (var i = 0; i < HJ.RANKS.length; i++) if (HJ.RANKS[i].key === k) return HJ.RANKS[i];
     return null;
   };
+  // 예전 이름: 정사각 격자 n 으로 난이도를 찾는다
+  HJ.rankOf = function (n) {
+    for (var i = 0; i < HJ.RANKS.length; i++) if (HJ.RANKS[i].c === HJ.RANKS[i].r && HJ.RANKS[i].c === n) return HJ.RANKS[i];
+    return null;
+  };
+  HJ.rankFor = function (cols, rows) {
+    for (var i = 0; i < HJ.RANKS.length; i++) if (HJ.RANKS[i].c === cols && HJ.RANKS[i].r === rows) return HJ.RANKS[i];
+    return null;
+  };
+  HJ.rankLabel = function (rank) { return rank.c + '×' + rank.r + ' · ' + rank.pieces + '조각'; };
 
   /* ---------------- 3. 격자 유틸 ---------------- */
   function identity(n) {
@@ -906,8 +996,10 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
   /* ---------------- 4. 셔플 (해결 가능성 보장) ----------------
      완성 배치에서 유효 교환만 적용하므로 해결 불가능한 배치는 원리적으로 나오지 않는다.
      같은 seed면 어느 기기에서든 같은 배치(INV: 시드 결정성). */
-  HJ.shuffleBoard = function (seed, n) {
-    var N = n * n;
+  HJ.shuffleBoard = function (seed, n) { return HJ.shufflePerm(seed, n * n); };   // 예전 이름(정사각 n)
+  HJ.shufflePerm = function (seed, N) {
+    N = N | 0;
+    if (N < 4) throw new Error('지원하지 않는 조각 수: ' + N);
     var attempt = 0, perm, rng, swaps, k, a, b, t, target;
     seed = (seed >>> 0) || 1;
     target = Math.ceil(0.6 * N);
@@ -933,15 +1025,20 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
 
   HJ.createGame = function (opts) {
     opts = opts || {};
-    var n = opts.n | 0;
-    if (!HJ.OPTIMAL[n]) throw new Error('지원하지 않는 격자: ' + opts.n);
+    var rk = opts.rank ? HJ.rankByKey(opts.rank) : null;
+    var cols = (opts.cols | 0) || (rk ? rk.c : 0) || (opts.n | 0);
+    var rows = (opts.rows | 0) || (rk ? rk.r : 0) || (opts.n | 0);
+    if (cols < 3 || rows < 3 || cols > 12 || rows > 12) throw new Error('지원하지 않는 격자: ' + cols + '×' + rows);
+    var N = cols * rows;
+    var rank = rk || HJ.rankFor(cols, rows);
     var stage = (opts.stage === undefined ? 1 : opts.stage | 0);
     var seed = (opts.seed === undefined ? 1 : opts.seed >>> 0) || 1;
-    var board = HJ.shuffleBoard(seed, n);
+    var board = HJ.shufflePerm(seed, N);
     var s = {
       v: SAVE_VERSION,
       stage: stage,
-      n: n,
+      rank: rank ? rank.key : null,
+      cols: cols, rows: rows, n: cols,
       seed: seed,
       board: board,
       moves: 0,
@@ -1030,28 +1127,31 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
   };
 
   /* ---------------- 7. 별점 (기획서 5.4) ---------------- */
-  HJ.starsFor = function (n, moves, hints, finished) {
+  /* pieces = 조각 수(보드 길이). 예전 호출처럼 격자 n 을 넣어도 그대로 동작한다. */
+  HJ.starsFor = function (pieces, moves, hints, finished) {
     if (!finished) return 0;
-    var opt = HJ.OPTIMAL[n] || 20;
+    var opt = HJ.optFor(pieces);
     if (hints > 0) return 1;
     if (moves <= Math.round(opt * 1.4)) return 3;
     if (moves <= Math.round(opt * 2.0)) return 2;
     return 1;
   };
 
-  HJ.stars = function (s) { return HJ.starsFor(s.n, s.moves, s.hints, s.finished); };
+  HJ.stars = function (s) { return HJ.starsFor(s.board.length, s.moves, s.hints, s.finished); };
 
   // 3별 목표 이동 수 / 2별 목표 이동 수 (UI 안내용)
-  HJ.targetsFor = function (n) {
-    var opt = HJ.OPTIMAL[n] || 20;
-    return { three: Math.round(opt * 1.4), two: Math.round(opt * 2.0), limit: (HJ.rankOf(n) || {}).limit || 120 };
+  HJ.targetsFor = function (pieces) {
+    var opt = HJ.optFor(pieces);
+    var rk = null, i;
+    for (i = 0; i < HJ.RANKS.length; i++) if (HJ.RANKS[i].pieces === (pieces | 0)) rk = HJ.RANKS[i];
+    return { three: Math.round(opt * 1.4), two: Math.round(opt * 2.0), limit: (rk || {}).limit || 120 };
   };
 
   /* ---------------- 8. 저장/복원 ---------------- */
   HJ.serialize = function (s) {
     return JSON.stringify({
       v: SAVE_VERSION,
-      stage: s.stage, n: s.n, seed: s.seed, board: s.board,
+      stage: s.stage, rank: s.rank || null, cols: s.cols, rows: s.rows, seed: s.seed, board: s.board,
       moves: s.moves, hints: s.hints, elapsed: Math.round(s.elapsed),
       finished: !!s.finished, savedAt: Date.now()
     });
@@ -1059,17 +1159,21 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
 
   // 손상된 저장은 null을 돌려준다(예외를 던지지 않는다) — 이어하기 화면에서 조용히 무시.
   HJ.deserialize = function (json) {
-    var o, n;
+    var o, cols, rows, N;
     try { o = JSON.parse(json); } catch (e) { return null; }
     if (!o || typeof o !== 'object') return null;
     if (o.v !== SAVE_VERSION) return null;
-    n = o.n | 0;
-    if (!HJ.OPTIMAL[n]) return null;
-    if (!isPermutation(o.board, n * n)) return null;
+    cols = (o.cols | 0) || (o.n | 0);
+    rows = (o.rows | 0) || (o.n | 0);
+    if (cols < 3 || rows < 3 || cols > 12 || rows > 12) return null;
+    N = cols * rows;
+    if (!isPermutation(o.board, N)) return null;
     if (!(o.moves >= 0) || !(o.hints >= 0) || !(o.elapsed >= 0)) return null;
     if (o.finished) return null; // 끝난 판은 이어하기 대상이 아니다
+    var rank = HJ.rankFor(cols, rows);
     return {
-      v: SAVE_VERSION, stage: o.stage | 0, n: n, seed: (o.seed >>> 0) || 1,
+      v: SAVE_VERSION, stage: o.stage | 0, rank: rank ? rank.key : null,
+      cols: cols, rows: rows, n: cols, seed: (o.seed >>> 0) || 1,
       board: o.board.slice(), moves: o.moves | 0, hints: o.hints | 0,
       elapsed: o.elapsed | 0, paused: false, finished: false,
       startedAt: Date.now(), finishedAt: null, lastAction: null, savedAt: o.savedAt || 0
@@ -1084,7 +1188,7 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
     function bad(id, msg) { errs.push(id + ' ' + msg); }
     if (!s || typeof s !== 'object') { bad('INV-00', 'state 없음'); return errs; }
 
-    var n = s.n, N = n * n;
+    var cols = (s.cols | 0) || (s.n | 0), rows = (s.rows | 0) || (s.n | 0), N = cols * rows;
 
     // INV-01 조각 총합 보존
     if (!Array.isArray(s.board) || s.board.length !== N) bad('INV-01', 'board.length=' + (s.board && s.board.length) + ' != ' + N);
@@ -1320,6 +1424,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       try { p = JSON.parse(read(K.progress) || 'null'); } catch (e) { p = null; }
       if (p && typeof p === 'object' && p.v === K.v && p.best && p.cleared) {
         this.progress = { v: K.v, best: p.best, cleared: p.cleared };
+        this._migrate();
       }
       var o = null;
       try { o = JSON.parse(read(K.online) || 'null'); } catch (e) { o = null; }
@@ -1331,12 +1436,64 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     saveSettings: function () { write(K.settings, JSON.stringify(this.settings)); },
     saveProgress: function () { write(K.progress, JSON.stringify(this.progress)); },
 
-    /* 키: 스왑 '단계-격자' / 클래식 'c단계-난이도' */
-    key: function (stage, n) { return stage + '-' + n; },
+    /* 예전 기록 키('1-3' 처럼 격자 크기)를 난이도 키('1-easy')로 옮긴다 — 모은 별을 잃지 않게. */
+    _migrate: function () {
+      var map = { 3: 'easy', 4: 'normal', 5: 'hard', 6: 'master' }, best = this.progress.best, k, m, to, moved = false;
+      for (k in best) {
+        if (!Object.prototype.hasOwnProperty.call(best, k)) continue;
+        m = /^(\d+)-([3-6])$/.exec(k);
+        if (!m) continue;
+        to = m[1] + '-' + map[+m[2]];
+        if (!best[to] || (best[k].stars || 0) > (best[to].stars || 0)) best[to] = best[k];
+        delete best[k];
+        moved = true;
+      }
+      if (moved) this.saveProgress();
+    },
+
+    /* 키: 스왑 '단계-난이도' (예 '1-easy') / 클래식 'c단계-난이도' (예 'c1-easy') */
+    key: function (stage, rank) { return stage + '-' + rank; },
     ckey: function (stage, rank) { return 'c' + stage + '-' + rank; },
 
-    bestOf: function (stage, n) { return this.progress.best[this.key(stage, n)] || null; },
+    bestOf: function (stage, rank) { return this.progress.best[this.key(stage, rank)] || null; },
     bestOfClassic: function (stage, rank) { return this.progress.best[this.ckey(stage, rank)] || null; },
+
+    /* 난이도 순차 해금 — 한 모드 안에서 이전 난이도를 클리어해야 다음이 열린다.
+       초보는 처음부터 열려 있다. 대전(온라인) 로비는 공정한 대전을 위해 이 규칙을 쓰지 않는다. */
+    rankKeyOf: function (mode, stage, rank) {
+      return mode === 'classic' ? this.ckey(stage, rank) : this.key(stage, rank);
+    },
+    clearedRank: function (mode, stage, rank) {
+      var rec = this.progress.best[this.rankKeyOf(mode, stage, rank)];
+      return !!(rec && rec.stars > 0);
+    },
+    /* 그 모드에서 지금 도전할 수 있는 가장 높은 난이도 키 */
+    nextRank: function (mode, stage) {
+      var order = HJ.RANK_ORDER || ['easy', 'normal', 'hard', 'master'], i, best = order[0];
+      for (i = 0; i < order.length; i++) {
+        if (i === 0 || this.clearedRank(mode, stage, order[i - 1])) best = order[i];
+        else break;
+      }
+      return best;
+    },
+    isUnlocked: function (mode, stage, rank) {
+      var order = HJ.RANK_ORDER || ['easy', 'normal', 'hard', 'master'];
+      var i = order.indexOf(rank);
+      if (i <= 0) return i === 0;
+      return this.clearedRank(mode, stage, order[i - 1]);
+    },
+    /* 그 그림에서 지금까지 해금한 가장 넓은 원본 영역(갤러리 부분 공개용) */
+    artCrop: function (stage) {
+      var order = HJ.RANK_ORDER || ['easy', 'normal', 'hard', 'master'], i, sw = 0, any = false, master = false;
+      for (i = 0; i < order.length; i++) {
+        if (this.clearedRank('classic', stage, order[i]) || this.clearedRank('swap', stage, order[i])) {
+          any = true;
+          if (HJ.cropFor(order[i]).sw > sw) sw = HJ.cropFor(order[i]).sw;
+          if (order[i] === 'master') master = true;
+        }
+      }
+      return { sw: any ? sw : 0, any: any, master: master };
+    },
 
     _better: function (rec, prev) {
       if (!prev) return true;
@@ -1348,8 +1505,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     },
 
     // 별 → 이동 수 → 시간 순으로 더 좋은 기록만 남긴다.
-    submit: function (stage, n, rec) {
-      var k = this.key(stage, n), prev = this.progress.best[k] || null, isNew = false;
+    submit: function (stage, rank, rec) {
+      var k = this.key(stage, rank), prev = this.progress.best[k] || null, isNew = false;
       if (!prev) isNew = true;
       else if (rec.stars > prev.stars) isNew = true;
       else if (rec.stars === prev.stars && rec.moves < prev.moves) isNew = true;
@@ -1378,10 +1535,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
     /* 그 그림의 모든 모드·난이도 중 최고 별 (갤러리 표시용) */
     bestStarsOf: function (stage) {
-      var best = 0, n, r, i, J2 = HJ.Jigsaw;
+      var best = 0, r, i, J2 = HJ.Jigsaw;
       for (i = 0; i < HJ.RANKS.length; i++) {
-        n = HJ.RANKS[i].n;
-        r = this.bestOf(stage, n);
+        r = this.bestOf(stage, HJ.RANKS[i].key);
         if (r && r.stars > best) best = r.stars;
       }
       if (J2) for (i = 0; i < J2.RANKS.length; i++) {
@@ -1462,13 +1618,16 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
 </script>
 <script>
-/* 한판 직소 — 렌더러 (Canvas). 게임 규칙은 core.js, 화면 조작은 app.js 담당 */
+/* 한판 직소 — 렌더러 (Canvas). 게임 규칙은 core.js, 화면 조작은 app.js 담당
+   2026-11-28: 조각 2배(c×r 격자) + 난이도별 원본 크롭 반영 — 칸은 가로·세로 크기가
+   다를 수 있고(cw·ch), 그림은 원본의 crop 영역(0~1)만 잘라 그린다. */
 (function (root) {
   'use strict';
   var HJ = root.HJ;
   var V = HJ.Render = {
     canvas: null, ctx: null,
-    size: 0, cell: 0, n: 3, dpr: 1,
+    size: 0, cw: 0, ch: 0, cols: 3, rows: 3, dpr: 1,
+    crop: { sx: 0, sy: 0, sw: 1, sh: 1 },
     img: null, imgReady: false
   };
 
@@ -1500,10 +1659,23 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     V.canvas.style.width = px + 'px';
     V.canvas.style.height = px + 'px';
     V.ctx.setTransform(V.dpr, 0, 0, V.dpr, 0, 0);
-    V.cell = px / V.n;
+    V.cw = px / V.cols;
+    V.ch = px / V.rows;
   };
 
-  V.setGrid = function (n) { V.n = n; V.cell = V.size / n; };
+  /* 크롭 영역(원본의 어느 부분을 퍼즐로 쓰는가) */
+  V.setCrop = function (crop) {
+    var c = crop || { sx: 0, sy: 0, sw: 1, sh: 1 };
+    V.crop = { sx: c.sx, sy: c.sy, sw: c.sw, sh: c.sh };
+  };
+
+  V.setGrid = function (cols, rows, crop) {
+    V.cols = Math.max(2, cols | 0);
+    V.rows = Math.max(2, rows | 0);
+    if (crop) V.setCrop(crop);
+    V.cw = V.size / V.cols;
+    V.ch = V.size / V.rows;
+  };
 
   V.setImage = function (im) {
     V.img = im;
@@ -1513,40 +1685,43 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   V.cellAt = function (x, y) {
     if (!(V.size > 0)) return -1;
     if (x < 0 || y < 0 || x >= V.size || y >= V.size) return -1;
-    var c = Math.floor(x / V.cell), r = Math.floor(y / V.cell);
-    if (c < 0 || c >= V.n || r < 0 || r >= V.n) return -1;
-    return r * V.n + c;
+    var c = Math.floor(x / V.cw), r = Math.floor(y / V.ch);
+    if (c < 0 || c >= V.cols || r < 0 || r >= V.rows) return -1;
+    return r * V.cols + c;
   };
 
   V.cellCenter = function (idx) {
-    return { x: ((idx % V.n) + 0.5) * V.cell, y: (((idx / V.n) | 0) + 0.5) * V.cell };
+    return { x: ((idx % V.cols) + 0.5) * V.cw, y: (((idx / V.cols) | 0) + 0.5) * V.ch };
   };
 
   function gapFor() {
-    return Math.max(1.4, Math.min(4.5, V.cell * 0.045));
+    return Math.max(1.4, Math.min(4.5, Math.min(V.cw, V.ch) * 0.045));
   }
 
+  /* 조각 하나를 (dx,dy,w,h) 에 그린다. 그림은 원본의 크롭 영역에서 그 조각 칸만큼. */
   function tile(piece, dx, dy, w, h, rad, alpha) {
     if (!V.imgReady) return;
-    var isz = V.img.naturalWidth / V.n;
-    var sx = (piece % V.n) * isz;
-    var sy = ((piece / V.n) | 0) * isz;
-    var c = V.ctx;
-    c.save();
-    if (alpha != null) c.globalAlpha = alpha;
-    rrect(c, dx, dy, w, h, rad);
-    c.clip();
-    c.drawImage(V.img, sx, sy, isz, isz, dx, dy, w, h);
-    c.restore();
+    var nw = V.img.naturalWidth, nh = V.img.naturalHeight;
+    var c = V.crop;
+    var sw = (c.sw * nw) / V.cols, sh = (c.sh * nh) / V.rows;
+    var sx = c.sx * nw + (piece % V.cols) * sw;
+    var sy = c.sy * nh + (((piece / V.cols) | 0)) * sh;
+    var ctx = V.ctx;
+    ctx.save();
+    if (alpha != null) ctx.globalAlpha = alpha;
+    rrect(ctx, dx, dy, w, h, rad);
+    ctx.clip();
+    ctx.drawImage(V.img, sx, sy, sw, sh, dx, dy, w, h);
+    ctx.restore();
   }
 
   /**
-   * @param s   게임 상태
-   * @param ui  {selected, dragging, dragFrom, dragPos, swap, hintPair, hintUntil, preview, flash[], completeAt, particles, now}
+   * @param s   게임 상태 (cols·rows·board)
+   * @param ui  {selected, dragging, dragFrom, dragPos, swap, hintPair, hintUntil, preview, flash[], completeAt, particles}
    * @param t   현재 시각(ms)
    */
   V.draw = function (s, ui, t) {
-    var c = V.ctx, S = V.size, n = V.n, cell = V.cell, i;
+    var c = V.ctx, S = V.size, cols = V.cols, rows = V.rows, cw = V.cw, ch = V.ch, i;
     if (!c || !S) return;
     c.clearRect(0, 0, S, S);
 
@@ -1560,7 +1735,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       completeK = Math.max(0, Math.min(1, (t - ui.completeAt) / 620));
       gap = gapFor() * (1 - completeK);   // 완성되면 틈이 닫히며 한 장의 그림이 된다
     }
-    var rad = Math.max(1.5, Math.min(4, cell * 0.045)) * (1 - completeK * 0.8);
+    var rad = Math.max(1.5, Math.min(4, Math.min(cw, ch) * 0.045)) * (1 - completeK * 0.8);
+    var minSide = Math.min(cw, ch);
 
     if (!V.imgReady) {
       c.fillStyle = 'rgba(255,255,255,.5)';
@@ -1580,9 +1756,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     // 조각들
     for (i = 0; i < s.board.length; i++) {
       if (ui.dragging && i === ui.dragFrom) continue;
-      var x = (i % n) * cell, y = ((i / n) | 0) * cell;
+      var x = (i % cols) * cw, y = ((i / cols) | 0) * ch;
       var g = gap / 2;
-      var w = cell - gap, h = cell - gap;
+      var w = cw - gap, h = ch - gap;
       var ox = 0, oy = 0;
 
       if (i === swapA) {
@@ -1601,7 +1777,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         var pulse = 0.55 + 0.18 * Math.sin(t / 520 + i);
         c.save();
         c.strokeStyle = 'rgba(255,203,77,' + pulse.toFixed(3) + ')';
-        c.lineWidth = Math.max(1.2, cell * 0.018);
+        c.lineWidth = Math.max(1.2, minSide * 0.018);
         rrect(c, x + g + 0.6 + ox, y + g + 0.6 + oy, w - 1.2, h - 1.2, rad);
         c.stroke();
         c.restore();
@@ -1618,8 +1794,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         c.save();
         c.globalAlpha = (1 - k) * 0.85;
         c.strokeStyle = '#ffe9a8';
-        c.lineWidth = Math.max(2, cell * 0.035 * (1 - k));
-        var sz = cell * (0.55 + 0.55 * k);
+        c.lineWidth = Math.max(2, minSide * 0.035 * (1 - k));
+        var sz = minSide * (0.55 + 0.55 * k);
         rrect(c, cc.x - sz / 2, cc.y - sz / 2, sz, sz, 10);
         c.stroke();
         c.restore();
@@ -1635,10 +1811,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         c.save();
         c.globalAlpha = blink;
         c.strokeStyle = '#5ee0d0';
-        c.lineWidth = Math.max(2.5, cell * 0.05);
+        c.lineWidth = Math.max(2.5, minSide * 0.05);
         c.shadowColor = 'rgba(94,224,208,.9)';
-        c.shadowBlur = cell * 0.28;
-        rrect(c, cc2.x - cell / 2 + 3, cc2.y - cell / 2 + 3, cell - 6, cell - 6, 9);
+        c.shadowBlur = minSide * 0.28;
+        rrect(c, cc2.x - cw / 2 + 3, cc2.y - ch / 2 + 3, cw - 6, ch - 6, 9);
         c.stroke();
         c.restore();
       }
@@ -1649,10 +1825,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var cs = V.cellCenter(ui.selected);
       c.save();
       c.strokeStyle = 'rgba(255,255,255,.92)';
-      c.lineWidth = Math.max(2.5, cell * 0.045);
+      c.lineWidth = Math.max(2.5, minSide * 0.045);
       c.shadowColor = 'rgba(94,224,208,.85)';
-      c.shadowBlur = cell * 0.3;
-      rrect(c, cs.x - cell / 2 + 3, cs.y - cell / 2 + 3, cell - 6, cell - 6, 9);
+      c.shadowBlur = minSide * 0.3;
+      rrect(c, cs.x - cw / 2 + 3, cs.y - ch / 2 + 3, cw - 6, ch - 6, 9);
       c.stroke();
       c.restore();
     }
@@ -1662,45 +1838,49 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var cd = V.cellCenter(ui.dropCell);
       c.save();
       c.fillStyle = 'rgba(94,224,208,.14)';
-      rrect(c, cd.x - cell / 2 + 2, cd.y - cell / 2 + 2, cell - 4, cell - 4, 9);
+      rrect(c, cd.x - cw / 2 + 2, cd.y - ch / 2 + 2, cw - 4, ch - 4, 9);
       c.fill();
       c.strokeStyle = 'rgba(94,224,208,.85)';
-      c.lineWidth = Math.max(2, cell * 0.04);
-      rrect(c, cd.x - cell / 2 + 2, cd.y - cell / 2 + 2, cell - 4, cell - 4, 9);
+      c.lineWidth = Math.max(2, minSide * 0.04);
+      rrect(c, cd.x - cw / 2 + 2, cd.y - ch / 2 + 2, cw - 4, ch - 4, 9);
       c.stroke();
       c.restore();
     }
 
     // 끌고 있는 조각
     if (ui.dragging && ui.dragFrom >= 0 && ui.dragPos) {
-      var dsz = cell * 1.09;
+      var dsz = 1.09;
       c.save();
       c.shadowColor = 'rgba(0,0,0,.55)';
-      c.shadowBlur = cell * 0.22;
-      c.shadowOffsetY = cell * 0.05;
-      tile(s.board[ui.dragFrom], ui.dragPos.x - dsz / 2, ui.dragPos.y - dsz / 2, dsz, dsz, rad + 2);
+      c.shadowBlur = minSide * 0.22;
+      c.shadowOffsetY = minSide * 0.05;
+      tile(s.board[ui.dragFrom], ui.dragPos.x - cw * dsz / 2, ui.dragPos.y - ch * dsz / 2,
+        cw * dsz, ch * dsz, rad + 2);
       c.restore();
       // 원래 칸은 흐리게
       var og = gap / 2;
       c.save();
       c.fillStyle = 'rgba(6,11,22,.55)';
-      var ox0 = (ui.dragFrom % n) * cell, oy0 = ((ui.dragFrom / n) | 0) * cell;
-      rrect(c, ox0 + og, oy0 + og, cell - gap, cell - gap, rad);
+      var ox0 = (ui.dragFrom % cols) * cw, oy0 = ((ui.dragFrom / cols) | 0) * ch;
+      rrect(c, ox0 + og, oy0 + og, cw - gap, ch - gap, rad);
       c.fill();
       c.restore();
     }
 
-    // 미리보기(원본 그림)
+    // 미리보기(해당 난이도의 크롭 영역)
     if (ui.preview) {
+      var cr = V.crop, nw = V.img.naturalWidth, nh = V.img.naturalHeight;
       c.save();
       c.globalAlpha = 0.985;
-      c.drawImage(V.img, 0, 0, V.img.naturalWidth, V.img.naturalHeight, 0, 0, S, S);
+      c.drawImage(V.img, cr.sx * nw, cr.sy * nh, cr.sw * nw, cr.sh * nh, 0, 0, S, S);
       c.globalAlpha = 0.16;
       c.strokeStyle = '#ffffff';
       c.lineWidth = 1;
-      for (i = 1; i < n; i++) {
-        c.beginPath(); c.moveTo((S / n) * i, 0); c.lineTo((S / n) * i, S); c.stroke();
-        c.beginPath(); c.moveTo(0, (S / n) * i); c.lineTo(S, (S / n) * i); c.stroke();
+      for (i = 1; i < cols; i++) {
+        c.beginPath(); c.moveTo(cw * i, 0); c.lineTo(cw * i, S); c.stroke();
+      }
+      for (i = 1; i < rows; i++) {
+        c.beginPath(); c.moveTo(0, ch * i); c.lineTo(S, ch * i); c.stroke();
       }
       c.restore();
       c.save();
@@ -1795,10 +1975,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   ];
 
   J.RANKS = [
-    { key: 'easy',   name: '초보', c: 3, r: 4, pieces: 12, three: 120000, two: 180000 },
-    { key: 'normal', name: '중수', c: 4, r: 5, pieces: 20, three: 240000, two: 360000 },
-    { key: 'hard',   name: '고수', c: 5, r: 6, pieces: 30, three: 420000, two: 630000 },
-    { key: 'master', name: '달인', c: 6, r: 8, pieces: 48, three: 660000, two: 990000 }
+    { key: 'easy',   name: '초보', c: 4,  r: 6,  pieces: 24, three: 240000, two: 360000 },
+    { key: 'normal', name: '중수', c: 5,  r: 8,  pieces: 40, three: 480000, two: 720000 },
+    { key: 'hard',   name: '고수', c: 6,  r: 10, pieces: 60, three: 840000, two: 1260000 },
+    { key: 'master', name: '달인', c: 8,  r: 12, pieces: 96, three: 1320000, two: 1980000 }
   ];
 
   J.rankByKey = function (k) {
@@ -1810,6 +1990,13 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     return null;
   };
   J.rankLabel = function (rank) { return rank.c + '×' + rank.r + ' · ' + rank.pieces + '조각'; };
+  /* 난이도별로 원본에서 잘라 쓰는 영역(정규화 0~1) — core.js 의 HJ.cropFor 와 같은 값.
+     낮은 난이도는 원본의 일부만, 달인은 원본 전체를 쓴다. */
+  J.cropFor = function (rankKey) { return HJ.cropFor(rankKey); };
+  J.cropPercent = function (rankKey) {
+    var c = J.cropFor(rankKey);
+    return Math.round(c.sw * 100);
+  };
 
   var DIRS = J.DIRS = ['top', 'right', 'bottom', 'left'];
 
@@ -2750,6 +2937,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   R.view = { zoom: 1, tx: 0, ty: 0 };
   R.paths = {}; R.cache = {}; R.cacheOrder = [];
   R.key = ''; R.state = null; R.lift = 26;      // 드래그 시 손가락 위로 띄우는 px
+  R.crop = { sx: 0, sy: 0, sw: 1, sh: 1 };      // 원본에서 퍼즐로 쓰는 영역(난이도별)
   R.lastOrder = [];                             // 마지막으로 그린 gid 순서(아래→위) — 테스트·디버그용
   var CACHE_MAX = 96;
 
@@ -2784,6 +2972,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     R.state = s;
     R.paths = {};
     R.clearCache();
+    R.crop = J.cropFor(s.rank);
     R.view.zoom = 1; R.view.tx = 0; R.view.ty = 0;
     R.key = '';
     R.fitView(s);
@@ -2917,10 +3106,22 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     try {
       var pat = ctx.createPattern(R.img, 'no-repeat');
       if (!pat || !pat.setTransform) return pat;
-      var sx = J.UNIT / R.img.naturalWidth, sy = J.UNIT / R.img.naturalHeight;
-      if (typeof DOMMatrix !== 'undefined') pat.setTransform(new DOMMatrix([sx, 0, 0, sy, 0, 0]));
+      // 크롭 영역이 보드(0~1000) 전체가 되도록 옮기고 늘린다
+      var cr = R.crop;
+      var sx = J.UNIT / (R.img.naturalWidth * cr.sw), sy = J.UNIT / (R.img.naturalHeight * cr.sh);
+      if (typeof DOMMatrix !== 'undefined') {
+        pat.setTransform(new DOMMatrix([sx, 0, 0, sy, -cr.sx * R.img.naturalWidth * sx, -cr.sy * R.img.naturalHeight * sy]));
+      }
       return pat;
     } catch (e) { return null; }
+  }
+
+  /* 원본 그림을 '지금 난이도의 크롭 영역'만 보드(0..UNIT)에 맞춰 그린다 */
+  function drawArt(c, dx, dy, dw, dh) {
+    if (!R.imgReady) return false;
+    var cr = R.crop, nw = R.img.naturalWidth, nh = R.img.naturalHeight;
+    c.drawImage(R.img, cr.sx * nw, cr.sy * nh, cr.sw * nw, cr.sh * nh, dx, dy, dw, dh);
+    return true;
   }
 
   function buildBitmap(s, pid, key) {
@@ -2951,7 +3152,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     c.setTransform(sx, 0, 0, sy, -bx * sx, -by * sy);
     if (R.imgReady) {
       c.imageSmoothingQuality = 'high';
-      c.drawImage(R.img, 0, 0, R.img.naturalWidth, R.img.naturalHeight, 0, 0, J.UNIT, J.UNIT);
+      drawArt(c, 0, 0, J.UNIT, J.UNIT);
       // 이음새 방지: 경계 안쪽을 같은 그림으로 한 번 더 채운다
       var pat = patternFor(c, s);
       if (pat) {
@@ -2999,7 +3200,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     c.save();
     c.beginPath(); c.clip(path);
     if (R.imgReady) {
-      c.drawImage(R.img, 0, 0, R.img.naturalWidth, R.img.naturalHeight, 0, 0, J.UNIT, J.UNIT);
+      drawArt(c, 0, 0, J.UNIT, J.UNIT);
       var pat = patternFor(c, s);
       if (pat) { c.strokeStyle = pat; c.lineWidth = 3 / Math.min(sx, sy); c.stroke(path); }
     } else {
@@ -3054,7 +3255,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (ga > 0 && R.imgReady) {
       c.save();
       c.globalAlpha = ga;
-      c.drawImage(R.img, 0, 0, R.img.naturalWidth, R.img.naturalHeight, px, py, side, side);
+      drawArt(c, px, py, side, side);
       c.restore();
     }
 
@@ -3178,7 +3379,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var k2 = Math.min(1, ((ui.doneAt ? t - ui.doneAt : 9999) / 700));
       c.save();
       c.globalAlpha = 1;
-      c.drawImage(R.img, 0, 0, R.img.naturalWidth, R.img.naturalHeight, px, py, side, side);
+      drawArt(c, px, py, side, side);
       c.globalAlpha = 0.55 * (1 - k2);
       c.fillStyle = '#fff8e1';
       c.fillRect(px, py, side, side);
@@ -3191,11 +3392,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       c.restore();
     }
 
-    // 미리보기(원본 전체)
+    // 미리보기(해당 난이도의 크롭 영역)
     if (ui.preview) {
       c.save();
       c.globalAlpha = 0.985;
-      c.drawImage(R.img, 0, 0, R.img.naturalWidth, R.img.naturalHeight, px, py, side, side);
+      drawArt(c, px, py, side, side);
       c.globalAlpha = 0.9;
       c.fillStyle = 'rgba(4,8,16,.72)';
       rrect(c, W / 2 - 58, H - 40, 116, 26, 13);
@@ -3234,7 +3435,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var cv = root.document.createElement('canvas');
       cv.width = s.cols; cv.height = s.rows;
       var c = cv.getContext('2d');
-      c.drawImage(R.img, 0, 0, R.img.naturalWidth, R.img.naturalHeight, 0, 0, s.cols, s.rows);
+      var cr = R.crop, nw = R.img.naturalWidth, nh = R.img.naturalHeight;
+      c.drawImage(R.img, cr.sx * nw, cr.sy * nh, cr.sw * nw, cr.sh * nh, 0, 0, s.cols, s.rows);
       var d = c.getImageData(0, 0, s.cols, s.rows).data;
       for (i = 0; i < s.pieces.length; i++) {
         p = s.pieces[i];
@@ -4559,7 +4761,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   /* ---------------- 상태 ---------------- */
   var G = null;
-  var cur = { stage: 1, n: 3 };
+  var cur = { stage: 1, rank: 'easy' };
   var ui = {
     screen: 'home', selected: -1, dragging: false, dragFrom: -1, dragPos: null, dropCell: -1,
     swap: null, hintPair: null, hintUntil: 0, preview: false, previewLocked: false,
@@ -4600,9 +4802,55 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       wrap.addEventListener('pointerdown', function (e) { if (e.target === wrap) closeOverlay(); });
     }
     root_.appendChild(wrap);
+    paintCrops(wrap);
     return wrap;
   }
   function closeOverlay() { $('#overlayRoot').innerHTML = ''; }
+
+  /* 원본의 일부만 보여 주는 그림 상자(크롭) — 달인 전에는 전체 사진을 보여 주지 않는다.
+     상자의 비율에 맞춰(cover) 그리도록 캔버스로 만들고, 오버레이가 붙은 뒤 paintCrops 가 그린다. */
+  function artSrc(stage) { return root.THUMB[stage] || root.ART[stage]; }
+  function cropArtHTML(stage, crop, cls) {
+    var src = artSrc(stage);
+    var c = crop || { sx: 0, sy: 0, sw: 1, sh: 1 };
+    if (c.sw >= 0.999 && c.sh >= 0.999) return '<img src="' + src + '" alt="" draggable="false">';
+    return '<div class="cropimg' + (cls ? ' ' + cls : '') + '"><canvas class="cimg" width="384" height="384" data-stage="' + stage +
+      '" data-sx="' + c.sx + '" data-sy="' + c.sy + '" data-sw="' + c.sw + '" data-sh="' + c.sh + '"></canvas></div>';
+  }
+  var artCache = {};
+  function artImage(stage, cb) {
+    var im = artCache[stage];
+    if (!im) {
+      im = artCache[stage] = new Image();
+      im.decoding = 'async';
+      im.src = root.ART[stage];
+    }
+    if (im.complete && im.naturalWidth > 0) { cb(im); return; }
+    im.addEventListener('load', function () { cb(im); }, { once: true });
+  }
+  function paintOne(cv) {
+    var stage = +cv.getAttribute('data-stage');
+    var sx = +cv.getAttribute('data-sx'), sy = +cv.getAttribute('data-sy');
+    var sw = +cv.getAttribute('data-sw'), sh = +cv.getAttribute('data-sh');
+    artImage(stage, function (im) {
+      try {
+        var w = 480, h = 480;
+        cv.width = w; cv.height = h;
+        var c = cv.getContext('2d');
+        if (!c) return;
+        c.drawImage(im, sx * im.naturalWidth, sy * im.naturalHeight,
+          sw * im.naturalWidth, sh * im.naturalHeight, 0, 0, w, h);
+      } catch (e) { /* 그림을 못 그리면 빈 상자로 둔다 */ }
+    });
+  }
+  function paintCrops(scope) {
+    var list = (scope || doc).querySelectorAll('canvas.cimg[data-stage]'), i;
+    for (i = 0; i < list.length; i++) paintOne(list[i]);
+  }
+  /* 테스트·이어하기용: 잠겨 있으면 그 단계에서 지금 열린 가장 높은 난이도로 */
+  function safeRank(md, stage, want) {
+    return Store.isUnlocked(md, stage, want) ? want : Store.nextRank(md, stage);
+  }
 
   /* ---------------- 홈 ---------------- */
   function buildHome() {
@@ -4626,7 +4874,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var cleared = Store.clearedCount();
     var three = 0, k;
     for (k in Store.progress.cleared) if (Store.progress.cleared[k] >= 3) three++;
-    $('#statStars').innerHTML = total + '<small>/' + (STAGES.length * 8) + '</small>';
+    var maxStars = STAGES.length * (HJ.RANKS.length + HJ.Jigsaw.RANKS.length) * 3;
+    $('#statStars').innerHTML = total + '<small>/' + maxStars + '</small>';
     $('#statClear').innerHTML = cleared + '<small>/' + STAGES.length + '</small>';
     $('#statBest').innerHTML = three + '<small>개</small>';
     var orec = $('#olRecTxt');
@@ -4644,14 +4893,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         $('#resumeSub').textContent = '클래식 ' + rank2.name + ' ' + rank2.c + '×' + rank2.r +
           ' · 트레이 ' + saved.g.tray.length + '개 · ' + HJ.formatTime(saved.g.elapsed);
       } else {
+        var rk3 = HJ.rankByKey(saved.g.rank) || HJ.RANKS[0];
         $('#resumeTitle').textContent = '이어서 하기 · ⚡ ' + st2.title;
-        $('#resumeSub').textContent = saved.g.n + '×' + saved.g.n + ' · ' + saved.g.moves + '수 · ' + HJ.formatTime(saved.g.elapsed);
+        $('#resumeSub').textContent = rk3.name + ' ' + rk3.c + '×' + rk3.r + ' · ' + saved.g.moves + '수 · ' + HJ.formatTime(saved.g.elapsed);
       }
       card.classList.remove('hidden');
     } else card.classList.add('hidden');
   }
 
-  /* ---------------- 난이도 시트 (모드 선택 포함) ---------------- */
+  /* ---------------- 난이도 시트 (모드 선택 + 순차 해금) ----------------
+     초보 → 중수 → 고수 → 달인 순서로만 열린다. 이전 난이도를 클리어해야 다음이 열리고,
+     스테이지를 누르면 지금 도전할 수 있는 가장 높은 난이도가 자동으로 골라져 있다. */
   function openRankSheet(stage, mode0) {
     var st = stageById(stage);
     var md = (mode0 || Store.settings.mode || 'classic') === 'swap' ? 'swap' : 'classic';
@@ -4662,60 +4914,92 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       '<button type="button" data-m="swap">⚡ 스피드 스왑</button>' +
       '</div>' +
       '<p class="sub" id="sheetSub"></p>' +
-      '<div id="rankRows"></div></div>');
+      '<div id="rankRows"></div>' +
+      '<button class="btn primary wide rankgo" id="btnRankGo"></button></div>');
+
+    function list(md2) { return md2 === 'classic' ? HJ.Jigsaw.RANKS : HJ.RANKS; }
+    function prevName(md2, rankKey) {
+      var order = HJ.RANK_ORDER, i = order.indexOf(rankKey);
+      if (i <= 0) return '';
+      var l = list(md2), k;
+      for (k = 0; k < l.length; k++) if (l[k].key === order[i - 1]) return l[k].name;
+      return '';
+    }
 
     function rows(md2) {
-      var html = '', i, rank, best, rec, sub;
-      if (md2 === 'classic') {
-        for (i = 0; i < HJ.Jigsaw.RANKS.length; i++) {
-          rank = HJ.Jigsaw.RANKS[i];
+      var l = list(md2), html = '', i, rank, best, rec, sub, lk, auto = Store.nextRank(md2, stage), crop;
+      for (i = 0; i < l.length; i++) {
+        rank = l[i];
+        lk = !Store.isUnlocked(md2, stage, rank.key);
+        crop = HJ.cropPercent(rank.key);
+        if (md2 === 'classic') {
           best = Store.bestOfClassic(stage, rank.key);
           rec = best
             ? (starHTML(best.stars) + ' · ' + HJ.formatTime(best.time) + ' · ' + best.moves + '수')
             : '<span class="none">기록 없음</span>';
-          sub = rank.c + '×' + rank.r + ' · ' + rank.pieces + '조각 · 3별 ' + HJ.formatTime(rank.three);
-          html += '<button class="rank cl" data-stage="' + stage + '" data-rank="' + rank.key + '">' +
-            '<span class="g">' + rank.c + '×' + rank.r + '</span>' +
-            '<span class="t"><b>' + rank.name + '</b><small>' + sub + '</small></span>' +
-            '<span class="r' + (best ? '' : ' none') + '">' + rec + '</span></button>';
-        }
-      } else {
-        for (i = 0; i < HJ.RANKS.length; i++) {
-          rank = HJ.RANKS[i];
-          best = Store.bestOf(stage, rank.n);
+          sub = rank.c + '×' + rank.r + ' · ' + rank.pieces + '조각 · 그림 ' + crop + '%';
+        } else {
+          best = Store.bestOf(stage, rank.key);
           rec = best
             ? (starHTML(best.stars) + ' · ' + best.moves + '수 · ' + HJ.formatTime(best.time))
             : '<span class="none">기록 없음</span>';
-          sub = '조각 ' + (rank.n * rank.n) + '개 · 3별 ' + HJ.targetsFor(rank.n).three + '수 이내';
-          html += '<button class="rank" data-stage="' + stage + '" data-n="' + rank.n + '">' +
-            '<span class="g">' + rank.n + '×' + rank.n + '</span>' +
-            '<span class="t"><b>' + rank.name + '</b><small>' + sub + '</small></span>' +
-            '<span class="r' + (best ? '' : ' none') + '">' + rec + '</span></button>';
+          sub = rank.c + '×' + rank.r + ' · ' + rank.pieces + '조각 · 그림 ' + crop + '% · 3별 ' + HJ.targetsFor(rank.pieces).three + '수';
         }
+        html += '<button class="rank' + (md2 === 'classic' ? ' cl' : '') +
+          (lk ? ' locked' : '') + (!lk && rank.key === auto ? ' auto' : '') +
+          '" data-stage="' + stage + '" data-rank="' + rank.key + '" data-pieces="' + rank.pieces + '">' +
+          '<span class="g">' + rank.c + '×' + rank.r + '</span>' +
+          '<span class="t"><b>' + rank.name + (lk ? ' <span class="lk">🔒</span>' : '') + '</b><small>' + sub + '</small></span>' +
+          '<span class="r' + (best ? '' : ' none') + '">' + (lk ? '잠김' : rec) + '</span></button>';
       }
       return html;
     }
+
+    function label(md2) {
+      var auto = Store.nextRank(md2, stage), l = list(md2), k, r = l[0];
+      for (k = 0; k < l.length; k++) if (l[k].key === auto) r = l[k];
+      return '▶ ' + r.name + ' ' + r.c + '×' + r.r + ' (' + r.pieces + '조각) 시작';
+    }
+
     function sync(md2) {
       md = md2;
       w.querySelector('#modeSeg').querySelectorAll('button').forEach(function (b) {
         b.classList.toggle('on', b.getAttribute('data-m') === md2);
       });
       w.querySelector('#sheetSub').innerHTML = md2 === 'classic'
-        ? '진짜 직소 조각 · 자석 스냅 · 그룹 합체<br>난이도를 고르면 바로 시작합니다.'
-        : '칸을 두 번 터치해 맞바꾸기<br>난이도를 고르면 바로 시작합니다.';
+        ? '초보 → 달인 순서로 열립니다 · 이전 난이도를 클리어해야 다음이 열려요<br>달인을 풀어야 원본 전체 사진을 소장합니다.'
+        : '초보 → 달인 순서로 열립니다 · 이전 난이도를 클리어해야 다음이 열려요<br>조각을 맞바꿔 그림을 완성하세요.';
       w.querySelector('#rankRows').innerHTML = rows(md2);
+      w.querySelector('#btnRankGo').textContent = label(md2);
     }
     sync(md);
     w.addEventListener('click', function (e) {
       var seg = e.target.closest('#modeSeg button');
       if (seg) { SFX.tap(); Store.settings.mode = seg.getAttribute('data-m'); Store.saveSettings(); sync(seg.getAttribute('data-m')); return; }
+      var go = e.target.closest('#btnRankGo');
+      if (go) {
+        var rk = Store.nextRank(md, stage);
+        SFX.tap(); Store.settings.mode = md; Store.saveSettings();
+        closeOverlay();
+        if (md === 'classic') startClassic(stage, rk);
+        else startPlay(stage, rk);
+        return;
+      }
       var b = e.target.closest('.rank');
       if (!b) return;
+      var rk2 = b.getAttribute('data-rank');
+      if (!Store.isUnlocked(md, stage, rk2)) {
+        SFX.blocked();
+        haptic(20);
+        toast(prevName(md, rk2) + '를 먼저 클리어하면 ' + b.querySelector('.t b').textContent.replace('🔒', '').trim() + '가 열립니다', 2400);
+        return;
+      }
       var stg = +b.getAttribute('data-stage');
+      SFX.tap();
       Store.settings.mode = md; Store.saveSettings();
       closeOverlay();
-      if (md === 'classic') startClassic(stg, b.getAttribute('data-rank'));
-      else startPlay(stg, +b.getAttribute('data-n'));
+      if (md === 'classic') startClassic(stg, rk2);
+      else startPlay(stg, rk2);
     });
   }
 
@@ -4743,16 +5027,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     V.setImage(im);
   }
 
-  function startPlay(stage, n, resumeState) {
+  function startPlay(stage, rankKey, resumeState) {
     closeOverlay();
     resultOpen = false;
     mode = 'swap';
     if (C) C.stop();
     var st = stageById(stage);
-    cur = { stage: stage, n: n };
+    var rank = HJ.rankByKey(rankKey) || HJ.rankByKey(safeRank('swap', stage, rankKey)) || HJ.RANKS[0];
+    cur = { stage: stage, rank: rank.key };
     G = resumeState || HJ.createGame({
-      n: n, stage: stage,
-      seed: ((Date.now() & 0x7fffffff) ^ (stage * 7919) ^ (n * 104729)) >>> 0 || 1
+      rank: rank.key, stage: stage,
+      seed: ((Date.now() & 0x7fffffff) ^ (stage * 7919) ^ HJ.hashSeed(rank.key)) >>> 0 || 1
     });
     G.paused = false;
 
@@ -4770,11 +5055,12 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     $('#pauseOv').classList.add('hidden');
 
     $('#playTitle').textContent = st.title;
-    $('#playSub').textContent = HJ.rankOf(n).name + ' ' + n + '×' + n + ' · ' + (n * n) + '조각';
-    $('#artThumb').src = root.THUMB[stage] || root.ART[stage];
-    $('#boardWrap').style.setProperty('--art', 'url("' + (root.THUMB[stage] || root.ART[stage]) + '")');
+    $('#playSub').textContent = rank.name + ' ' + rank.c + '×' + rank.r + ' · ' + G.board.length +
+      '조각 · 그림 ' + HJ.cropPercent(rank.key) + '%';
+    $('#artThumb').src = artSrc(stage);
+    $('#boardWrap').style.setProperty('--art', 'url("' + artSrc(stage) + '")');
 
-    V.setGrid(n);
+    V.setGrid(G.cols, G.rows, HJ.cropFor(rank.key));
     showScreen('play');
     loadArt(stage, function () { layout(); });
     layout();
@@ -4805,7 +5091,6 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var cap = ui.immersive ? 4096 : 620;          // 꽉 채우기에서는 화면이 허락하는 만큼
     var size = Math.floor(Math.max(150, Math.min(w, h, cap)));
     if (V.size !== size) V.resize(size);
-    V.cell = size / V.n;
     drawOnce();
   }
   function drawOnce() { if (G) V.draw(G, ui, (root.performance ? performance.now() : Date.now())); }
@@ -4816,7 +5101,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     $('#hudMoves').textContent = G.moves;
     var p = Math.round(HJ.progressOf(G) * 100);
     $('#progFill2').style.width = p + '%';
-    var tg = HJ.targetsFor(G.n);
+    var tg = HJ.targetsFor(G.board.length);
     $('#starTarget').textContent = tg.three + '수';
     var left = G.board.length - HJ.misplacedCount(G.board);
     $('#goalText').innerHTML = '제자리 <b>' + left + '/' + G.board.length + '</b>' +
@@ -4856,7 +5141,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
     var stars = HJ.stars(G);
     var rec = { stars: stars, moves: G.moves, time: Math.round(G.elapsed), hints: G.hints };
-    var res = Store.submit(cur.stage, cur.n, rec);
+    var res = Store.submit(cur.stage, cur.rank, rec);
     Store.clearGame();
 
     setTimeout(function () { showResult(stars, rec, res); }, 950);
@@ -4880,13 +5165,18 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (resultOpen) return;
     resultOpen = true;
     var st = stageById(cur.stage);
+    var rank = HJ.rankByKey(cur.rank) || HJ.RANKS[0];
+    var crop = HJ.cropFor(cur.rank);
     var badge = submitRes.isNew ? '🎉 새 최고 기록!' : '';
     if (submitRes.isNew && !submitRes.prev) badge = '🎉 첫 완성! 갤러리에 담겼어요';
+    var lockLine = rank.key === 'master'
+      ? '🏆 완벽한 사진을 손에 넣었어요 · 전체 그림 저장 가능'
+      : '🔒 최고 난이도(달인)를 풀면 전체 사진을 소장할 수 있어요!';
     var nextStage = cur.stage >= STAGES.length ? 1 : cur.stage + 1;
     var w = overlay('<div class="result">' +
-      '<div class="art"><img src="' + (root.THUMB[cur.stage] || root.ART[cur.stage]) + '" alt=""></div>' +
+      '<div class="art">' + cropArtHTML(cur.stage, crop) + '</div>' +
       '<div class="body">' +
-      '<div class="kicker">' + (cur.n * cur.n) + '조각 완성</div>' +
+      '<div class="kicker">' + G.board.length + '조각 완성 · ' + rank.name + '</div>' +
       '<h3>' + st.title + '</h3>' +
       '<div class="stars" id="resStars">' + '<span class="off">★</span><span class="off">★</span><span class="off">★</span>' + '</div>' +
       '<div class="nums">' +
@@ -4895,6 +5185,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       '<div><b>' + rec.hints + '회</b><span>힌트</span></div>' +
       '</div>' +
       '<p class="badges">' + badge + '</p>' +
+      '<p class="lockline">' + lockLine + '</p>' +
       '<div class="acts">' +
       '<button class="btn primary" data-act="next">다음 그림</button>' +
       '<button class="btn" data-act="again">다시</button>' +
@@ -4917,10 +5208,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var b = e.target.closest('[data-act]');
       if (!b) return;
       var act = b.getAttribute('data-act');
-      if (act === 'save') { saveArt(cur.stage); return; }
+      if (act === 'save') { saveArt(cur.stage, { crop: HJ.cropFor(cur.rank) }); return; }
       closeOverlay(); resultOpen = false;
-      if (act === 'next') startPlay(nextStage, cur.n);
-      else if (act === 'again') startPlay(cur.stage, cur.n);
+      if (act === 'next') startPlay(nextStage, safeRank('swap', nextStage, cur.rank));
+      else if (act === 'again') startPlay(cur.stage, cur.rank);
       else { showScreen('home'); buildHome(); }
     });
   }
@@ -5037,29 +5328,45 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     prevT = 0;
   }
 
-  /* ---------------- 갤러리 ---------------- */
+  /* ---------------- 갤러리 ----------------
+     · 미해금 그림: 잠금
+     · 초보~고수만 깼다: 그동안 해금한 가장 넓은 영역만 보이고 바깥은 어둡게 + '달인 미해금'
+     · 달인을 깼다: 원본 전체 사진 + 전체 저장 가능 */
   function buildGallery() {
-    var grid = $('#galGrid'), i, st, stars, locked;
+    var grid = $('#galGrid'), i, st, stars, locked, art, inset, badge;
     var html = '';
     for (i = 0; i < STAGES.length; i++) {
       st = STAGES[i];
       stars = Store.bestStarsOf(st.id);
       locked = stars <= 0;
-      html += '<button class="gal' + (locked ? ' locked' : '') + '" data-stage="' + st.id + '">' +
-        '<img src="' + (root.THUMB[st.id] || root.ART[st.id]) + '" alt="" draggable="false">' +
+      art = locked ? { sw: 0, any: false, master: false } : Store.artCrop(st.id);
+      inset = Math.max(0, (1 - art.sw) / 2) * 100;
+      badge = !locked && !art.master ? '<span class="gal-badge">달인 미해금 ' + Math.round(art.sw * 100) + '%</span>' :
+        (!locked ? '<span class="gal-badge full">전체 사진</span>' : '');
+      html += '<button class="gal' + (locked ? ' locked' : '') + (art.master ? ' full' : '') +
+        '" data-stage="' + st.id + '">' +
+        '<img src="' + artSrc(st.id) + '" alt="" draggable="false">' +
         (locked ? '<span class="gal-ov">🔒</span>' : '') +
+        (!locked && art.sw > 0 && art.sw < 0.999
+          ? '<span class="gal-crop" style="left:' + inset.toFixed(2) + '%;top:' + inset.toFixed(2) +
+            '%;right:' + inset.toFixed(2) + '%;bottom:' + inset.toFixed(2) + '%"></span>' : '') +
+        badge +
         '<span class="gal-foot"><span class="gnum">' + (st.id < 10 ? '0' : '') + st.id + '</span>' +
         (locked ? '<span class="st off">미완성</span>' : starHTML(stars)) + '</span>' +
         '</button>';
     }
     grid.innerHTML = html;
-    $('#galSub').textContent = '완성한 그림 ' + Store.clearedCount() + ' / ' + STAGES.length;
+    var full = 0;
+    for (i = 0; i < STAGES.length; i++) if (Store.artCrop(STAGES[i].id).master) full++;
+    $('#galSub').textContent = '완성한 그림 ' + Store.clearedCount() + ' / ' + STAGES.length +
+      (full ? ' · 전체 사진 ' + full + '장' : '');
   }
 
   function openGalleryDetail(stage) {
     var stars = Store.bestStarsOf(stage);
     var st = stageById(stage);
     if (stars <= 0) { toast('그림을 완성하면 갤러리에 담깁니다'); return; }
+    var art = Store.artCrop(stage);
     var rows = '', i, rank, b;
     for (i = 0; i < HJ.Jigsaw.RANKS.length; i++) {
       rank = HJ.Jigsaw.RANKS[i];
@@ -5070,26 +5377,36 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     }
     for (i = 0; i < HJ.RANKS.length; i++) {
       rank = HJ.RANKS[i];
-      b = Store.bestOf(stage, rank.n);
-      rows += '<tr><td>⚡ ' + rank.name + ' ' + rank.n + '×' + rank.n + '</td><td>' +
+      b = Store.bestOf(stage, rank.key);
+      rows += '<tr><td>⚡ ' + rank.name + ' ' + rank.c + '×' + rank.r + '</td><td>' +
         (b ? ('★'.repeat(b.stars) + ' '.repeat(3 - b.stars)) + '  ' + b.moves + '수 · ' + HJ.formatTime(b.time) : '—') +
         '</td></tr>';
     }
-    var w = overlay('<div class="detail"><img src="' + root.ART[stage] + '" alt="">' +
+    var crop = HJ.cropFor('easy');
+    if (art.sw >= 0.999) crop = HJ.cropFor('master');
+    else if (art.sw >= 0.82) crop = HJ.cropFor('hard');
+    else if (art.sw >= 0.65) crop = HJ.cropFor('normal');
+    var state = art.master
+      ? '<span class="ok">전체 사진 해금 · 원본 100%</span>'
+      : '<span style="color:var(--dim)">지금까지 ' + Math.round(art.sw * 100) + '% 공개 · <b>달인을 풀면 전체 사진</b></span>';
+    var w = overlay('<div class="detail">' + cropArtHTML(stage, crop) +
       '<div class="d-body"><h3>' + st.title + '</h3>' +
       '<div style="font-size:12px;color:#9fb0cc">' + st.sub + '</div>' +
+      '<div class="cropstate">' + state + '</div>' +
       '<table>' + rows + '</table>' +
       '<div style="display:flex;gap:8px;margin-top:12px">' +
       '<button class="btn primary" style="flex:1" data-act="play">이 그림으로 하기</button>' +
-      '<button class="btn" data-act="save">🖼️ 저장</button>' +
+      '<button class="btn' + (art.master ? '' : ' off') + '" data-act="save">' + (art.master ? '💾 그림 저장' : '🔒 전체 저장') + '</button>' +
       '<button class="btn" data-act="close">닫기</button></div></div></div>', { center: true });
     w.addEventListener('click', function (e) {
       var b2 = e.target.closest('[data-act]');
       if (!b2) return;
       var act = b2.getAttribute('data-act');
       if (act === 'play') { closeOverlay(); openRankSheet(stage); }
-      else if (act === 'save') saveArt(stage);
-      else closeOverlay();
+      else if (act === 'save') {
+        if (!art.master) { toast('🔒 최고 난이도(달인)를 풀면 전체 사진을 저장할 수 있어요', 2400); return; }
+        saveArt(stage, { full: true });
+      } else closeOverlay();
     });
   }
 
@@ -5185,7 +5502,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var r = Store.resume();
       if (!r) { buildHome(); toast('이어할 판이 없어요'); return; }
       if (r.mode === 'classic') startClassic(r.g.stage, r.g.rank, r.g);
-      else startPlay(r.g.stage, r.g.n, r.g);
+      else startPlay(r.g.stage, r.g.rank || Store.nextRank('swap', r.g.stage), r.g);
     });
     $('#btnGallery').addEventListener('click', function () { buildGallery(); showScreen('gallery'); });
     if ($('#btnOnline')) $('#btnOnline').addEventListener('click', function () {
@@ -5339,23 +5656,34 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (!G.finished && t - lastSave > 3000) { Store.saveGame(G); lastSave = t; }
   }
 
-  /* ---------------- 그림 저장 ---------------- */
-  function saveArt(stage) {
+  /* ---------------- 그림 저장 ----------------
+     opts.full  : 원본 전체(달인 해금 후에만)
+     opts.crop  : 방금 깬 난이도의 영역만 저장(기본 = 전체) */
+  function saveArt(stage, opts) {
+    opts = opts || {};
+    var crop = opts.full ? null : (opts.crop || null);
     var im = new Image();
     im.onload = function () {
       try {
+        var nw = im.naturalWidth, nh = im.naturalHeight;
+        var cx = 0, cy = 0, cw = nw, ch = nh;
+        if (crop) {
+          cx = Math.round(crop.sx * nw); cy = Math.round(crop.sy * nh);
+          cw = Math.round(crop.sw * nw); ch = Math.round(crop.sh * nh);
+        }
         var cv = doc.createElement('canvas');
-        cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+        cv.width = cw; cv.height = ch;
         var c = cv.getContext('2d');
-        c.drawImage(im, 0, 0);
+        c.drawImage(im, cx, cy, cw, ch, 0, 0, cw, ch);
         var url = cv.toDataURL('image/png');
         var a = doc.createElement('a');
         a.href = url;
-        a.download = '한판직소_그림' + (stage < 10 ? '0' : '') + stage + '.png';
+        a.download = '한판직소_그림' + (stage < 10 ? '0' : '') + stage +
+          (crop ? '_' + Math.round(crop.sw * 100) : '') + '.png';
         doc.body.appendChild(a);
         a.click();
         setTimeout(function () { if (a.parentNode) a.remove(); }, 400);
-        toast('그림을 저장했어요 · 사진첩에서 확인하세요', 2200);
+        toast(crop ? '이번에 깬 부분을 저장했어요 · 달인을 풀면 전체 사진을 저장할 수 있어요' : '그림을 저장했어요 · 사진첩에서 확인하세요', 2400);
       } catch (e) { toast('그림을 저장하지 못했어요'); }
     };
     im.onerror = function () { toast('그림을 불러오지 못했어요'); };
@@ -5368,7 +5696,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     root.__hjTest = {
       state: function () { return G ? HJ.clone(G) : null; },
       board: function () { return G ? G.board.slice() : null; },
-      n: function () { return G ? G.n : 0; },
+      n: function () { return G ? G.cols : 0; },
+      pieces: function () { return G ? G.board.length : 0; },
+      rank: function () { return G ? G.rank : null; },
       screen: function () { return ui.screen; },
       plan: function () { return G ? HJ.solvePlan(G) : null; },
       invariants: function () { return G ? HJ.checkInvariants(G) : ['no-game']; },
@@ -5379,7 +5709,34 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         return { x: r.left + c.x * (r.width / V.size), y: r.top + c.y * (r.height / V.size) };
       },
       boardSize: function () { var r = V.canvas.getBoundingClientRect(); return { w: r.width, h: r.height, left: r.left, top: r.top }; },
-      start: function (stage, n) { startPlay(stage, n); },
+      start: function (stage, rank) { startPlay(stage, rank); },
+      /* 테스트: 지금 단계의 해금 상태(순차 해금 검사용) */
+      unlocks: function (stage, mode) {
+        var out = {}, order = HJ.RANK_ORDER, i;
+        for (i = 0; i < order.length; i++) out[order[i]] = Store.isUnlocked(mode || 'classic', stage, order[i]);
+        out.next = Store.nextRank(mode || 'classic', stage);
+        return out;
+      },
+      /* 테스트: 아래 난이도를 클리어한 것으로 기록한다(게임을 다 돌리지 않고 해금 상태를 만들 때) */
+      grantClears: function (stage, mode, ranks) {
+        var md = mode || 'classic', list = ranks || ['easy'], i, k;
+        for (i = 0; i < list.length; i++) {
+          k = Store.rankKeyOf(md, stage, list[i]);
+          Store.progress.best[k] = { stars: 1, moves: 99, time: 999000, hints: 0, at: Date.now() };
+          Store.progress.cleared[stage] = Math.max(Store.progress.cleared[stage] || 0, 1);
+        }
+        Store.saveProgress();
+        buildHome();
+        return this.unlocks(stage, md);
+      },
+      resetProgress: function () {
+        Store.progress = { v: 1, best: {}, cleared: {} };
+        Store.saveProgress(); Store.clearGame(); Store.clearJigsaw();
+        buildHome();
+        return true;
+      },
+      artCrop: function (stage) { return Store.artCrop(stage); },
+      crop: function (rankKey) { return HJ.cropFor(rankKey); },
       hints: function () { return G ? G.hints : -1; },
       store: function () { return { best: Store.progress.best, cleared: Store.progress.cleared, total: Store.totalStars() }; },
       seedBoard: function () { return G ? G.board.slice() : null; },
@@ -5417,6 +5774,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     haptic: haptic,
     overlay: overlay,
     closeOverlay: closeOverlay,
+    cropArtHTML: cropArtHTML,
+    paintCrops: paintCrops,
+    artSrc: artSrc,
     stageById: stageById,
     stages: function () { return STAGES; },
     saveArt: saveArt,
@@ -5428,6 +5788,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     Store.load();
     C = HJ.Classic;
     if (C && C.setup) C.setup({ toast: toast, haptic: haptic, overlay: overlay, closeOverlay: closeOverlay,
+      cropArtHTML: cropArtHTML, paintCrops: paintCrops,
       showScreen: showScreen, buildHome: buildHome, stageById: stageById, stageCount: function () { return STAGES.length; },
       saveArt: saveArt, sfx: SFX });
     SFX.setMuted(Store.settings.muted);
@@ -5482,6 +5843,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   var $ = function (s) { return doc.querySelector(s); };
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  /* 원본의 일부(난이도별 크롭)만 보여 주는 그림 상자 — 달인 전에는 전체 사진을 보여 주지 않는다 */
+  function cropArtHTML(crop) { return api.cropArtHTML(cur.stage, crop); }
 
   /* ---------------- dp·좌표 유틸 ---------------- */
   /* 자석 스냅 허용 반경(보드 단위).
@@ -5548,7 +5912,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
     $('#playTitle').textContent = st.title;
     $('#playSub').textContent = '🧩 클래식 ' + J.rankByKey(rankKey).name + ' ' +
-      J.rankByKey(rankKey).c + '×' + J.rankByKey(rankKey).r + ' · ' + S.pieces.length + '조각';
+      J.rankByKey(rankKey).c + '×' + J.rankByKey(rankKey).r + ' · ' + S.pieces.length + '조각 · 그림 ' +
+      J.cropPercent(rankKey) + '%';
     $('#artThumb').src = root.THUMB[stage] || root.ART[stage];
     $('#boardWrap').style.setProperty('--art', 'url("' + (root.THUMB[stage] || root.ART[stage]) + '")');
 
@@ -5805,14 +6170,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         var adx = Math.abs(dx), ady = Math.abs(dy);
         var along = axis === 'x' ? adx : ady;      // 트레이 스크롤 방향
         var across = axis === 'x' ? ady : adx;     // 조각을 꺼내는 방향
-        if (across > SLOP && across >= along * 0.9) {
+        // 2026-11-28: 조각이 많아져 트레이 반대쪽 조각을 대각선으로 끌어 오는 일이 흔해졌다.
+        //  스크롤 축에서 30도만 벗어나도 조각 집기로 본다(예전에는 거의 정직각만 인정해
+        //  대각선으로 끈 조각이 스크롤로 새는 일이 있었다).
+        if (across > SLOP && across >= along * 0.6) {
           dragging = true;                         // 트레이 밖으로 끌기 = 조각 집기
           node.classList.add('lift');
           ghost = makeGhost();
           ghostAt(); ghostMagnet();
           SFX.select();
           try { api.haptic(8); } catch (err) {}
-        } else if (along > SLOP + 4 && along > across * 1.35) {
+        } else if (along > SLOP + 4 && along > across * 1.6) {
           scrolling = true;                        // 트레이 스크롤에 맡긴다
           cleanup();
           return;
@@ -6160,12 +6528,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (!api) return;
     var st = api.stageById(cur.stage);
     var rank = J.rankByKey(cur.rank);
+    var crop = J.cropFor(cur.rank);
+    var full = rank.key === 'master';
     var badge = '';
     if (submitRes.isNew && !submitRes.prev) badge = '🎉 첫 완성! 갤러리에 담겼어요';
     else if (submitRes.isNew) badge = '🎉 새 최고 기록!';
+    var lockLine = full
+      ? '🏆 완벽한 사진을 손에 넣었어요 · 전체 그림 저장 가능'
+      : '🔒 최고 난이도(달인)를 풀면 전체 사진을 소장할 수 있어요!';
     var nextStage = cur.stage >= api.stageCount() ? 1 : cur.stage + 1;
     var w = api.overlay('<div class="result">' +
-      '<div class="art"><img src="' + (root.THUMB[cur.stage] || root.ART[cur.stage]) + '" alt=""></div>' +
+      '<div class="art">' + cropArtHTML(crop) + '</div>' +
       '<div class="body">' +
       '<div class="kicker">🧩 클래식 ' + rank.name + ' · ' + S.pieces.length + '조각 완성</div>' +
       '<h3>' + st.title + '</h3>' +
@@ -6176,6 +6549,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       '<div><b>' + rec.hints + '회</b><span>힌트</span></div>' +
       '</div>' +
       '<p class="badges">' + badge + '</p>' +
+      '<p class="lockline">' + lockLine + '</p>' +
       '<div class="acts">' +
       '<button class="btn primary" data-act="next">다음 그림</button>' +
       '<button class="btn" data-act="again">다시</button>' +
@@ -6197,10 +6571,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var b = e.target.closest('[data-act]');
       if (!b) return;
       var act = b.getAttribute('data-act');
-      if (act === 'save') { api.saveArt(cur.stage); return; }
+      if (act === 'save') { api.saveArt(cur.stage, { crop: crop }); return; }
       api.closeOverlay(); resultOpen = false;
-      if (act === 'next') C.start(nextStage, cur.rank);
-      else if (act === 'again') C.start(cur.stage, cur.rank);
+      if (act === 'next') C.start(nextStage, rank.key);
+      else if (act === 'again') C.start(cur.stage, rank.key);
       else { C.stop(); api.showScreen('home'); api.buildHome(); }
     });
   }
@@ -6257,6 +6631,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       invariants: function () { return S ? J.checkInvariants(S) : ['no-state']; },
       progress: function () { return S ? J.progress(S) : null; },
       rank: function () { return S ? S.rank : null; },
+      crop: function () { return S ? J.cropFor(S.rank) : null; },
+      pieces: function () { return S ? S.pieces.length : 0; },
       active: function () { return C.active; },
       view: function () { return { zoom: R.view.zoom, tx: R.view.tx, ty: R.view.ty, fit: R.fit, cssW: R.cssW, cssH: R.cssH }; },
       toCss: function (x, y) {
@@ -6398,7 +6774,13 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   function totalPieces(cfg) {
     var rk = J.rankByKey(cfg && cfg.rank);
-    return rk ? rk.c * rk.r : 12;
+    return rk ? rk.c * rk.r : 24;
+  }
+  /* 대전 결과 그림도 그 난이도의 크롭 영역만 보여 준다(달인 전 전체 사진 금지) */
+  function cropArtHTML(stage, rankKey) {
+    var c = J.cropFor(rankKey);
+    if (HJ.App && HJ.App.cropArtHTML) return HJ.App.cropArtHTML(stage, c);
+    return '<img src="' + (root.THUMB[stage] || root.ART[stage]) + '" alt="">';
   }
   function savedNick() {
     var v = '';
@@ -6819,23 +7201,26 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (!ctx || !cfg) return;
     var rk = J.rankByKey(cfg.rank) || J.RANKS[0];
     var cols = rk.c, rows = rk.r;
+    var cr = J.cropFor(cfg.rank);
     ctx.clearRect(0, 0, size, size);
     ctx.fillStyle = '#0a1220';
     ctx.fillRect(0, 0, size, size);
     var im = OL.artImg;
     if (imgReady(im)) {
-      ctx.globalAlpha = 0.13;
-      ctx.drawImage(im, 0, 0, size, size);
-      ctx.globalAlpha = 1;
       var iw = im.naturalWidth, ih = im.naturalHeight;
+      var cx = cr.sx * iw, cy = cr.sy * ih, cwid = cr.sw * iw, chei = cr.sh * ih;
+      ctx.globalAlpha = 0.13;
+      ctx.drawImage(im, cx, cy, cwid, chei, 0, 0, size, size);
+      ctx.globalAlpha = 1;
       var pw = size / cols, ph = size / rows;
+      var sw = cwid / cols, sh = chei / rows;
       var snaps = (OL.M.peer && OL.M.peer.snaps) || {};
       for (var k in snaps) {
         if (!Object.prototype.hasOwnProperty.call(snaps, k)) continue;
         var pid = +k;
         if (!(pid >= 0 && pid < cols * rows)) continue;
         var r = (pid / cols) | 0, c = pid % cols;
-        ctx.drawImage(im, (c * iw) / cols, (r * ih) / rows, iw / cols, ih / rows,
+        ctx.drawImage(im, cx + c * sw, cy + r * sh, sw, sh,
           Math.floor(c * pw), Math.floor(r * ph), Math.ceil(pw) + 0.5, Math.ceil(ph) + 0.5);
       }
     }
@@ -6890,7 +7275,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     }
 
     var html = '<div class="result olres ' + cls + '">' +
-      '<div class="art"><img src="' + (root.THUMB[OL.M.cfg.stage] || root.ART[OL.M.cfg.stage]) + '" alt=""></div>' +
+      '<div class="art">' + cropArtHTML(OL.M.cfg.stage, OL.M.cfg.rank) + '</div>' +
       '<div class="body">' +
       '<div class="kicker">🌐 온라인 1:1 · ' + rk.name + ' ' + rk.c + '×' + rk.r + '</div>' +
       '<h3 class="olbig-label">' + label + '</h3>' +
@@ -6994,14 +7379,74 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   /* ---------------- 초대 링크 ---------------- */
   OL.link = function () { return HJ.net.roomLink(OL.code, false); };   // 초대는 항상 손님용
-  function copyLink() {
-    var link = OL.link();
-    var done = function () { toast('초대 링크를 복사했어요', 1800); };
+  /* 초대 문구 — 문자/카톡/공유 어디로 보내든 같은 내용 */
+  OL.inviteText = function () {
+    return '한판 직소 같이 해요! 🧩\n방 코드: ' + (OL.code || '····') +
+      '\n' + name() + ' 님이 기다리고 있어요.\n' + OL.link();
+  };
+  OL.smsHref = function () {
+    // iOS·Android 모두: sms:?&body=… (공백은 %20으로 인코딩)
+    return 'sms:?&body=' + encodeURIComponent(OL.inviteText()).replace(/%0A/g, '%0A');
+  };
+  function copyText(txt, msg) {
+    var done = function () { toast(msg, 2000); };
     if (root.navigator && navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(link).then(done, function () { fallbackCopy(link); });
-    } else fallbackCopy(link);
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, msg); });
+    } else fallbackCopy(txt, msg);
   }
-  function fallbackCopy(txt) {
+  function copyLink() { copyText(OL.link(), '초대 링크를 복사했어요'); }
+
+  /* ✉️ 문자 — 문자 앱에 초대 문구를 채워 바로 띄운다. 안 열리는 환경이면 복사해 안내 */
+  function shareSms() {
+    var href = OL.smsHref();
+    var txt = OL.inviteText();
+    // 어느 환경이든 문구는 복사해 두면 문자 앱이 안 열려도 붙여넣을 수 있다
+    copyTextSilent(txt);
+    var a = doc.createElement('a');
+    a.href = href;
+    a.style.display = 'none';
+    doc.body.appendChild(a);
+    try { a.click(); } catch (e) { /* 아래 안내로 */ }
+    setTimeout(function () { if (a.parentNode) a.remove(); }, 600);
+    toast('문자 앱을 열었어요 · 안 열리면 복사한 문구를 붙여넣으세요', 2600);
+  }
+
+  /* 💬 카톡/공유 — navigator.share 가 있으면 공유 시트(카카오톡 등)를 바로 띄운다 */
+  function shareSheet() {
+    var txt = OL.inviteText();
+    var url = OL.link();
+    if (root.navigator && navigator.share) {
+      var p;
+      try {
+        p = navigator.share({ title: '한판 직소 초대 (방 코드 ' + (OL.code || '') + ')', text: txt, url: url });
+      } catch (e) { p = null; }
+      if (p && p.then) {
+        p.then(function () { toast('초대를 보냈어요', 1800); },
+          function (err) {
+            if (err && err.name === 'AbortError') return;      // 사용자가 닫음
+            copyText(txt, '공유를 쓸 수 없어 초대 문구를 복사했어요');
+          });
+        return;
+      }
+    }
+    copyText(txt, '공유를 쓸 수 없어 초대 문구를 복사했어요 · 붙여넣기 하세요');
+  }
+
+  function copyTextSilent(txt) {
+    try {
+      if (root.navigator && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).catch(function () { });
+        return;
+      }
+      var ta = doc.createElement('textarea');
+      ta.value = txt; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      doc.body.appendChild(ta); ta.select();
+      doc.execCommand('copy');
+      ta.remove();
+    } catch (e) { /* 복사 실패는 무시 — 문자 앱이 열리면 그대로 쓰면 된다 */ }
+  }
+
+  function fallbackCopy(txt, msg) {
     try {
       var ta = doc.createElement('textarea');
       ta.value = txt;
@@ -7011,8 +7456,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       ta.select();
       doc.execCommand('copy');
       ta.remove();
-      toast('초대 링크를 복사했어요', 1800);
-    } catch (e) { toast('링크: ' + txt, 3200); }
+      toast(msg || '복사했어요', 2000);
+    } catch (e) { toast('복사하지 못했어요 · 링크: ' + OL.link(), 3200); }
   }
 
   /* ---------------- 바인딩 ---------------- */
@@ -7042,6 +7487,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       if (e.key === 'Enter') OL.joinRoom();
     });
     $('#btnCopy').addEventListener('click', function () { sfx().tap(); copyLink(); });
+    if ($('#btnSms')) $('#btnSms').addEventListener('click', function () { sfx().tap(); shareSms(); });
+    if ($('#btnShare')) $('#btnShare').addEventListener('click', function () { sfx().tap(); shareSheet(); });
     $('#btnOlStart').addEventListener('click', function () { OL.startMatch(); });
     $('#btnOlBack').addEventListener('click', function () {
       sfx().tap();
@@ -7127,6 +7574,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       state: function () { return OL.testState(); },
       setPick: function (st, rk) { OL.stage = st; OL.rank = rk; },
       link: function () { return OL.link(); },
+      inviteText: function () { return OL.inviteText(); },
+      smsHref: function () { return OL.smsHref(); },
+      share: function () { shareSheet(); },
       open: function (t) { return OL.openLobby(t); }
     };
   }
