@@ -5752,7 +5752,7 @@ function aiResolveTurn(dry){
         /* 잠금이 쌓일수록 콤보 공격이 줄어든다 */
         var chance=diff.atk*Math.max(0.35, 1-0.05*aiLocks);
         if (Math.random()<chance){
-            attacked=Math.min(attackChain-1, 3);
+            attacked=Math.min(attackChain-1, ATK_MAX);   // 2콤보=1 … 7콤보 이상=6개
             if (!dry) aiAttackPlayer(attacked, attackChain);
         }
     }

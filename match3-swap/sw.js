@@ -1,5 +1,5 @@
 /* 매치 3 서비스 워커: 화면 이동은 네트워크 우선, 그림·소리는 캐시 우선 */
-var CACHE = 'match3-79f859ff';
+var CACHE = 'match3-25454b98';
 var CORE = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', function(e){
