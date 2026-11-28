@@ -2759,7 +2759,7 @@ h1 em {
       room: function () { return App.room ? JSON.parse(JSON.stringify(App.room.snapshot())) : null; },
       roomRole: function () { return App.roomRole; },
       roomCode: function () { return App.room ? App.room.code : ''; },
-      roomMode: function () { return App.room && App.room.bus ? App.room.bus.mode : ''; },
+      roomMode: function () { return (App.room && App.room.bus && App.room.bus.mode) || ''; },
       status: function () { return App.room ? App.room.status : ''; },
       offset: function () { return App.room ? App.room.offset : 0; },
       seats: function () { return Array.prototype.map.call(document.querySelectorAll('#roomSeats .seat'), function (b) { return b.textContent.trim(); }); },
