@@ -130,6 +130,46 @@
     border:1px solid rgba(255,255,255,.13);position:relative;z-index:4;
   }
   .alt:hover{background:rgba(255,255,255,.16)}
+  /* ── 자유게시판 배너 ── */
+  .board-banner{
+    position:relative;display:flex;align-items:center;gap:14px;
+    padding:16px 18px;border-radius:var(--radius);text-decoration:none;color:inherit;overflow:hidden;
+    background:
+      linear-gradient(120deg, rgba(255,203,77,.16), rgba(177,140,255,.16)),
+      linear-gradient(180deg,#1a2440,#141c2e);
+    border:1px solid rgba(255,203,77,.36);
+    box-shadow:0 12px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+  }
+  .board-banner::after{
+    content:"";position:absolute;right:-50px;top:-60px;width:190px;height:190px;border-radius:50%;
+    background:radial-gradient(circle,#ffcb4d,transparent 70%);opacity:.16;pointer-events:none;
+  }
+  .board-banner:hover{transform:translateY(-2px);border-color:rgba(255,203,77,.62);box-shadow:0 18px 40px rgba(0,0,0,.46)}
+  .board-banner:active{transform:scale(.992)}
+  .bb-ico{
+    position:relative;z-index:1;flex:0 0 auto;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;
+    background:linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.14);box-shadow:0 6px 16px rgba(0,0,0,.3);
+  }
+  .bb-txt{position:relative;z-index:1;min-width:0;flex:1 1 190px}
+  .bb-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .bb-title .bb-sub2{font-size:12.5px;font-weight:700;color:var(--dim)}
+  .bb-title .new{
+    font-size:10px;font-weight:800;letter-spacing:.06em;color:#0a0d15;
+    background:linear-gradient(140deg,#ffcb4d,#ffe9a8);border-radius:999px;padding:3px 7px;
+  }
+  .bb-desc{font-size:12.5px;color:var(--dim);margin-top:4px;line-height:1.55}
+  .bb-go{
+    position:relative;z-index:1;flex:0 0 auto;font-size:12.5px;font-weight:800;color:#0a0d15;
+    background:linear-gradient(140deg,#ffcb4d,#ffe9a8);border-radius:12px;padding:9px 13px;white-space:nowrap;
+    box-shadow:0 6px 16px rgba(255,203,77,.25);
+  }
+  @media (max-width:560px){
+    .board-banner{flex-wrap:wrap;gap:10px;padding:14px 15px}
+    .bb-go{width:100%;text-align:center}
+  }
+
   .hint{
     display:flex;gap:10px;align-items:flex-start;
     padding:14px 16px;border-radius:16px;font-size:12.5px;line-height:1.6;color:var(--dim);
@@ -148,6 +188,15 @@
     <h1>링크 하나로 <em>바로 한 판</em></h1>
     <p class="lede">설치 없이 브라우저에서 실행돼요. 온라인 대전은 두 사람이 같은 주소를 열고 방 코드만 주고받으면 됩니다.</p>
   </header>
+
+  <a class="board-banner" href="./board/index.html" aria-label="자유게시판 열기 — 수정·업데이트 요청">
+    <div class="bb-ico" aria-hidden="true">📝</div>
+    <div class="bb-txt">
+      <div class="bb-title">자유게시판 <span class="bb-sub2">(수정·업데이트 요청)</span> <span class="new">NEW</span></div>
+      <div class="bb-desc">버그 제보 · 업데이트 요청 · 새 게임 아이디어 · 자유 수다 — 로그인 없이 바로 남길 수 있어요. 진행 상태도 확인됩니다.</div>
+    </div>
+    <div class="bb-go" aria-hidden="true">게시판 가기 →</div>
+  </a>
 
   <main class="grid">
 
@@ -288,7 +337,7 @@
     <span><b>양이톡</b>을 열고 닉네임을 넣으면 내 초대 코드가 나옵니다. 그 코드나 초대 링크를 가족·친구에게 보내면 1:1 대화방이 열리고, 대화방에서 <b>＋ → 게임하기</b>로 한판 맞고·블록 듀얼·Match3를 바로 시작할 수 있어요.</span>
   </div>
 
-  <footer>한판 맞고 · 양이톡 · 블록 듀얼 · Match3 · 한판 직소 · 한판 사다리 — 웹 게임 모음</footer>
+  <footer>한판 맞고 · 양이톡 · 블록 듀얼 · Match3 · 한판 직소 · 한판 사다리 · <a href="./board/index.html" style="color:#8592b8;text-decoration:none">자유게시판</a> — 웹 게임 모음</footer>
 
 </div>
 </body>

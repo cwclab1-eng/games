@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080b13">
+<title>📝 자유게시판 (수정·업데이트 요청) — gameZONE</title>
+<meta name="description" content="gameZONE 게임 포털 자유게시판 — 버그 제보, 업데이트 요청, 새 게임 아이디어, 자유 수다. 로그인 없이 글을 남길 수 있어요.">
+<meta property="og:title" content="📝 자유게시판 (수정·업데이트 요청)">
+<meta property="og:description" content="한판 맞고 · 블록 듀얼 · Match3 · 양이톡 · 한판 직소 · 한판 사다리 — 버그 제보와 업데이트 요청을 남겨 주세요.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#080b13; --bg2:#101728;
+    --card:#141c2e; --card2:#1a2440;
+    --line:rgba(255,255,255,.09);
+    --txt:#eef2ff; --dim:#9aa6c4; --faint:#7f8bad;
+    --gold:#ffcb4d; --mint:#4ee6a8; --sky:#5ad1ff; --violet:#b18cff; --rose:#ff6b6b;
+    --r:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;min-height:100dvh;
+    background:
+      radial-gradient(900px 600px at 6% -10%, rgba(255,203,77,.13), transparent 60%),
+      radial-gradient(800px 600px at 100% 0%, rgba(90,209,255,.12), transparent 55%),
+      radial-gradient(900px 700px at 50% 115%, rgba(177,140,255,.14), transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    color:var(--txt);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:calc(14px + env(safe-area-inset-top)) 12px calc(92px + env(safe-area-inset-bottom));
+  }
+  body.lock{overflow:hidden}
+  .wrap{width:100%;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:13px}
+  [hidden]{display:none!important}
+
+  /* ── header ── */
+  .hero{display:flex;flex-direction:column;gap:9px}
+  .topline{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .back{font-size:12.5px;font-weight:700;color:var(--dim);text-decoration:none;padding:8px 11px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+  .back:hover{color:#fff;border-color:rgba(255,255,255,.22)}
+  .icons{display:flex;gap:6px}
+  .ico{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);font-size:15px;width:36px;height:36px;border-radius:11px;cursor:pointer;line-height:1;display:grid;place-items:center;transition:.15s}
+  .ico:hover{background:rgba(255,255,255,.12)}
+  .ico.on{background:rgba(255,203,77,.18);border-color:rgba(255,203,77,.55);box-shadow:inset 0 0 0 1px rgba(255,203,77,.25)}
+  h1{margin:0;font-size:clamp(23px,6.6vw,31px);line-height:1.2;letter-spacing:-.02em;font-weight:800}
+  h1 em{font-style:normal;background:linear-gradient(100deg,var(--gold),#ff9a5c 55%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{margin:0;color:var(--dim);font-size:13px;line-height:1.6}
+  .connrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .connchip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--dim)}
+  .connchip .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex:0 0 auto}
+  .connchip.live{color:#bff7dd;border-color:rgba(78,230,168,.38);background:rgba(78,230,168,.12)}
+  .connchip.live .dot{background:var(--mint);box-shadow:0 0 8px var(--mint)}
+  .connchip.err{color:#ffd0d0;border-color:rgba(255,107,107,.42);background:rgba(255,107,107,.12)}
+  .connchip.err .dot{background:var(--rose)}
+  .connchip.recon{color:#ffe7b8;border-color:rgba(255,203,77,.42);background:rgba(255,203,77,.12)}
+  .connchip.recon .dot{background:var(--gold)}
+  .connchip.admin{color:#ffe7b8;border-color:rgba(255,203,77,.5);background:rgba(255,203,77,.16)}
+  .connchip.wait{color:#cfd8f0}
+
+  /* ── chips ── */
+  .chips{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 5px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;appearance:none;font:inherit;font-size:12.5px;font-weight:700;color:var(--dim);padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer;white-space:nowrap;transition:.15s}
+  .chip:hover{color:var(--txt);border-color:rgba(255,255,255,.2)}
+  .chip.on{color:#0a0d15;background:linear-gradient(140deg,var(--gold),#ffe9a8);border-color:transparent;box-shadow:0 4px 14px rgba(255,203,77,.22);font-weight:800}
+  .chip.small{font-size:11.5px;padding:6px 10px}
+
+  /* ── search + write ── */
+  .searchrow{display:flex;gap:8px;align-items:stretch}
+  .searchbox{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:7px;padding:0 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+  .searchbox:focus-within{border-color:rgba(255,203,77,.45);box-shadow:0 0 0 3px rgba(255,203,77,.1)}
+  .searchbox > span{font-size:13px;opacity:.8;flex:0 0 auto}
+  .searchbox input{flex:1 1 auto;min-width:0;background:none;border:0;outline:none;color:var(--txt);font:inherit;font-size:14px;padding:12px 0}
+  .searchbox input::-webkit-search-cancel-button{filter:invert(.7)}
+  .write{flex:0 0 auto;appearance:none;font:inherit;font-size:13px;font-weight:800;padding:0 15px;border-radius:14px;border:0;cursor:pointer;color:#0a0d15;background:linear-gradient(140deg,var(--gold),#ffe9a8);box-shadow:0 6px 18px rgba(255,203,77,.22)}
+  .write:active{transform:scale(.98)}
+  .listmeta{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--faint);padding:0 3px}
+
+  /* ── list ── */
+  .list{display:flex;flex-direction:column;gap:10px}
+  .post{position:relative;display:flex;flex-direction:column;gap:0;padding:14px;border-radius:var(--r);
+    background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    box-shadow:0 8px 22px rgba(0,0,0,.28);cursor:pointer;transition:transform .15s,border-color .15s}
+  .post:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.2)}
+  .post:active{transform:scale(.994)}
+  .post:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .badges{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .cat{font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+  .cat.bug{background:rgba(255,107,107,.16);color:#ffb3b3;border-color:rgba(255,107,107,.32)}
+  .cat.update{background:rgba(90,209,255,.14);color:#a9ecff;border-color:rgba(90,209,255,.3)}
+  .cat.idea{background:rgba(255,203,77,.16);color:#ffe2a1;border-color:rgba(255,203,77,.32)}
+  .cat.talk{background:rgba(177,140,255,.16);color:#d8c6ff;border-color:rgba(177,140,255,.32)}
+  .game{font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+  .st{font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:999px;white-space:nowrap}
+  .st.wait{background:rgba(255,255,255,.08);color:#c3cce4}
+  .st.check{background:rgba(255,203,77,.18);color:#ffdf9a}
+  .st.done{background:rgba(78,230,168,.16);color:#9ff0cd}
+  .ptitle{margin:9px 0 0;font-size:15.5px;font-weight:800;line-height:1.35;overflow-wrap:anywhere}
+  .pbody{margin:5px 0 0;font-size:12.5px;color:var(--dim);line-height:1.55;overflow-wrap:anywhere;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .pmeta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--faint)}
+  .pmeta .who{color:#b9c3dc;font-weight:700}
+  .sp{flex:1 1 auto}
+  .likebtn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--dim);font:inherit;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .likebtn.on{color:#ffb3b3;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.12)}
+  .empty{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;padding:32px 18px;border-radius:var(--r);background:rgba(255,255,255,.035);border:1px dashed rgba(255,255,255,.14)}
+  .empty .ei{font-size:34px;line-height:1}
+  .empty b{font-size:14px}
+  .empty p{margin:0;font-size:12.5px;color:var(--dim);line-height:1.6}
+
+  /* ── buttons ── */
+  .btn{appearance:none;font:inherit;font-size:13px;font-weight:800;padding:10px 14px;border-radius:12px;cursor:pointer;
+    color:var(--txt);background:rgba(255,255,255,.07);border:1px solid var(--line);transition:.15s;line-height:1.2}
+  .btn:hover{background:rgba(255,255,255,.13)}
+  .btn.primary{color:#0a0d15;background:linear-gradient(140deg,var(--gold),#ffe9a8);border-color:transparent;box-shadow:0 6px 18px rgba(255,203,77,.2)}
+  .btn.primary:hover{filter:brightness(1.05)}
+  .btn.ghost{background:transparent}
+  .btn.danger{color:#ffc2c2;border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.1)}
+  .btn.sm{font-size:12px;padding:8px 11px;border-radius:10px}
+  .btn:disabled{opacity:.55;cursor:default}
+
+  /* ── FAB ── */
+  .fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;
+    border:0;font-size:22px;cursor:pointer;color:#0a0d15;background:linear-gradient(140deg,var(--gold),#ffe9a8);
+    box-shadow:0 12px 26px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12);z-index:30;display:grid;place-items:center}
+  .fab:active{transform:scale(.95)}
+
+  /* ── issues ── */
+  .issues{display:flex;flex-direction:column;gap:7px;padding:14px;border-radius:var(--r);background:rgba(255,255,255,.035);border:1px solid var(--line)}
+  .issues h2{margin:0;font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .issues h2 .tag2{font-size:10px;font-weight:800;color:var(--faint);border:1px solid var(--line);border-radius:999px;padding:3px 7px}
+  .issues .more{margin-left:auto;font-size:11.5px;color:var(--gold);text-decoration:none;white-space:nowrap}
+  .ilist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+  .ilist li a{display:flex;align-items:center;gap:8px;padding:8px 6px;border-radius:10px;text-decoration:none;color:var(--txt);font-size:12.5px}
+  .ilist li a:hover{background:rgba(255,255,255,.06)}
+  .ist{flex:0 0 auto;font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;white-space:nowrap}
+  .ist.open{background:rgba(78,230,168,.16);color:#9ff0cd}
+  .ist.closed{background:rgba(255,255,255,.1);color:#b9c3dc}
+  .itxt{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .inum{flex:0 0 auto;color:var(--faint);font-size:11px}
+  .noIssue{padding:8px 6px;font-size:12px;color:var(--dim)}
+  .noIssue a{color:var(--gold);text-decoration:none}
+
+  /* ── sheets ── */
+  .sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+  .sheet .backdrop{position:absolute;inset:0;background:rgba(3,6,12,.74);backdrop-filter:blur(3px)}
+  .panel{position:relative;width:100%;max-width:620px;max-height:92dvh;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,#131b2c,#0d1421);border:1px solid rgba(255,255,255,.12);
+    border-radius:20px 20px 0 0;box-shadow:0 -12px 44px rgba(0,0,0,.65);overflow:hidden;animation:sheetUp .18s ease}
+  @keyframes sheetUp{from{transform:translateY(14px);opacity:.6}to{transform:none;opacity:1}}
+  @media(min-width:680px){ .sheet{align-items:center;padding:22px} .panel{border-radius:20px;max-height:88dvh} }
+  .panelHead{display:flex;align-items:center;gap:9px;padding:13px 14px;border-bottom:1px solid var(--line);flex:0 0 auto;min-height:52px}
+  .panelHead h2{margin:0;font-size:15.5px;font-weight:800}
+  .panelHead .ico{margin-left:auto}
+  .panelBody{padding:14px 15px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-height:0}
+  .panelFoot{display:flex;gap:8px;padding:12px 15px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);flex:0 0 auto}
+  .panelFoot .btn{flex:1}
+  .panelFoot .btn.primary{flex:2}
+
+  /* ── form ── */
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px;min-width:0}
+  .field > label,.flabel{font-size:11.5px;font-weight:800;color:var(--dim);letter-spacing:.01em}
+  input[type=text],input[type=search],textarea{width:100%;font:inherit;font-size:14px;color:var(--txt);
+    background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none;min-width:0}
+  textarea{min-height:118px;resize:vertical;line-height:1.6}
+  input::placeholder,textarea::placeholder{color:#66719a}
+  input:focus,textarea:focus{border-color:rgba(255,203,77,.5);box-shadow:0 0 0 3px rgba(255,203,77,.12)}
+  .hint{font-size:11px;color:var(--faint);line-height:1.5}
+  .err{margin:0;font-size:12px;font-weight:700;color:#ffb3b3;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);border-radius:10px;padding:9px 11px}
+
+  /* ── detail ── */
+  .dtitle{margin:12px 0 0;font-size:18px;font-weight:800;line-height:1.35;overflow-wrap:anywhere}
+  .dmeta{margin-top:6px;font-size:11.5px;color:var(--faint)}
+  .dbody{margin-top:12px;font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;color:#e2e8fb}
+  .dacts{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .dacts.own{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08)}
+  .dadmin{margin-top:14px;padding:11px;border-radius:12px;background:rgba(255,203,77,.07);border:1px solid rgba(255,203,77,.22);display:flex;flex-direction:column;gap:7px}
+  .cmts{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .cmts h3{margin:0 0 10px;font-size:13.5px;font-weight:800;display:flex;align-items:center;gap:6px}
+  .cmts h3 span{color:var(--faint);font-weight:700;font-size:12px}
+  .clist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .cmt{padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);min-width:0}
+  .cmeta{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--faint);flex-wrap:wrap}
+  .cmeta b{color:#cfd8f0;font-size:11.5px;font-weight:800}
+  .cmeta .delc{margin-left:auto;appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--faint);font-size:11px;border-radius:8px;padding:3px 7px;cursor:pointer;line-height:1.2}
+  .cmeta .delc:hover{color:#ffb3b3;border-color:rgba(255,107,107,.4)}
+  .cbody{margin-top:5px;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+  .noCmt{padding:10px 2px;font-size:12px;color:var(--faint)}
+  .cform{margin-top:11px;display:flex;flex-direction:column;gap:6px}
+  .crow{display:flex;gap:6px;min-width:0}
+  .crow input{flex:1 1 auto;min-width:0}
+  .crow #cName{flex:0 1 96px}
+  .crow #cPw{flex:0 1 92px}
+
+  /* ── settings ── */
+  .sect{margin-bottom:18px}
+  .sect h3{margin:0 0 7px;font-size:14px;font-weight:800}
+  .sect p{margin:0 0 9px;font-size:12.5px;color:var(--dim);line-height:1.65}
+  details{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}
+  details summary{cursor:pointer;font-size:12.5px;font-weight:800;color:#cfd8f0}
+  details ol{margin:9px 0 0;padding-left:18px;font-size:12px;color:var(--dim);line-height:1.75}
+  details b{color:var(--txt)}
+  pre{margin:9px 0 0;padding:10px;border-radius:10px;background:#070b14;border:1px solid var(--line);font-size:11.5px;color:#9ff0cd;overflow-x:auto}
+  .warn{font-size:11.5px;color:#ffd08a;line-height:1.55;margin:9px 0 0}
+  .row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+  .row input{flex:1 1 180px;min-width:0}
+
+  /* ── prompt ── */
+  .mini{max-width:380px}
+  .mini .panelBody{padding:18px 16px}
+  .mini h3{margin:0 0 6px;font-size:15px;font-weight:800}
+  .mini p{margin:0 0 12px;font-size:12.5px;color:var(--dim);line-height:1.6}
+  .mini input{font-size:18px;letter-spacing:.22em;text-align:center;padding:12px}
+
+  /* ── toast ── */
+  .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(8px);
+    max-width:calc(100vw - 32px);z-index:90;padding:11px 15px;border-radius:999px;font-size:12.5px;font-weight:700;
+    background:rgba(20,28,46,.97);border:1px solid rgba(255,255,255,.16);color:var(--txt);
+    box-shadow:0 10px 28px rgba(0,0,0,.5);opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  footer{text-align:center;font-size:11px;color:#5f6a8c;line-height:1.7;padding:2px 0 4px}
+  footer a{color:#8592b8;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="topline">
+      <a class="back" id="portalLink" href="../index.html">← 게임 포털</a>
+      <div class="icons">
+        <button class="ico" id="btnAdmin" title="방장 모드" aria-label="방장 모드">👑</button>
+        <button class="ico" id="btnSettings" title="게시판 연결" aria-label="게시판 연결">⚙️</button>
+      </div>
+    </div>
+    <h1>📝 자유게시판</h1>
+    <p class="lede"><em>수정 · 업데이트 요청</em>을 자유롭게 남겨 주세요. 버그 제보도, 새 게임 아이디어도 좋아요. 로그인은 필요 없어요.</p>
+    <div class="connrow">
+      <span class="connchip" id="connChip"><span class="dot"></span><span id="connText">이 기기에만 저장 중</span></span>
+      <span class="connchip admin" id="adminChip" hidden>👑 방장 모드</span>
+    </div>
+  </header>
+
+  <section class="filters" aria-label="필터">
+    <div class="chips" id="catChips" role="group" aria-label="말머리 필터"></div>
+    <div class="chips" id="gameChips" role="group" aria-label="대상 게임 필터"></div>
+  </section>
+
+  <div class="searchrow">
+    <div class="searchbox"><span aria-hidden="true">🔍</span>
+      <input id="q" type="search" placeholder="제목 · 내용 · 작성자 검색" autocomplete="off" aria-label="검색">
+    </div>
+    <button class="write" id="btnWrite">✏️ 글쓰기</button>
+  </div>
+
+  <div class="listmeta"><span id="listCount">0개</span><span id="listHint"></span></div>
+
+  <main id="list" class="list" aria-live="polite"></main>
+
+  <section class="issues" id="issues" hidden aria-label="GitHub 공식 요청 내역">
+    <h2>🐙 공식 요청 · 업데이트 <span class="tag2">GitHub Issues</span>
+      <a class="more" id="issueMore" href="https://github.com/cwclab1-eng/games/issues" target="_blank" rel="noopener">전체 보기 →</a>
+    </h2>
+    <ul class="ilist" id="issueList"></ul>
+  </section>
+
+  <footer>
+    gameZONE 자유게시판 · <a href="../index.html">게임 포털로 돌아가기</a><br>
+    비밀번호 · 개인정보는 올리지 마세요. 공개 게시판입니다.
+  </footer>
+</div>
+
+<button class="fab" id="fab" aria-label="글쓰기">✏️</button>
+
+<!-- 상세 -->
+<section class="sheet" id="detailSheet" hidden aria-hidden="true">
+  <div class="backdrop" data-close="detailSheet"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <div class="panelHead">
+      <div class="badges" id="dBadges"></div>
+      <button class="ico" data-close="detailSheet" aria-label="닫기">✕</button>
+    </div>
+    <div class="panelBody">
+      <h2 class="dtitle" id="dTitle"></h2>
+      <div class="dmeta" id="dMeta"></div>
+
+      <div class="dadmin" id="dAdmin" hidden>
+        <span class="flabel">방장 · 진행 상태 바꾸기</span>
+        <div class="chips" id="statusChips">
+          <button class="chip small" data-status="wait">접수대기</button>
+          <button class="chip small" data-status="check">확인중</button>
+          <button class="chip small" data-status="done">완료</button>
+        </div>
+      </div>
+
+      <div class="dbody" id="dBody"></div>
+
+      <div class="dacts">
+        <button class="btn sm" id="dLike">🤍 좋아요 <b id="dLikeN">0</b></button>
+        <button class="btn sm" id="dCopy">📋 요청 내용 복사</button>
+        <button class="btn sm" id="dGh">🐙 GitHub에 올리기</button>
+      </div>
+      <div class="dacts own">
+        <button class="btn sm ghost" id="dEdit">✏️ 수정</button>
+        <button class="btn sm danger" id="dDel">🗑 삭제</button>
+      </div>
+
+      <section class="cmts">
+        <h3>💬 댓글 <span id="cCount">0</span></h3>
+        <ul class="clist" id="cList"></ul>
+        <form class="cform" id="cForm" autocomplete="off">
+          <div class="crow">
+            <input id="cName" type="text" maxlength="12" placeholder="닉네임" aria-label="댓글 닉네임">
+            <input id="cPw" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="비번 4자리" aria-label="댓글 비밀번호 4자리">
+          </div>
+          <div class="crow">
+            <input id="cBody" type="text" maxlength="300" placeholder="댓글을 남겨 주세요" aria-label="댓글 내용">
+            <button class="btn primary sm" type="submit">등록</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- 글쓰기 / 수정 -->
+<section class="sheet" id="writeSheet" hidden aria-hidden="true">
+  <div class="backdrop" data-close="writeSheet"></div>
+  <form class="panel" id="writeForm" role="dialog" aria-modal="true" aria-labelledby="writeTitle" autocomplete="off">
+    <div class="panelHead">
+      <h2 id="writeTitle">글쓰기</h2>
+      <button type="button" class="ico" data-close="writeSheet" aria-label="닫기">✕</button>
+    </div>
+    <div class="panelBody">
+      <div class="field">
+        <label for="wName">닉네임</label>
+        <input id="wName" type="text" maxlength="12" placeholder="예: 석호" autocomplete="nickname">
+      </div>
+      <div class="field">
+        <span class="flabel">말머리</span>
+        <div class="chips" id="wCatChips" role="group" aria-label="말머리 선택"></div>
+      </div>
+      <div class="field">
+        <span class="flabel">대상 게임</span>
+        <div class="chips" id="wGameChips" role="group" aria-label="대상 게임 선택"></div>
+      </div>
+      <div class="field">
+        <label for="wTitle">제목</label>
+        <input id="wTitle" type="text" maxlength="60" placeholder="한 줄로 적어 주세요">
+      </div>
+      <div class="field">
+        <label for="wBody">내용</label>
+        <textarea id="wBody" maxlength="2000" placeholder="어떤 점을 고쳤으면 하는지, 어떤 상황에서 문제가 생겼는지 적어 주세요."></textarea>
+        <span class="hint">버그라면 — 게임 이름 · 누른 버튼 · 화면에 보인 것을 적어 주시면 빨라요.</span>
+      </div>
+      <div class="field">
+        <label for="wPw">비밀번호 (4자리)</label>
+        <input id="wPw" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="숫자 4자리" autocomplete="off">
+        <span class="hint" id="wPwHint">4자리 숫자 · 수정 / 삭제할 때 필요해요.</span>
+      </div>
+      <p class="err" id="wErr" hidden></p>
+    </div>
+    <div class="panelFoot">
+      <button type="button" class="btn ghost" data-close="writeSheet">취소</button>
+      <button type="submit" class="btn primary" id="wSubmit">등록</button>
+    </div>
+  </form>
+</section>
+
+<!-- 설정 -->
+<section class="sheet" id="settingsSheet" hidden aria-hidden="true">
+  <div class="backdrop" data-close="settingsSheet"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="panelHead">
+      <h2 id="setTitle">⚙️ 게시판 연결</h2>
+      <button class="ico" data-close="settingsSheet" aria-label="닫기">✕</button>
+    </div>
+    <div class="panelBody">
+      <div class="sect">
+        <h3>실시간 공유 (Firebase Realtime Database)</h3>
+        <p>주소를 넣으면 이 게시판에 쓴 글이 <b>방문자 모두에게 실시간으로</b> 보입니다. 비워 두면 이 폰에만 저장돼요.</p>
+        <input id="setDb" type="text" placeholder="https://내프로젝트-default-rtdb.firebaseio.com" autocomplete="off" spellcheck="false">
+        <div class="row">
+          <button class="btn primary" id="setConnect" type="button">연결</button>
+          <button class="btn" id="setDisconnect" type="button">연결 해제</button>
+        </div>
+        <details>
+          <summary>Firebase 준비 방법 (3분)</summary>
+          <ol>
+            <li><b>console.firebase.google.com</b> → 프로젝트 만들기</li>
+            <li>빌드 → <b>Realtime Database</b> → 데이터베이스 만들기 → 위치 선택 → <b>테스트 모드</b>로 시작</li>
+            <li>데이터 탭 위에 나오는 주소(<b>…firebaseio.com</b> 또는 <b>…firebasedatabase.app</b>)를 복사해 위 칸에 붙여넣기</li>
+            <li>규칙(Rules)이 아래처럼 되어 있어야 누구나 읽고 쓸 수 있어요</li>
+          </ol>
+          <pre id="rulesBox">{ "rules": { ".read": true, ".write": true } }</pre>
+          <div class="row"><button class="btn sm" id="copyRules" type="button">규칙 복사</button>
+          <a class="btn sm" href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="text-decoration:none">Firebase 콘솔 열기</a></div>
+          <p class="warn">공개 게시판이라 누구나 읽고 쓸 수 있습니다. 비밀번호 · 개인정보는 올리지 마세요.</p>
+        </details>
+      </div>
+
+      <div class="sect">
+        <h3>방장 코드</h3>
+        <p>글 상태(<b>접수대기 → 확인중 → 완료</b>)를 바꿀 때 쓰는 코드입니다. 기본 코드는 <b>7777</b>이고, 여기서 바꿀 수 있어요.</p>
+        <div class="row">
+          <input id="setAdmin" type="text" inputmode="numeric" maxlength="8" placeholder="새 방장 코드 (4~8자리)" autocomplete="off">
+          <button class="btn" id="setAdminSave" type="button">저장</button>
+        </div>
+        <div class="row"><button class="btn sm" id="setAdminLogout" type="button">방장 모드 해제</button></div>
+      </div>
+
+      <div class="sect" id="uploadSect" hidden>
+        <h3>이 기기의 글 올리기</h3>
+        <p>연결 전에 이 폰에만 저장해 둔 글을 게시판으로 옮깁니다.</p>
+        <div class="row"><button class="btn" id="setUploadLocal" type="button">올리기</button></div>
+      </div>
+    </div>
+    <div class="panelFoot"><button class="btn ghost" data-close="settingsSheet">닫기</button></div>
+  </div>
+</section>
+
+<!-- 비밀번호 / 코드 입력 -->
+<section class="sheet" id="promptSheet" hidden aria-hidden="true">
+  <div class="backdrop" data-close="promptSheet"></div>
+  <form class="panel mini" id="promptForm" role="dialog" aria-modal="true" aria-labelledby="promptTitle" autocomplete="off">
+    <div class="panelBody">
+      <h3 id="promptTitle">비밀번호</h3>
+      <p id="promptDesc"></p>
+      <input id="promptInput" type="text" maxlength="12" autocomplete="off">
+    </div>
+    <div class="panelFoot">
+      <button type="button" class="btn ghost" id="promptCancel">취소</button>
+      <button type="submit" class="btn primary">확인</button>
+    </div>
+  </form>
+</section>
+
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ───────────────────────── 상수 ───────────────────────── */
+var GITHUB_REPO = 'cwclab1-eng/games';
+var LIVE_BOARD = 'https://cwclab1-eng.github.io/games/board/';
+var DEFAULT_ADMIN = '7777';
+
+var CATS = [
+  {id:'bug',    label:'버그 제보',       icon:'🐛'},
+  {id:'update', label:'업데이트 요청',   icon:'✨'},
+  {id:'idea',   label:'새 게임 아이디어', icon:'💡'},
+  {id:'talk',   label:'자유 수다',        icon:'💬'}
+];
+var GAMES = [
+  {id:'portal', label:'포털',        icon:'🎮'},
+  {id:'ladder', label:'한판 사다리',  icon:'🪜'},
+  {id:'jigsaw', label:'한판 직소',    icon:'🧩'},
+  {id:'matgo',  label:'한판 맞고',    icon:'🎴'},
+  {id:'yangi',  label:'양이톡',       icon:'🐱'},
+  {id:'block',  label:'블록 듀얼',    icon:'🧱'},
+  {id:'match3', label:'Match3',      icon:'💎'}
+];
+var STATUS = {wait:'접수대기', check:'확인중', done:'완료'};
+var CAT  = {}; CATS.forEach(function(c){ CAT[c.id]=c; });
+var GAME = {}; GAMES.forEach(function(g){ GAME[g.id]=g; });
+
+var LS = {
+  posts:'gp_board_posts_v1',
+  cache:'gp_board_cache_v1',
+  db:'gp_board_db_v1',
+  nick:'gp_board_nick_v1',
+  adminCode:'gp_board_admincode_v1',
+  adminOn:'gp_board_adminon_v1',
+  uid:'gp_board_uid_v1'
+};
+
+/* ───────────────────────── 유틸 ───────────────────────── */
+function $(s,r){ return (r||document).querySelector(s); }
+function $$(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+var mem = {};
+function lsGet(k){
+  try{ var v = localStorage.getItem(k); return v==null ? (mem[k]===undefined?null:mem[k]) : v; }
+  catch(e){ return mem[k]===undefined?null:mem[k]; }
+}
+function lsSet(k,v){ mem[k]=String(v); try{ localStorage.setItem(k,String(v)); }catch(e){} }
+function lsDel(k){ delete mem[k]; try{ localStorage.removeItem(k); }catch(e){} }
+
+function readJSON(k, dflt){
+  var raw = lsGet(k);
+  if(!raw) return dflt;
+  try{ var v = JSON.parse(raw); return v==null?dflt:v; }catch(e){ return dflt; }
+}
+function writeJSON(k, v){ lsSet(k, JSON.stringify(v)); }
+
+function hashPw(pw, salt){
+  var s = String(pw||'')+'#'+String(salt||'');
+  var h = 2166136261;
+  for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return ('0000000'+(h>>>0).toString(16)).slice(-8);
+}
+function pad2(n){ return (n<10?'0':'')+n; }
+function when(ts){
+  if(!ts) return '';
+  var d = new Date(ts), diff = Math.max(0, Date.now()-ts);
+  if(diff < 60e3) return '방금 전';
+  if(diff < 3600e3) return Math.floor(diff/60e3)+'분 전';
+  if(diff < 86400e3) return Math.floor(diff/3600e3)+'시간 전';
+  if(diff < 7*86400e3) return Math.floor(diff/86400e3)+'일 전';
+  return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+}
+function newId(prefix){
+  return (prefix||'p') + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+function clientId(){
+  var v = lsGet(LS.uid);
+  if(!v){ v = 'u'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); lsSet(LS.uid, v); }
+  return v;
+}
+function normName(v){ return String(v||'').trim().slice(0,12); }
+function digits4(v){ return /^\d{4}$/.test(String(v||'').trim()); }
+
+/* ───────────────────────── 상태 ───────────────────────── */
+var state = {
+  posts:{},          // 현재 보이는 글 (id -> post)
+  db:'',             // 연결된 RTDB base URL
+  es:null,
+  live:false,
+  cat:'all',
+  game:'all',
+  q:'',
+  admin:false,
+  detailId:null,
+  formCat:'update',
+  formGame:'portal',
+  editing:null,
+  local:{}
+};
+var refetchTimer = 0;
+
+/* ───────────────────────── 저장소 ───────────────────────── */
+function loadLocal(){ var m = readJSON(LS.posts, {}); return (m && typeof m==='object')?m:{}; }
+function saveLocal(m){ writeJSON(LS.posts, m); }
+
+function mirror(p){
+  if(state.db) return;                 // 연결 중에는 원격이 원본
+  var all = loadLocal(); all[p.id] = p; saveLocal(all);
+  state.local = all;
+}
+
+function dbBase(){ return String(state.db||'').replace(/\/+$/,''); }
+
+function dbReqBase(base, path, opt){
+  opt = opt||{};
+  var method = opt.method || 'GET';
+  var url = base + '/' + String(path).replace(/^\/+/,'');
+  var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, opt.timeout||9000) : 0;
+  var init = { method:method, cache:'no-store' };
+  if(ctrl) init.signal = ctrl.signal;
+  if(opt.body !== undefined && opt.body !== null){
+    init.headers = {'Content-Type':'application/json'};
+    init.body = JSON.stringify(opt.body);
+  }
+  return fetch(url, init).then(function(res){
+    if(timer) clearTimeout(timer);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return res;
+  }, function(err){
+    if(timer) clearTimeout(timer);
+    throw err;
+  });
+}
+function dbReq(path, opt){ return dbReqBase(dbBase(), path, opt); }
+
+/* 실시간 구독 (Firebase REST 스트리밍 = EventSource) */
+function subscribe(base){
+  unsubscribe();
+  var es;
+  try{ es = new EventSource(base + '/posts.json'); }catch(e){ setConn('err','실시간 연결 실패'); return; }
+  state.es = es;
+  es.addEventListener('open', function(){
+    state.live = true; setConn('live','실시간 공유 중');
+  });
+  es.addEventListener('error', function(){
+    if(!state.es) return;
+    state.live = false;
+    if(state.db) setConn('recon','연결 끊김 · 다시 연결 중');
+  });
+  es.addEventListener('put',   function(ev){ onStream(ev,'put'); });
+  es.addEventListener('patch', function(ev){ onStream(ev,'patch'); });
+  es.addEventListener('cancel',function(){ setConn('err','읽기 권한이 없어요'); });
+}
+function unsubscribe(){
+  if(state.es){ try{ state.es.close(); }catch(e){} }
+  state.es = null; state.live = false;
+}
+
+function onStream(ev, kind){
+  var msg;
+  try{ msg = JSON.parse(ev.data); }catch(e){ return; }
+  if(!msg) return;
+  var path = msg.path || '/';
+  if(kind === 'put' && (path === '/' || path === '')){
+    state.posts = (msg.data && typeof msg.data === 'object') ? msg.data : {};
+    render(); refreshDetail();
+    return;
+  }
+  var m = path.match(/^\/([^/]+)$/);
+  if(kind === 'put' && m){
+    var id;
+    try{ id = decodeURIComponent(m[1]); }catch(e){ id = m[1]; }
+    if(msg.data === null || msg.data === undefined) delete state.posts[id];
+    else state.posts[id] = msg.data;
+    render(); refreshDetail();
+    return;
+  }
+  clearTimeout(refetchTimer);
+  refetchTimer = setTimeout(fetchSnapshot, 320);
+}
+
+function fetchSnapshot(){
+  if(!state.db) return Promise.resolve();
+  return dbReq('posts.json', {timeout:9000}).then(function(res){ return res.json(); }).then(function(data){
+    state.posts = (data && typeof data === 'object') ? data : {};
+    writeJSON(LS.cache, state.posts);
+    render(); refreshDetail();
+  }).catch(function(){});
+}
+
+function setConn(kind, text){
+  var chip = $('#connChip');
+  chip.className = 'connchip ' + (kind||'');
+  $('#connText').textContent = text;
+  $('#connChip').title = text;
+}
+
+async function connectDb(rawUrl, silent){
+  var base = String(rawUrl||'').trim();
+  if(!base) return false;
+  if(!/^https?:\/\//i.test(base)) base = 'https://' + base;
+  base = base.split('?')[0].split('#')[0].replace(/\/+$/,'').replace(/\.json$/,'');
+  if(!/^https?:\/\/[^\s\/]+\.[^\s\/]+/i.test(base)){
+    setConn('err','주소를 확인해 주세요');
+    if(!silent) toast('Firebase 주소를 확인해 주세요 (예: https://내프로젝트-default-rtdb.firebaseio.com)');
+    return false;
+  }
+  setConn('wait','연결 확인 중…');
+  try{
+    var res = await dbReqBase(base, 'posts.json', {timeout:9000});
+    var data = await res.json().catch(function(){ return null; });
+    unsubscribe();
+    state.db = base; lsSet(LS.db, base);
+    state.posts = (data && typeof data === 'object') ? data : {};
+    writeJSON(LS.cache, state.posts);
+    render(); refreshDetail(); updateSettingsUI();
+    subscribe(base);
+    setConn('live','실시간 공유 중');
+    if(!silent) toast('게시판에 연결했어요. 이제 글이 모두에게 공유됩니다.');
+    return true;
+  }catch(err){
+    setConn('err','연결 실패 · 주소/규칙 확인');
+    if(!silent) toast('연결하지 못했어요: ' + (err && err.message ? err.message : '알 수 없는 오류'));
+    return false;
+  }
+}
+
+function disconnectDb(quiet){
+  unsubscribe();
+  state.db = ''; lsDel(LS.db);
+  state.posts = loadLocal();
+  setConn('','이 기기에만 저장 중');
+  render(); refreshDetail(); updateSettingsUI();
+  if(!quiet) toast('연결을 해제했어요. 이제 이 글은 이 기기에만 저장됩니다.');
+}
+
+/* ───────────────────────── 조회 ───────────────────────── */
+function commentsOf(p){ return Object.keys((p && p.comments) || {}).map(function(k){ return p.comments[k]; }).filter(Boolean); }
+function likeCount(p){ return Object.keys((p && p.likes) || {}).length; }
+function likedByMe(p){ return !!((p && p.likes) || {})[clientId()]; }
+function statusOf(p){ return STATUS[p && p.status] ? p.status : 'wait'; }
+
+function visiblePosts(){
+  var q = state.q.trim().toLowerCase();
+  return Object.keys(state.posts).map(function(k){ return state.posts[k]; }).filter(function(p){
+    if(!p || !p.id) return false;
+    if(state.cat !== 'all' && p.cat !== state.cat) return false;
+    if(state.game !== 'all' && p.game !== state.game) return false;
+    if(q){
+      var hay = String(p.title||'')+' '+String(p.body||'')+' '+String(p.name||'');
+      if(hay.toLowerCase().indexOf(q) < 0) return false;
+    }
+    return true;
+  }).sort(function(a,b){ return (b.ts||0) - (a.ts||0); });
+}
+
+/* ───────────────────────── 렌더 ───────────────────────── */
+function buildChips(){
+  var cc = ['<button class="chip on" type="button" data-cat="all">전체</button>'];
+  CATS.forEach(function(c){ cc.push('<button class="chip" type="button" data-cat="'+c.id+'">'+c.icon+' '+esc(c.label)+'</button>'); });
+  $('#catChips').innerHTML = cc.join('');
+
+  var gc = ['<button class="chip on" type="button" data-game="all">전체</button>'];
+  GAMES.forEach(function(g){ gc.push('<button class="chip" type="button" data-game="'+g.id+'">'+g.icon+' '+esc(g.label)+'</button>'); });
+  $('#gameChips').innerHTML = gc.join('');
+}
+
+function syncChips(){
+  $$('#catChips [data-cat]').forEach(function(b){ b.classList.toggle('on', b.dataset.cat === state.cat); });
+  $$('#gameChips [data-game]').forEach(function(b){ b.classList.toggle('on', b.dataset.game === state.game); });
+}
+
+function postCard(p){
+  var cat = CAT[p.cat] || CAT.talk;
+  var g = GAME[p.game] || GAME.portal;
+  var st = statusOf(p);
+  var nC = commentsOf(p).length;
+  var nL = likeCount(p);
+  var body = String(p.body||'').replace(/\s+/g,' ').trim();
+  return '<article class="post" data-id="'+esc(p.id)+'" tabindex="0" role="button" aria-label="'+esc(p.title||'글')+'">'
+    + '<div class="badges">'
+      + '<span class="cat '+esc(p.cat)+'">'+cat.icon+' '+esc(cat.label)+'</span>'
+      + '<span class="game">'+g.icon+' '+esc(g.label)+'</span>'
+      + '<span class="st '+esc(st)+'">'+esc(STATUS[st])+'</span>'
+    + '</div>'
+    + '<h3 class="ptitle">'+esc(p.title||'(제목 없음)')+'</h3>'
+    + (body ? '<p class="pbody">'+esc(body)+'</p>' : '')
+    + '<div class="pmeta">'
+      + '<span class="who">'+esc(p.name||'익명')+'</span><span>·</span><span>'+when(p.ts)+(p.editedTs?' (수정됨)':'')+'</span>'
+      + '<span class="sp"></span>'
+      + '<span>💬 '+nC+'</span>'
+      + '<button class="likebtn'+(likedByMe(p)?' on':'')+'" type="button" data-act="like">'+(likedByMe(p)?'❤️':'🤍')+' '+nL+'</button>'
+    + '</div>'
+  + '</article>';
+}
+
+function emptyHTML(){
+  var filtered = (state.cat !== 'all' || state.game !== 'all' || state.q.trim());
+  if(filtered){
+    return '<div class="empty"><div class="ei">🔍</div><b>조건에 맞는 글이 없어요</b>'
+      + '<p>말머리 · 게임 필터를 풀거나 다른 낱말로 검색해 보세요.</p>'
+      + '<button class="btn sm" type="button" data-act="clear">필터 초기화</button></div>';
+  }
+  return '<div class="empty"><div class="ei">📝</div><b>아직 글이 없어요</b>'
+    + '<p>버그 제보, 업데이트 요청, 새 게임 아이디어 — 무엇이든 좋아요.</p>'
+    + '<button class="btn primary sm" type="button" data-act="write">첫 글 남기기</button></div>';
+}
+
+function render(){
+  var arr = visiblePosts();
+  $('#listCount').textContent = arr.length + '개';
+  var hint = [];
+  if(state.cat !== 'all' && CAT[state.cat]) hint.push(CAT[state.cat].icon+' '+CAT[state.cat].label);
+  if(state.game !== 'all' && GAME[state.game]) hint.push(GAME[state.game].icon+' '+GAME[state.game].label);
+  if(state.q.trim()) hint.push('“'+state.q.trim()+'”');
+  $('#listHint').textContent = hint.join(' · ');
+  $('#list').innerHTML = arr.length ? arr.map(postCard).join('') : emptyHTML();
+}
+
+function refreshDetail(){
+  var id = state.detailId;
+  if(!id) return;
+  var p = state.posts[id];
+  if(!p){ closeSheet($('#detailSheet')); return; }
+  var cat = CAT[p.cat] || CAT.talk;
+  var g = GAME[p.game] || GAME.portal;
+  var st = statusOf(p);
+
+  $('#dBadges').innerHTML = '<span class="cat '+esc(p.cat)+'">'+cat.icon+' '+esc(cat.label)+'</span>'
+    + '<span class="game">'+g.icon+' '+esc(g.label)+'</span>'
+    + '<span class="st '+esc(st)+'">'+esc(STATUS[st])+'</span>';
+  $('#dTitle').textContent = p.title || '(제목 없음)';
+  $('#dMeta').textContent = (p.name||'익명') + ' · ' + when(p.ts) + (p.editedTs ? ' (수정됨)' : '');
+  $('#dBody').textContent = p.body || '';
+
+  $('#dLikeN').textContent = likeCount(p);
+  $('#dLike').firstChild.nodeValue = (likedByMe(p) ? '❤️' : '🤍') + ' 좋아요 ';
+  $('#dLike').classList.toggle('primary', likedByMe(p));
+
+  $('#dAdmin').hidden = !state.admin;
+  $$('#statusChips [data-status]').forEach(function(b){ b.classList.toggle('on', b.dataset.status === st); });
+
+  var cs = commentsOf(p).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+  $('#cCount').textContent = cs.length;
+  $('#cList').innerHTML = cs.length ? cs.map(function(c){
+    return '<li class="cmt" data-cid="'+esc(c.id)+'">'
+      + '<div class="cmeta"><b>'+esc(c.name||'익명')+'</b><span>'+when(c.ts)+'</span>'
+      + '<button class="delc" type="button" data-act="delc" data-cid="'+esc(c.id)+'" title="댓글 삭제">🗑</button></div>'
+      + '<div class="cbody">'+esc(c.body||'')+'</div>'
+    + '</li>';
+  }).join('') : '<li class="noCmt">첫 댓글을 남겨 보세요.</li>';
+
+  if(!$('#cName').value) $('#cName').value = lsGet(LS.nick) || '';
+}
+
+/* ───────────────────────── 시트 ───────────────────────── */
+var promptResolve = null;
+
+function openSheet(el){
+  if(!el) return;
+  el.hidden = false;
+  el.setAttribute('aria-hidden','false');
+  document.body.classList.add('lock');
+}
+function closeSheet(el){
+  if(!el) return;
+  el.hidden = true;
+  el.setAttribute('aria-hidden','true');
+  if(el.id === 'promptSheet' && promptResolve){
+    var r = promptResolve; promptResolve = null; r(null);
+  }
+  if(el.id === 'detailSheet'){
+    state.detailId = null;
+    if(location.hash.indexOf('#post/') === 0){
+      try{ history.replaceState(null,'',location.pathname + location.search); }catch(e){}
+    }
+  }
+  if(!$$('.sheet:not([hidden])').length) document.body.classList.remove('lock');
+}
+function anySheetOpen(){ return $$('.sheet:not([hidden])').length > 0; }
+
+function askSecret(opt){
+  opt = opt || {};
+  $('#promptTitle').textContent = opt.title || '비밀번호';
+  var desc = $('#promptDesc');
+  desc.textContent = opt.desc || '';
+  desc.hidden = !opt.desc;
+  var inp = $('#promptInput');
+  inp.value = opt.value || '';
+  inp.maxLength = opt.maxlength || 4;
+  inp.setAttribute('inputmode', opt.numeric === false ? 'text' : 'numeric');
+  inp.placeholder = opt.placeholder || '';
+  openSheet($('#promptSheet'));
+  setTimeout(function(){ try{ inp.focus(); inp.select(); }catch(e){} }, 160);
+  return new Promise(function(res){ promptResolve = res; });
+}
+
+/* ───────────────────────── 토스트 ───────────────────────── */
+var toastTimer = 0;
+function toast(msg){
+  var t = $('#toast');
+  t.textContent = msg;
+  t.hidden = false;
+  requestAnimationFrame(function(){ t.classList.add('show'); });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){
+    t.classList.remove('show');
+    setTimeout(function(){ t.hidden = true; }, 220);
+  }, 2400);
+}
+
+/* ───────────────────────── 글쓰기 ───────────────────────── */
+function drawFormChips(){
+  var cc = CATS.map(function(c){
+    return '<button class="chip" type="button" data-fcat="'+c.id+'" aria-pressed="'+(state.formCat===c.id)+'">'+c.icon+' '+esc(c.label)+'</button>';
+  }).join('');
+  $('#wCatChips').innerHTML = cc;
+  var gc = GAMES.map(function(g){
+    return '<button class="chip" type="button" data-fgame="'+g.id+'" aria-pressed="'+(state.formGame===g.id)+'">'+g.icon+' '+esc(g.label)+'</button>';
+  }).join('');
+  $('#wGameChips').innerHTML = gc;
+  syncFormChips();
+}
+function syncFormChips(){
+  $$('#wCatChips [data-fcat]').forEach(function(b){
+    var on = b.dataset.fcat === state.formCat; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false');
+  });
+  $$('#wGameChips [data-fgame]').forEach(function(b){
+    var on = b.dataset.fgame === state.formGame; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false');
+  });
+}
+
+function openWrite(editId, presetGame){
+  state.editing = editId || null;
+  var p = editId ? state.posts[editId] : null;
+  $('#writeTitle').textContent = p ? '✏️ 글 수정' : '✏️ 글쓰기';
+  $('#wName').value  = (p && p.name) || lsGet(LS.nick) || '';
+  $('#wTitle').value = p ? (p.title||'') : '';
+  $('#wBody').value  = p ? (p.body||'') : '';
+  $('#wPw').value    = '';
+  state.formCat  = p ? p.cat  : 'update';
+  state.formGame = p ? p.game : (GAME[presetGame] ? presetGame : 'portal');
+  drawFormChips();
+  $('#wErr').hidden = true;
+  $('#wSubmit').textContent = p ? '수정 저장' : '등록';
+  $('#wPwHint').textContent = p ? '수정하려면 글 비밀번호 4자리를 다시 입력하세요.' : '4자리 숫자 · 수정 / 삭제할 때 필요해요.';
+  openSheet($('#writeSheet'));
+  setTimeout(function(){ try{ $('#wName').focus(); }catch(e){} }, 160);
+}
+
+function showFormError(msg){
+  var e = $('#wErr'); e.textContent = msg; e.hidden = false;
+  try{ e.scrollIntoView({block:'nearest', behavior:'smooth'}); }catch(_){}
+}
+
+async function submitWrite(ev){
+  ev.preventDefault();
+  var editId = state.editing;
+  var name = normName($('#wName').value) || '익명';
+  var title = String($('#wTitle').value||'').trim();
+  var body = String($('#wBody').value||'').trim();
+  var pw = String($('#wPw').value||'').trim();
+
+  if(title.length < 2){ showFormError('제목을 2자 이상 적어 주세요.'); return; }
+  if(body.length < 2){ showFormError('내용을 2자 이상 적어 주세요.'); return; }
+  if(!digits4(pw)){ showFormError('비밀번호는 숫자 4자리로 정해 주세요.'); return; }
+
+  var btn = $('#wSubmit');
+  btn.disabled = true;
+
+  try{
+    if(editId){
+      var cur = state.posts[editId];
+      if(!cur){ closeSheet($('#writeSheet')); return; }
+      if(hashPw(pw, cur.id) !== cur.pwHash){
+        showFormError('비밀번호가 맞지 않아요. 글을 쓸 때 정한 4자리를 입력해 주세요.');
+        return;
+      }
+      var patch = {cat:state.formCat, game:state.formGame, title:title, body:body, name:name, editedTs:Date.now()};
+      Object.keys(patch).forEach(function(k){ cur[k] = patch[k]; });
+      mirror(cur); render();
+      if(state.db){
+        try{ await dbReq('posts/'+editId+'.json', {method:'PATCH', body:patch}); }
+        catch(e){ toast('수정 저장에 실패했어요: '+e.message); }
+      }
+      closeSheet($('#writeSheet'));
+      render(); refreshDetail();
+      openDetail(editId);
+      toast('글을 수정했어요.');
+    }else{
+      var id = newId('p');
+      var post = {
+        id:id, cat:state.formCat, game:state.formGame,
+        title:title, body:body, name:name,
+        pwHash:hashPw(pw, id), ts:Date.now(),
+        status:'wait', likes:{}, comments:{}
+      };
+      state.posts[id] = post;
+      mirror(post); render();
+      lsSet(LS.nick, name);
+      if(state.db){
+        try{ await dbReq('posts/'+id+'.json', {method:'PUT', body:post}); }
+        catch(e){ toast('게시판 저장에 실패했어요: '+e.message); }
+      }
+      closeSheet($('#writeSheet'));
+      render();
+      toast('등록했어요. 요청 내용을 복사해 카톡으로 보낼 수 있어요.');
+      openDetail(id);
+    }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ───────────────────────── 상세 ───────────────────────── */
+function openDetail(id){
+  if(!state.posts[id]){ toast('글을 찾을 수 없어요.'); return; }
+  state.detailId = id;
+  refreshDetail();
+  openSheet($('#detailSheet'));
+  var box = $('#detailSheet .panelBody');
+  if(box) box.scrollTop = 0;
+  try{ if(location.hash !== '#post/'+id) history.replaceState(null,'','#post/'+id); }catch(e){}
+}
+
+function shareUrl(id){
+  if(location.protocol === 'file:') return LIVE_BOARD + '#post/' + encodeURIComponent(id);
+  return location.origin + location.pathname + '#post/' + encodeURIComponent(id);
+}
+
+function postText(p){
+  var cat = CAT[p.cat] || CAT.talk;
+  var g = GAME[p.game] || GAME.portal;
+  return '📝 자유게시판 · ' + cat.icon + ' ' + cat.label + '\n'
+    + '대상 게임: ' + g.label + '\n'
+    + '제목: ' + (p.title||'') + '\n\n'
+    + (p.body||'') + '\n\n'
+    + '— ' + (p.name||'익명') + '\n'
+    + shareUrl(p.id);
+}
+
+function ghIssueUrl(p){
+  var cat = CAT[p.cat] || CAT.talk;
+  var g = GAME[p.game] || GAME.portal;
+  var title = '[' + cat.label + '] ' + g.label + ' — ' + (p.title||'');
+  var body = (p.body||'') + '\n\n---\n- 게시판 글: ' + shareUrl(p.id) + '\n- 작성자: ' + (p.name||'익명');
+  return 'https://github.com/' + GITHUB_REPO + '/issues/new?title='
+    + encodeURIComponent(title.slice(0,240)) + '&body=' + encodeURIComponent(body.slice(0,7000));
+}
+
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text).then(function(){ return true; }, function(){ return fallbackCopy(text); });
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
+function fallbackCopy(text){
+  try{
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.top = '-1000px'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    var ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){ return false; }
+}
+
+async function verifyPostPw(p){
+  var pw = await askSecret({title:'비밀번호 확인', desc:'글을 쓸 때 정한 4자리 비밀번호를 입력해 주세요.', maxlength:4, numeric:true});
+  if(pw === null) return false;
+  if(hashPw(String(pw).trim(), p.id) !== p.pwHash){ toast('비밀번호가 맞지 않아요.'); return false; }
+  return true;
+}
+
+async function deletePost(id){
+  var p = state.posts[id];
+  if(!p) return;
+  if(!state.admin){
+    var ok = await verifyPostPw(p);
+    if(!ok) return;
+  }
+  var yes = await askSecret({title:'글 삭제', desc:'이 글과 댓글이 모두 지워집니다. 계속하려면 “삭제”라고 입력해 주세요.', maxlength:6, numeric:false, placeholder:'삭제'});
+  if(yes === null || String(yes).trim() !== '삭제') return;
+
+  delete state.posts[id];
+  if(!state.db){ var all = loadLocal(); delete all[id]; saveLocal(all); }
+  closeSheet($('#detailSheet'));
+  render();
+  if(state.db){
+    try{ await dbReq('posts/'+id+'.json', {method:'DELETE'}); }
+    catch(e){ toast('삭제 요청 실패: '+e.message); }
+  }
+  toast('글을 삭제했어요.');
+}
+
+/* ───────────────────────── 댓글 ───────────────────────── */
+async function addComment(ev){
+  ev.preventDefault();
+  var id = state.detailId;
+  var p = state.posts[id];
+  if(!p) return;
+  var name = normName($('#cName').value) || '익명';
+  var body = String($('#cBody').value||'').trim();
+  var pw = String($('#cPw').value||'').trim();
+  if(!body){ toast('댓글 내용을 적어 주세요.'); return; }
+  if(!digits4(pw)){ toast('댓글 비밀번호 4자리를 정해 주세요.'); return; }
+
+  var cid = newId('c');
+  var c = {id:cid, name:name, body:body, ts:Date.now(), pwHash:hashPw(pw, cid)};
+
+  p.comments = p.comments || {};
+  p.comments[c.id] = c;
+  mirror(p);
+  lsSet(LS.nick, name);
+  $('#cBody').value = ''; $('#cPw').value = '';
+  render(); refreshDetail();
+  if(state.db){
+    try{ await dbReq('posts/'+id+'/comments/'+c.id+'.json', {method:'PUT', body:c}); }
+    catch(e){ toast('댓글 저장에 실패했어요: '+e.message); }
+  }
+  toast('댓글을 남겼어요.');
+}
+
+async function deleteComment(cid){
+  var id = state.detailId;
+  var p = state.posts[id];
+  if(!p || !p.comments || !p.comments[cid]) return;
+  var c = p.comments[cid];
+  if(!state.admin){
+    var pw = await askSecret({title:'댓글 삭제', desc:'댓글을 쓸 때 정한 4자리 비밀번호를 입력해 주세요.', maxlength:4, numeric:true});
+    if(pw === null) return;
+    if(hashPw(String(pw).trim(), c.id) !== c.pwHash){ toast('비밀번호가 맞지 않아요.'); return; }
+  }
+  delete p.comments[cid];
+  mirror(p);
+  render(); refreshDetail();
+  if(state.db){
+    try{ await dbReq('posts/'+id+'/comments/'+cid+'.json', {method:'DELETE'}); }
+    catch(e){ toast('댓글 삭제 실패: '+e.message); }
+  }
+  toast('댓글을 삭제했어요.');
+}
+
+/* ───────────────────────── 좋아요 / 상태 ───────────────────────── */
+async function toggleLike(id){
+  var p = state.posts[id];
+  if(!p) return;
+  var me = clientId();
+  p.likes = p.likes || {};
+  var on = !p.likes[me];
+  if(on) p.likes[me] = 1; else delete p.likes[me];
+  mirror(p);
+  render(); refreshDetail();
+  if(state.db){
+    try{
+      if(on) await dbReq('posts/'+id+'/likes/'+me+'.json', {method:'PUT', body:1});
+      else   await dbReq('posts/'+id+'/likes/'+me+'.json', {method:'DELETE'});
+    }catch(e){ toast('좋아요 저장 실패: '+e.message); }
+  }
+}
+
+async function setStatus(st){
+  var id = state.detailId;
+  var p = state.posts[id];
+  if(!p || !state.admin) return;
+  p.status = st; p.statusTs = Date.now();
+  mirror(p);
+  render(); refreshDetail();
+  if(state.db){
+    try{ await dbReq('posts/'+id+'.json', {method:'PATCH', body:{status:st, statusTs:p.statusTs}}); }
+    catch(e){ toast('상태 저장 실패: '+e.message); }
+  }
+  toast('상태를 「' + STATUS[st] + '」로 바꿨어요.');
+}
+
+/* ───────────────────────── 방장 ───────────────────────── */
+function adminCodeHash(){
+  var h = lsGet(LS.adminCode);
+  return h || hashPw(DEFAULT_ADMIN, '');
+}
+function applyAdminUI(){
+  var btn = $('#btnAdmin');
+  btn.textContent = state.admin ? '🔑' : '👑';
+  btn.classList.toggle('on', state.admin);
+  btn.setAttribute('aria-pressed', state.admin ? 'true' : 'false');
+  $('#adminChip').hidden = !state.admin;
+  $('#dAdmin').hidden = !state.admin;
+  if(state.detailId) refreshDetail();
+}
+async function toggleAdmin(){
+  if(state.admin){
+    state.admin = false; lsDel(LS.adminOn); applyAdminUI();
+    toast('방장 모드를 해제했어요.'); return;
+  }
+  var code = await askSecret({title:'방장 모드', desc:'방장 코드를 입력하면 글 상태를 바꿀 수 있어요. (기본 코드 7777)', maxlength:8, numeric:true});
+  if(code === null) return;
+  if(hashPw(String(code).trim(), '') !== adminCodeHash()){
+    toast('방장 코드가 맞지 않아요.'); return;
+  }
+  state.admin = true; lsSet(LS.adminOn,'1'); applyAdminUI();
+  toast('방장 모드로 들어왔어요. 글의 진행 상태를 바꿀 수 있습니다.');
+}
+
+/* ───────────────────────── 설정 ───────────────────────── */
+function updateSettingsUI(){
+  $('#setDb').value = state.db || '';
+  $('#connText').textContent = state.db ? (state.live ? '실시간 공유 중' : '게시판 연결됨') : '이 기기에만 저장 중';
+  var hasLocal = Object.keys(loadLocal()).length > 0;
+  $('#uploadSect').hidden = !(state.db && hasLocal);
+}
+async function uploadLocalPosts(){
+  var all = loadLocal();
+  var ids = Object.keys(all);
+  if(!ids.length){ toast('올릴 글이 없어요.'); return; }
+  var ok = 0;
+  for(var i=0;i<ids.length;i++){
+    try{ await dbReq('posts/'+ids[i]+'.json', {method:'PUT', body:all[ids[i]]}); ok++; }
+    catch(e){ /* 계속 */ }
+  }
+  await fetchSnapshot();
+  toast(ok + '개의 글을 게시판에 올렸어요.');
+  updateSettingsUI();
+}
+
+/* ───────────────────────── GitHub Issues ───────────────────────── */
+async function loadIssues(){
+  try{
+    var res = await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/issues?state=all&per_page=30&sort=updated',
+      {headers:{'Accept':'application/vnd.github+json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    var arr = await res.json();
+    if(!Array.isArray(arr)) throw new Error('bad');
+    var items = arr.filter(function(x){ return !x.pull_request; });
+    $('#issues').hidden = false;
+    $('#issueList').innerHTML = items.length ? items.slice(0,8).map(function(i){
+      var open = i.state === 'open';
+      return '<li><a href="'+esc(i.html_url)+'" target="_blank" rel="noopener">'
+        + '<span class="ist '+(open?'open':'closed')+'">'+(open?'진행 중':'완료')+'</span>'
+        + '<span class="itxt">'+esc(i.title)+'</span>'
+        + '<span class="inum">#'+i.number+'</span></a></li>';
+    }).join('') : '<li class="noIssue">아직 등록된 공식 이슈가 없어요. <a href="https://github.com/'+GITHUB_REPO+'/issues/new" target="_blank" rel="noopener">첫 이슈 남기기 →</a></li>';
+    $('#issueMore').href = 'https://github.com/'+GITHUB_REPO+'/issues';
+  }catch(e){
+    $('#issues').hidden = true;   // 실패하면 조용히 숨김
+  }
+}
+
+/* ───────────────────────── 이벤트 ───────────────────────── */
+function bindEvents(){
+  // 필터
+  $('#catChips').addEventListener('click', function(e){
+    var b = e.target.closest('[data-cat]'); if(!b) return;
+    state.cat = b.dataset.cat; syncChips(); render();
+  });
+  $('#gameChips').addEventListener('click', function(e){
+    var b = e.target.closest('[data-game]'); if(!b) return;
+    state.game = b.dataset.game; syncChips(); render();
+  });
+  // 검색
+  $('#q').addEventListener('input', function(e){
+    state.q = e.target.value || ''; render();
+  });
+  // 글쓰기
+  $('#btnWrite').addEventListener('click', function(){ openWrite(); });
+  $('#fab').addEventListener('click', function(){ openWrite(); });
+  $('#writeForm').addEventListener('submit', submitWrite);
+  $('#wCatChips').addEventListener('click', function(e){
+    var b = e.target.closest('[data-fcat]'); if(!b) return;
+    state.formCat = b.dataset.fcat; syncFormChips();
+  });
+  $('#wGameChips').addEventListener('click', function(e){
+    var b = e.target.closest('[data-fgame]'); if(!b) return;
+    state.formGame = b.dataset.fgame; syncFormChips();
+  });
+  // 목록
+  $('#list').addEventListener('click', function(e){
+    var act = e.target.closest('[data-act]');
+    if(act){
+      e.stopPropagation();
+      var a = act.dataset.act;
+      if(a === 'clear'){ state.cat='all'; state.game='all'; state.q=''; $('#q').value=''; syncChips(); render(); return; }
+      if(a === 'write'){ openWrite(); return; }
+      if(a === 'like'){
+        var card = act.closest('.post');
+        if(card) toggleLike(card.dataset.id);
+        return;
+      }
+    }
+    var post = e.target.closest('.post');
+    if(post) openDetail(post.dataset.id);
+  });
+  $('#list').addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    var post = e.target.closest('.post');
+    if(post && e.target === post){ e.preventDefault(); openDetail(post.dataset.id); }
+  });
+  // 상세
+  $('#detailSheet').addEventListener('click', function(e){
+    var close = e.target.closest('[data-close]');
+    if(close){ closeSheet($('#'+close.dataset.close)); return; }
+  });
+  $('#dLike').addEventListener('click', function(){ if(state.detailId) toggleLike(state.detailId); });
+  $('#dCopy').addEventListener('click', async function(){
+    var p = state.posts[state.detailId]; if(!p) return;
+    var ok = await copyText(postText(p));
+    toast(ok ? '요청 내용을 복사했어요. 카톡·문자에 붙여넣기 하세요.' : '복사하지 못했어요. 길게 눌러 직접 복사해 주세요.');
+  });
+  $('#dGh').addEventListener('click', function(){
+    var p = state.posts[state.detailId]; if(!p) return;
+    var w = window.open(ghIssueUrl(p), '_blank', 'noopener');
+    if(!w) toast('팝업이 막혔어요. 브라우저 설정에서 팝업을 허용해 주세요.');
+  });
+  $('#dEdit').addEventListener('click', function(){
+    var id = state.detailId; if(!id) return;
+    closeSheet($('#detailSheet'));
+    openWrite(id);
+  });
+  $('#dDel').addEventListener('click', function(){ if(state.detailId) deletePost(state.detailId); });
+  $('#statusChips').addEventListener('click', function(e){
+    var b = e.target.closest('[data-status]'); if(!b) return;
+    setStatus(b.dataset.status);
+  });
+  // 댓글
+  $('#cForm').addEventListener('submit', addComment);
+  $('#cList').addEventListener('click', function(e){
+    var b = e.target.closest('[data-act="delc"]'); if(!b) return;
+    deleteComment(b.dataset.cid);
+  });
+  // 글쓰기 시트 닫기
+  $('#writeSheet').addEventListener('click', function(e){
+    var close = e.target.closest('[data-close]');
+    if(close) closeSheet($('#'+close.dataset.close));
+  });
+  // 설정
+  $('#btnSettings').addEventListener('click', function(){ updateSettingsUI(); openSheet($('#settingsSheet')); });
+  $('#settingsSheet').addEventListener('click', function(e){
+    var close = e.target.closest('[data-close]');
+    if(close) closeSheet($('#'+close.dataset.close));
+  });
+  $('#setConnect').addEventListener('click', function(){
+    var url = $('#setDb').value.trim();
+    if(!url){ toast('Firebase 주소를 넣어 주세요.'); return; }
+    connectDb(url, false).then(function(ok){ if(ok) closeSheet($('#settingsSheet')); });
+  });
+  $('#setDisconnect').addEventListener('click', function(){ disconnectDb(false); });
+  $('#copyRules').addEventListener('click', async function(){
+    var ok = await copyText('{\n  "rules": { ".read": true, ".write": true }\n}');
+    toast(ok ? '규칙을 복사했어요. Firebase 규칙 칸에 붙여넣고 게시하세요.' : '복사하지 못했어요.');
+  });
+  $('#setAdminSave').addEventListener('click', function(){
+    var v = $('#setAdmin').value.trim();
+    if(!/^\d{4,8}$/.test(v)){ toast('방장 코드는 숫자 4~8자리로 정해 주세요.'); return; }
+    lsSet(LS.adminCode, hashPw(v, ''));
+    $('#setAdmin').value = '';
+    toast('방장 코드를 바꿨어요. 새 코드로 👑 방장 모드에 들어올 수 있습니다.');
+  });
+  $('#setAdminLogout').addEventListener('click', function(){
+    state.admin = false; lsDel(LS.adminOn); applyAdminUI(); toast('방장 모드를 해제했어요.');
+  });
+  $('#setUploadLocal').addEventListener('click', function(){ uploadLocalPosts(); });
+  // 방장
+  $('#btnAdmin').addEventListener('click', toggleAdmin);
+  // 프롬프트
+  $('#promptForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('#promptInput').value.trim();
+    var r = promptResolve; promptResolve = null;
+    closeSheet($('#promptSheet'));
+    if(r) r(v);
+  });
+  $('#promptCancel').addEventListener('click', function(){
+    var r = promptResolve; promptResolve = null;
+    closeSheet($('#promptSheet'));
+    if(r) r(null);
+  });
+  $('#promptSheet').addEventListener('click', function(e){
+    if(e.target.closest('[data-close]')){
+      var r = promptResolve; promptResolve = null;
+      closeSheet($('#promptSheet'));
+      if(r) r(null);
+    }
+  });
+  // ESC
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    var open = $$('.sheet:not([hidden])');
+    if(open.length) closeSheet(open[open.length-1]);
+  });
+  // 해시 이동
+  window.addEventListener('hashchange', function(){
+    var h = location.hash || '';
+    if(h.indexOf('#post/') === 0){
+      var id = decodeURIComponent(h.slice(6));
+      if(id && id !== state.detailId && state.posts[id]) openDetail(id);
+    }else if(state.detailId){
+      closeSheet($('#detailSheet'));
+    }
+  });
+}
+
+/* ───────────────────────── 시작 ───────────────────────── */
+function boot(){
+  buildChips();
+  bindEvents();
+  state.posts = loadLocal();
+  if(location.protocol === 'file:'){
+    var pl = $('#portalLink'); if(pl) pl.href = 'https://cwclab1-eng.github.io/games/';
+  }
+  render();
+  applyAdminUI();
+  loadIssues();
+
+  var qs = new URLSearchParams(location.search);
+  var adminParam = qs.get('admin');
+  if(adminParam && hashPw(adminParam, '') === adminCodeHash()){
+    state.admin = true; applyAdminUI();
+  }else if(lsGet(LS.adminOn) === '1'){
+    // 이전에 방장 모드였으면 유지
+    state.admin = true; applyAdminUI();
+  }
+
+  var dbParam = qs.get('db');
+  var savedDb = lsGet(LS.db);
+  if(dbParam){
+    connectDb(dbParam, false);
+  }else if(savedDb){
+    state.posts = readJSON(LS.cache, {});
+    render();
+    connectDb(savedDb, true);
+  }
+
+  if(location.hash.indexOf('#post/') === 0){
+    var id = decodeURIComponent(location.hash.slice(6));
+    setTimeout(function(){ if(state.posts[id]) openDetail(id); }, 350);
+  }
+
+  setInterval(function(){ if(!state.detailId && !anySheetOpen()) render(); }, 60000);
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+// 테스트/디버깅용 (읽기 전용 참조)
+window.BOARD = {
+  state: state,
+  render: render,
+  visible: visiblePosts,
+  postText: postText,
+  ghIssueUrl: ghIssueUrl,
+  hashPw: hashPw,
+  connect: connectDb,
+  disconnect: disconnectDb
+};
+})();
+</script>
+</body>
+</html>
