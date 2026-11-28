@@ -4325,14 +4325,14 @@ function init(){
         applyBackground();
         var b=$('btnStart');
         b.disabled=false;
-        b.textContent='시작하기';
+        b.textContent='🎯 솔로 도전';
         // 배경 미리보기
         currentBg=randInt(BG_COUNT);
         preloadBg(currentBg);
         applyBackground();
     }).catch(function(err){
         console.error('에셋 로드 실패', err);
-        var b=$('btnStart'); b.disabled=false; b.textContent='시작하기';
+        var b=$('btnStart'); b.disabled=false; b.textContent='🎯 솔로 도전';
     });
 
     // 효과음 wav 준비 (없으면 조용히 무시)
