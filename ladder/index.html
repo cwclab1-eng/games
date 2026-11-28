@@ -1427,6 +1427,8 @@ h1 em {
     });
     return this.bus.open().then(function (ok) {
       if (!ok) { self.setStatus('error', '연결할 수 없습니다'); return false; }
+      /* 중계에 붙은 즉시 '연결됨' — 방 코드 충돌 확인(1초)은 그 뒤에 조용히 한다 */
+      self.setStatus('connected');
       if (self.role !== 'host') return true;
       /* 방 코드 충돌 확인 — 처음 1.4초 안에 다른 방장이 보이면 새 코드로 */
       return new Promise(function (resolve) {
@@ -1440,7 +1442,7 @@ h1 em {
             return;
           }
           resolve(true);
-        }, 1400);
+        }, 1000);
       });
     }, function (err) {
       self.setStatus('error', (err && err.type) || '연결 실패');
