@@ -3566,6 +3566,7 @@ window.HP.STAGE = 1;
       });
     },
     upload: function (json) { return Cloud.req('POST', null, json); },
+    put: function (id, json) { return Cloud.req('PUT', id, json); },
     get: function (id) { return Cloud.req('GET', id); },
     remove: function (id) { return Cloud.req('DELETE', id); }
   };
@@ -3613,10 +3614,13 @@ window.HP.STAGE = 1;
       return Promise.resolve(false);
     }
     ST.cloudBusy = true; renderCloud();
-    return Cloud.upload(json).then(function () {
+    var haveId = p.cloudId && ST.cloudPacks.some(function (x) { return x.id === p.cloudId; });
+    var call = haveId ? Cloud.put(p.cloudId, json) : Cloud.upload(json);
+    return call.then(function (r) {
+      if (!haveId && r && r.name) { p.cloudId = r.name; savePack(p); }
       ST.cloudBusy = false;
       return loadCloud(false).then(function () {
-        toast('“' + p.name + '” 팩을 공용 서버에 올렸습니다');
+        toast('“' + p.name + '” 팩을 공용 서버에 ' + (haveId ? '다시 올렸습니다' : '올렸습니다'));
         return true;
       });
     }, function (err) {
@@ -3900,6 +3904,8 @@ window.HP.STAGE = 1;
     cloudPacks: function () { return ST.cloudPacks.slice(); },
     CAT: CAT
   };
+  /* 브리프의 이름 그대로 — 공용 목소리 저장소 모듈 */
+  HP.voiceCloud = Cloud;
 })();
 
 /* ===== 45_fx.js ===== */
