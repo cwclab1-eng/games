@@ -6159,14 +6159,15 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var rk = J.rankByKey(cfg && cfg.rank);
     return rk ? rk.c * rk.r : 12;
   }
-  function name() {
-    if (!OL.name) {
-      var v = '';
-      try { v = localStorage.getItem('hj.nick') || ''; } catch (e) { }
-      OL.name = String(v || '').slice(0, 8);
-    }
-    return OL.name || '나';
+  function savedNick() {
+    var v = '';
+    try { v = localStorage.getItem('hj.nick') || ''; } catch (e) { }
+    return String(v || '').slice(0, 8);
   }
+  /* 화면에 보이는 '나' — 이름을 안 넣었으면 '나' (저장은 하지 않는다) */
+  function name() { return OL.name || savedNick() || '나'; }
+  /* 방에 알리는 이름 — 이름을 안 넣었으면 '친구' */
+  function roomName() { return OL.name || savedNick() || '친구'; }
   function saveName(n) {
     OL.name = String(n || '').slice(0, 8);
     try { localStorage.setItem('hj.nick', OL.name); } catch (e) { }
@@ -6180,7 +6181,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     OL.mode = tab === 'join' ? 'join' : 'create';
     syncTabs();
     var nEl = $('#olName');
-    if (nEl) nEl.value = name();
+    if (nEl) nEl.value = OL.name || savedNick();      // 표시용 '나' 를 입력칸에 넣지 않는다
     renderLobby();
     if (OL.mode === 'join') setTimeout(function () { focusEl($('#olCode')); }, 90);
   };
@@ -6267,7 +6268,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   /* ---------------- 방 열기 ---------------- */
   function makeRoom(role, code) {
     var room = HJ.net.Room({
-      role: role, code: code, name: (OL.name || '친구'),
+      role: role, code: code, name: roomName(),
       forceBc: OL.forceBc
     });
     OL.room = room;
