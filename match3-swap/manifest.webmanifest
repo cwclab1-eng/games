@@ -1,0 +1,42 @@
+{
+ "id": "./",
+ "name": "매치 3 · 젬 퍼즐",
+ "short_name": "매치 3",
+ "description": "3개 이상 젬을 맞춰 배경을 모으는 퍼즐 게임",
+ "lang": "ko",
+ "dir": "ltr",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "display_override": [
+  "fullscreen",
+  "standalone"
+ ],
+ "orientation": "portrait",
+ "background_color": "#05070f",
+ "theme_color": "#05070f",
+ "categories": [
+  "games",
+  "puzzle"
+ ],
+ "icons": [
+  {
+   "src": "./icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "./icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "./icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
