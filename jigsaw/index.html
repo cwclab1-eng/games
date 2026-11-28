@@ -1292,7 +1292,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     flash: [], completeAt: 0, particles: [], wantFull: false, lastFullTry: 0
   };
   var ptr = { down: false, id: null, startX: 0, startY: 0, x: 0, y: 0, cell: -1, moved: false };
-  var imgCache = {};
+  var imgCache = {}, imgOrder = [], IMG_CACHE_MAX = 3;
   var lastHud = 0, lastSave = 0, prevT = 0, resultOpen = false;
 
   /* ---------------- 작은 도구 ---------------- */
@@ -1395,13 +1395,21 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   /* ---------------- 플레이 ---------------- */
   function loadArt(stage, cb) {
     var src = root.ART[stage];
-    if (imgCache[stage]) { V.setImage(imgCache[stage]); if (cb) cb(); return; }
+    if (imgCache[stage]) {
+      V.setImage(imgCache[stage]);
+      if (cb) cb();
+      drawOnce();
+      return;
+    }
     var im = new Image();
     im.decoding = 'async';
     im.onload = function () {
-      imgCache[stage] = im; V.setImage(im);
+      imgCache[stage] = im;
+      if (imgOrder.indexOf(stage) < 0) imgOrder.push(stage);
+      // 저사양 폰 메모리 보호: 최근 3장만 보관
+      while (imgOrder.length > IMG_CACHE_MAX) { delete imgCache[imgOrder.shift()]; }
+      if (cur.stage === stage) { V.setImage(im); drawOnce(); }
       if (cb) cb();
-      drawOnce();
     };
     im.onerror = function () { toast('그림을 불러오지 못했어요'); };
     im.src = src;
