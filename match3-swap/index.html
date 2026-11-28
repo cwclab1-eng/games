@@ -545,6 +545,33 @@
         font-variant-numeric:tabular-nums}
     #cdNum.pop{animation:cdPop .6s cubic-bezier(.2,1.5,.4,1)}
     @keyframes cdPop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+    /* =========================================================
+       🤖 AI 1:1 대전 — 시작 화면 모드 버튼 · 난이도 선택
+       ========================================================= */
+    .btn-row .mode-btn{flex:1 1 0;min-width:0;margin-top:12px;padding:12px 8px;font-size:12.5px;
+        letter-spacing:-.2px;white-space:nowrap}
+    @media (max-width:360px){ .btn-row .mode-btn{font-size:11.5px;padding:11px 5px} }
+
+    .ai-lobby .card{max-width:min(94vw,420px);max-height:88dvh;overflow:auto}
+    .ai-lead{margin:6px 0 12px;font-size:11.5px;line-height:1.6;color:#b9c8e6;text-align:left}
+    .ai-lead b{color:#dff0ff}
+    .ai-diffs{display:flex;flex-direction:column;gap:8px}
+    .ai-diff{display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+        padding:11px 13px;border-radius:14px;cursor:pointer;text-align:left;font-family:inherit;
+        background:rgba(14,20,38,.62);border:1px solid rgba(255,255,255,.13);color:#fff;
+        transition:transform .12s,border-color .18s,background .18s}
+    .ai-diff b{font-size:14px;font-weight:900}
+    .ai-diff span{font-size:10.5px;color:#93a3c6;font-weight:700}
+    .ai-diff:active{transform:scale(.985)}
+    .ai-diff:hover{border-color:rgba(150,200,255,.45);background:rgba(30,48,86,.72)}
+    .ai-diff.pick{border-color:rgba(255,214,102,.62);background:rgba(58,48,22,.55);
+        box-shadow:inset 0 0 0 1px rgba(255,214,102,.30)}
+    .ai-diff[data-diff="easy"] b{color:#a8f0c8}
+    .ai-diff[data-diff="normal"] b{color:#a8d4ff}
+    .ai-diff[data-diff="hard"] b{color:#ffb59f}
+    .lobby-alt{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+    .lobby-alt .btn{margin-top:0}
 </style>
 </head>
 <body>
@@ -584,7 +611,7 @@
             <span class="net-pill" id="netPill">🟢 연결</span>
         </div>
         <div class="bh-info">
-            <span class="bh-tag">🔒 상대 보드 <b id="bhOppLocks">0</b></span>
+            <span class="bh-tag" id="bhOppLocksTag">🔒 상대 보드 <b id="bhOppLocks">0</b></span>
             <span class="bh-tag">🔒 내 보드 <b id="bhLocks">0</b></span>
             <span class="bh-tag">⚔️ 보냄 <b id="bhSent">0</b> · 받음 <b id="bhRecv">0</b></span>
         </div>
@@ -656,10 +683,11 @@
         <p style="font-size:11.5px;color:#8494b5;margin-top:6px">180초로 시작 · 스테이지 클리어마다 <b style="color:#bcd4ff">+100초</b> 보너스(최대 6분)<br>배경 60장 · 60스테이지 완주가 목표</p>
         <button class="btn" id="btnStart" disabled>불러오는 중…</button>
         <div class="btn-row">
-            <button class="btn ghost online-btn" id="btnOnline">⚔️ 온라인 1:1 대전</button>
-            <button class="btn ghost" id="btnGoalOpen">🎯 스테이지 목표 보기</button>
+            <button class="btn ghost mode-btn" id="btnAi">🤖 AI 1:1 대전</button>
+            <button class="btn ghost mode-btn" id="btnOnline">⚔️ 온라인 1:1 대전</button>
         </div>
-        <div class="rule-line">⚔️ 친구와 <b>180초</b> 동시 대전 — 콤보가 터지면 상대 보드에 <b>🔒 잠금 블록</b>을 보냅니다. 잠긴 블록은 옆 칸을 맞춰 지워야 풀립니다.</div>
+        <div class="btn-row"><button class="btn ghost" id="btnGoalOpen">🎯 스테이지 목표 보기</button></div>
+        <div class="rule-line">🤖 AI·친구와 <b>180초</b> 동시 대전 — 콤보가 터지면 상대 보드에 <b>🔒 잠금 블록</b>을 보냅니다. 잠긴 블록은 옆 칸을 맞춰 지워야 풀립니다.</div>
     </div>
 </div>
 
@@ -800,7 +828,28 @@
             <button class="btn" id="btnJoin" style="margin-top:8px">입장하기</button>
             <div class="room-hint" style="margin-top:6px">방장이 알려 준 4자리 코드를 입력하세요 (0·O·1·I는 쓰지 않습니다)</div>
         </div>
+        <div class="lobby-alt">
+            <button class="btn ghost" id="btnLobbyAi">🤖 AI 1:1 대전</button>
+        </div>
         <div class="lobby-note" id="lobbyNote"></div>
+    </div>
+</div>
+
+<!-- AI 대전 난이도 선택 -->
+<div class="overlay ai-lobby" id="aiOverlay">
+    <div class="card">
+        <div class="lobby-top">
+            <button class="icobtn" id="aiBack" aria-label="뒤로">←</button>
+            <h2>🤖 AI 1:1 대전</h2>
+            <span class="net-badge on">180초</span>
+        </div>
+        <p class="ai-lead">AI와 <b>180초</b> 동안 점수를 겨룹니다. AI도 진짜 보드를 돌리며, 콤보가 터지면 서로의 보드에 <b>🔒 잠금 블록</b>을 보냅니다.<br>내 콤보가 AI 보드에 쌓이면 AI가 느려집니다.</p>
+        <div class="ai-diffs">
+            <button class="ai-diff" data-diff="easy"><b>🙂 쉬움</b><span>느긋한 템포 · 콤보가 드묾</span></button>
+            <button class="ai-diff" data-diff="normal"><b>😎 보통</b><span>적당한 템포 · 가끔 2~3콤보</span></button>
+            <button class="ai-diff" data-diff="hard"><b>🔥 어려움</b><span>빠른 템포 · 적극적인 콤보</span></button>
+        </div>
+        <div class="lobby-note">난이도를 고르면 3·2·1 카운트다운 뒤 바로 시작합니다.</div>
     </div>
 </div>
 
@@ -822,6 +871,7 @@
         </div>
         <div class="btn-row">
             <button class="btn" id="btnRematch">재대전</button>
+            <button class="btn ghost hidden" id="btnBattleDiff">난이도 변경</button>
             <button class="btn ghost" id="btnBattleLobby">로비로</button>
             <button class="btn ghost" id="btnBattleSolo">솔로 플레이</button>
         </div>
@@ -4356,7 +4406,7 @@ function init(){
     applyAppMode();
     registerServiceWorker();
     document.addEventListener('visibilitychange', function(){
-        if (document.hidden && started && state==='IDLE' && mode!=='online'){
+        if (document.hidden && started && state==='IDLE' && mode!=='online' && mode!=='ai'){
             pausedFrom='IDLE'; state='PAUSED';
             $('pauseOverlay').classList.add('show');
         }
@@ -4595,7 +4645,7 @@ hasValidMove = function(){
     while (freed < 2 && unlockOldest()) freed++;
     if (!freed) return false;
     var ok = !!findMoveLocked();
-    if (ok && mode === 'online' && started) toast('🔓 둘 곳이 없어 잠금을 풀었어요');
+    if (ok && (mode === 'online' || mode === 'ai') && started) toast('🔓 둘 곳이 없어 잠금을 풀었어요');
     return ok;
 };
 
@@ -4750,7 +4800,7 @@ function stopBattleLoops(){
 function startBattleLoops(){
     stopBattleLoops();
     battleTick = setInterval(function(){
-        if (mode !== 'online') return;
+        if (mode !== 'online' && mode !== 'ai') return;
         updateBattleHud();
         if (started && !battleEnded && net && net.connected){
             var now = performance.now();
@@ -5355,19 +5405,21 @@ if ($('btnSms')) $('btnSms').addEventListener('click', function(ev){
 if ($('btnShare')) $('btnShare').addEventListener('click', function(){ shareInvite(); });
 if ($('btnRematch')) $('btnRematch').addEventListener('click', function(){ askRematch(); });
 if ($('btnBattleLobby')) $('btnBattleLobby').addEventListener('click', function(){
+    var wasAi = (mode === 'ai');
     leaveBattle();
-    openLobby('create');
+    if (!wasAi) openLobby('create');      // AI 대전은 나가기 → 시작 화면
 });
 if ($('btnBattleSolo')) $('btnBattleSolo').addEventListener('click', function(){
     leaveBattle();
     startGame();
 });
 if ($('btnBattleBack')) $('btnBattleBack').addEventListener('click', function(){
+    var wasAi = (mode === 'ai');
     if (net && net.connected && started && !battleEnded){
         try{ net.byeNow(); }catch(e){}
     }
     leaveBattle();
-    openLobby('create');
+    if (!wasAi) openLobby('create');    // AI 대전의 ← 는 시작 화면으로
 });
 
 /* 빈 자리 클릭으로 로비 닫기 */
@@ -5438,6 +5490,630 @@ window.__m3battle = {
     normalize: function(c){ return MN ? MN.normalizeCode(c) : c; },
     newCode: function(){ return MN ? MN.newCode() : ''; },
     shot: function(){ return {cd:$('cdOverlay') ? $('cdOverlay').classList.contains('show') : false}; }
+};
+
+/* =========================================================
+   🤖 AI 1:1 대전
+   ---------------------------------------------------------
+   · 온라인 대전과 같은 규칙: 180초 · 콤보(2연쇄부터)마다
+     상대 보드에 🔒 잠금 블록 1개 · 옆 칸 매치로 해제 · 최대 12개
+   · AI는 진짜 6×6 보드를 따로 돌린다. 난이도에 따라
+     수를 고르는 솜씨와 템포가 달라지고, 콤보가 터지면
+     내 보드로 잠금 공격이 날아온다.
+   · 내가 콤보를 터뜨리면 AI 보드에 잠금이 쌓여 AI의
+     매치 속도와 콤보 빈도가 줄어든다 (HUD 🔒 AI 보드 N).
+   ========================================================= */
+/* tick : 한 수를 두기까지 기본 시간(ms)
+   gainMs : 연쇄가 길어질수록 늘어나는 시간(ms/점) — 실제 게임의 연쇄 연출 시간을 흉내
+   cap  : 점수·공격으로 인정되는 연쇄 깊이 (쉬움은 깊은 콤보를 못 챙긴다)
+   smart: 좋은 수를 고르는 솜씨, atk: 콤보 공격 확률 */
+var AI_DIFFS = {
+    easy:   {label:'쉬움',  tick:2200, gainMs:14, cap:2,  smart:0.15, atk:0.35},
+    normal: {label:'보통',  tick:1200, gainMs:12, cap:4,  smart:0.60, atk:0.55},
+    hard:   {label:'어려움', tick: 850, gainMs:9.5, cap:10, smart:0.97, atk:0.75}
+};
+var LS_AI_DIFF = 'match3swap_ai_diff';
+
+var aiDiffKey = 'normal';
+var aiGrid = [], aiLocked = [];
+var aiScore = 0, aiLocks = 0, aiMaxCombo = 0, aiTurns = 0;
+var aiTimer = null, aiBusy = false, aiDry = false, aiLast = null;
+
+function aiLabel(){ return (AI_DIFFS[aiDiffKey] || AI_DIFFS.normal).label; }
+
+/* ---------------------------------------------------------
+   AI 보드 — 6×6 색 배열 + 칸별 잠금
+   --------------------------------------------------------- */
+function aiMakeBoard(){
+    var attempt, r, c;
+    for (attempt=0; attempt<220; attempt++){
+        var m=[];
+        for (r=0;r<G;r++) m.push(new Array(G).fill(-1));
+        for (r=0;r<G;r++){
+            for (c=0;c<G;c++){
+                var banned={};
+                var dirs=[[0,-1],[-1,0],[-1,-1],[-1,1]];
+                for (var d=0;d<dirs.length;d++){
+                    var r1=r+dirs[d][0], c1=c+dirs[d][1];
+                    var r2=r+2*dirs[d][0], c2=c+2*dirs[d][1];
+                    if (inB(r1,c1) && inB(r2,c2) && m[r1][c1]>=0 && m[r1][c1]===m[r2][c2]){
+                        banned[m[r1][c1]]=1;
+                    }
+                }
+                var pick=-1;
+                for (var guard=0; guard<40; guard++){
+                    var v=randInt(COLORS);
+                    if (!banned[v]){ pick=v; break; }
+                }
+                if (pick<0){
+                    for (var k=0;k<COLORS;k++) if (!banned[k]){ pick=k; break; }
+                }
+                if (pick<0) pick=randInt(COLORS);
+                m[r][c]=pick;
+            }
+        }
+        if (aiFindRuns(m).length) continue;
+        if (aiHasSwap(m)) return m;
+    }
+    var out=[];
+    for (r=0;r<G;r++){ out.push([]); for (c=0;c<G;c++) out[r].push(randInt(COLORS)); }
+    return out;
+}
+
+/* 매치(가로·세로·대각 3개 이상) — 게임 본체와 같은 규칙 */
+function aiFindRuns(m){
+    var out=[], DIRS=[[0,1],[1,0],[1,1],[-1,1]];
+    for (var d=0;d<DIRS.length;d++){
+        var dr=DIRS[d][0], dc=DIRS[d][1];
+        for (var r=0;r<G;r++){
+            for (var c=0;c<G;c++){
+                var v=m[r][c];
+                if (v<0) continue;
+                if (inB(r-dr,c-dc) && m[r-dr][c-dc]===v) continue;
+                var cells=[], rr=r, cc=c;
+                while (inB(rr,cc) && m[rr][cc]===v){ cells.push({r:rr,c:cc}); rr+=dr; cc+=dc; }
+                if (cells.length>=3) out.push(cells);
+            }
+        }
+    }
+    return out;
+}
+
+function aiSwapEval(m, a, b){
+    var t=m[a.r][a.c]; m[a.r][a.c]=m[b.r][b.c]; m[b.r][b.c]=t;
+    var runs=aiFindRuns(m), val=0, longest=0;
+    for (var i=0;i<runs.length;i++){
+        val+=runs[i].length;
+        if (runs[i].length>longest) longest=runs[i].length;
+    }
+    m[b.r][b.c]=m[a.r][a.c]; m[a.r][a.c]=t;
+    return {val:val, longest:longest};
+}
+
+function aiHasSwap(m){
+    for (var r=0;r<G;r++) for (var c=0;c<G;c++){
+        if (m[r][c]<0) continue;
+        var dirs=[[0,1],[1,0]];
+        for (var d=0;d<2;d++){
+            var r2=r+dirs[d][0], c2=c+dirs[d][1];
+            if (!inB(r2,c2) || m[r2][c2]<0 || m[r][c]===m[r2][c2]) continue;
+            if (aiSwapEval(m,{r:r,c:c},{r:r2,c:c2}).val>=3) return true;
+        }
+    }
+    return false;
+}
+
+/* 지금 둘 수 있는 수 전부 (잠긴 칸은 쓸 수 없다) — 좋은 순으로 정렬 */
+function aiCandidates(){
+    var out=[];
+    for (var r=0;r<G;r++) for (var c=0;c<G;c++){
+        if (aiLocked[r][c] || aiGrid[r][c]<0) continue;
+        var dirs=[[0,1],[1,0]];
+        for (var d=0;d<2;d++){
+            var r2=r+dirs[d][0], c2=c+dirs[d][1];
+            if (!inB(r2,c2)) continue;
+            if (aiLocked[r2][c2] || aiGrid[r2][c2]<0) continue;
+            if (aiGrid[r][c]===aiGrid[r2][c2]) continue;
+            var ev=aiSwapEval(aiGrid,{r:r,c:c},{r:r2,c:c2});
+            if (ev.val>=3) out.push({a:{r:r,c:c}, b:{r:r2,c:c2}, val:ev.val});
+        }
+    }
+    out.sort(function(x,y){ return (y.val-x.val) || 0; });
+    return out;
+}
+
+function aiLockCount(){
+    var n=0;
+    for (var r=0;r<G;r++) for (var c=0;c<G;c++) if (aiLocked[r][c]) n++;
+    aiLocks = n;
+    return n;
+}
+
+/* 보드만 새로 (점수·기록은 그대로) — 둘 곳이 없을 때 */
+function aiBoardReset(){
+    aiGrid = aiMakeBoard();
+    aiLocked = [];
+    for (var r=0;r<G;r++) aiLocked.push(new Array(G).fill(false));
+    aiLockCount();
+}
+
+/* 라운드 시작 — 점수·기록까지 0으로 */
+function aiBoardInit(){
+    aiBoardReset();
+    aiScore = 0; aiMaxCombo = 0; aiTurns = 0; aiLast = null;
+}
+
+/* 지워진 칸 옆의 잠금을 푼다 (플레이어 보드와 같은 규칙) */
+function aiUnlockNeighbors(cells){
+    var done=0, seen={};
+    var dd=[[-1,0],[1,0],[0,-1],[0,1]];
+    for (var i=0;i<cells.length;i++){
+        var p=cells[i];
+        for (var d=0;d<4;d++){
+            var rr=p.r+dd[d][0], cc=p.c+dd[d][1];
+            if (!inB(rr,cc)) continue;
+            var k=keyOf(rr,cc);
+            if (seen[k]) continue;
+            seen[k]=1;
+            if (aiLocked[rr][cc]){ aiLocked[rr][cc]=false; done++; }
+        }
+    }
+    return done;
+}
+
+/* 빈 칸을 채운다 — 잠금은 타일과 함께 내려간다 */
+function aiGravityFill(){
+    for (var c=0;c<G;c++){
+        var write=G-1;
+        for (var r=G-1;r>=0;r--){
+            if (aiGrid[r][c]>=0){
+                if (r!==write){
+                    aiGrid[write][c]=aiGrid[r][c];
+                    aiLocked[write][c]=aiLocked[r][c];
+                    aiGrid[r][c]=-1;
+                    aiLocked[r][c]=false;
+                }
+                write--;
+            }
+        }
+        for (var r2=write;r2>=0;r2--){
+            aiGrid[r2][c]=randInt(COLORS);
+            aiLocked[r2][c]=false;
+        }
+    }
+}
+
+/* 내 콤보 → AI 보드에 잠금을 보낸다 */
+function aiAddLocks(n){
+    var applied=0, tries=0;
+    while (applied<n && tries<n*12){
+        tries++;
+        if (aiLockCount()>=LOCK_MAX) break;
+        var pool=[];
+        for (var r=0;r<G;r++) for (var c=0;c<G;c++) if (!aiLocked[r][c]) pool.push({r:r,c:c});
+        if (!pool.length) break;
+        var pick=pool[randInt(pool.length)];
+        aiLocked[pick.r][pick.c]=true;
+        applied++;
+    }
+    aiLockCount();
+    return applied;
+}
+
+/* ---------------------------------------------------------
+   AI 한 수
+   --------------------------------------------------------- */
+function aiResolveTurn(dry){
+    var diff=AI_DIFFS[aiDiffKey] || AI_DIFFS.normal;
+    var cand=aiCandidates();
+    if (!cand.length){
+        /* 둘 곳이 없으면 보드만 다시 만든다 (점수는 그대로) */
+        aiBoardReset();
+        aiLast={chain:0, gain:0, attacked:0, shuffled:true, turns:aiTurns};
+        return aiLast;
+    }
+    var pick;
+    if (diff.smart >= 0.9) pick=cand[0];
+    else if (diff.smart >= 0.5) pick=cand[randInt(Math.max(1, Math.ceil(cand.length*0.35)))];
+    else pick=cand[randInt(cand.length)];
+
+    var a=pick.a, b=pick.b, tmp=aiGrid[a.r][a.c];
+    aiGrid[a.r][a.c]=aiGrid[b.r][b.c]; aiGrid[b.r][b.c]=tmp;
+
+    var chain=0, gain=0, maxChain=0, attackChain=0;
+    while (chain<10){
+        var runs=aiFindRuns(aiGrid);
+        if (!runs.length) break;
+        chain++;
+        var seen={}, cells=[];
+        for (var i=0;i<runs.length;i++){
+            for (var j=0;j<runs[i].length;j++){
+                var p=runs[i][j], k=keyOf(p.r,p.c);
+                if (seen[k]) continue;
+                seen[k]=1; cells.push(p);
+            }
+        }
+        if (chain<=diff.cap){          // 난이도만큼만 콤보를 챙긴다
+            var mult=Math.min(1+0.5*(chain-1),5);
+            gain += Math.round(cells.length*POINT_PER_TILE*mult);
+            if (chain>=2) attackChain=chain;
+        }
+        aiUnlockNeighbors(cells);
+        for (var ci=0;ci<cells.length;ci++) aiGrid[cells[ci].r][cells[ci].c]=-1;
+        aiGravityFill();
+    }
+    aiScore += gain;
+    aiTurns++;
+    if (chain>maxChain) maxChain=chain;
+    if (attackChain>aiMaxCombo) aiMaxCombo=attackChain;
+
+    var attacked=0;
+    if (attackChain>=2){
+        /* 잠금이 쌓일수록 콤보 공격이 줄어든다 */
+        var chance=diff.atk*Math.max(0.35, 1-0.05*aiLocks);
+        if (Math.random()<chance){
+            attacked=Math.min(attackChain-1, 3);
+            if (!dry) aiAttackPlayer(attacked, attackChain);
+        }
+    }
+    lockAiBoard();
+    aiLast={chain:chain, gain:gain, attacked:attacked, shuffled:false, turns:aiTurns,
+            maxChain:maxChain};
+    return aiLast;
+}
+
+/* AI 보드가 막히면(잠금 과다·수 없음) 가장 오래된 잠금 대신 몇 개를 풀어 준다 */
+function lockAiBoard(){
+    if (aiCandidates().length) return;
+    var freed=0;
+    while (freed<3){
+        var pool=[];
+        for (var r=0;r<G;r++) for (var c=0;c<G;c++) if (aiLocked[r][c]) pool.push({r:r,c:c});
+        if (!pool.length) break;
+        var pick=pool[randInt(pool.length)];
+        aiLocked[pick.r][pick.c]=false;
+        freed++;
+        if (aiCandidates().length) break;
+    }
+    aiLockCount();
+}
+
+function aiInterval(){
+    var diff=AI_DIFFS[aiDiffKey] || AI_DIFFS.normal;
+    var slow=1+0.07*aiLockCount();
+    var jitter=0.86+Math.random()*0.28;
+    var lastGain=(aiLast && aiLast.gain) || 0;
+    /* 연쇄가 길었던 판은 그만큼 보드가 정리되는 시간을 쓴다 (최대 6초) */
+    var ms=(diff.tick+lastGain*diff.gainMs)*slow*jitter;
+    return Math.round(Math.min(ms, 6000));
+}
+
+function aiStopTimer(){ clearTimeout(aiTimer); aiTimer=null; }
+
+function aiScheduleTurn(delay){
+    aiStopTimer();
+    if (mode!=='ai' || battleEnded || !started) return;
+    aiTimer=setTimeout(aiTurn, typeof delay==='number' ? delay : aiInterval());
+}
+
+function aiTurn(){
+    aiTimer=null;
+    if (mode!=='ai' || battleEnded || !started) return;
+    if (aiBusy){ aiScheduleTurn(400); return; }
+    aiBusy=true;
+    try{
+        aiResolveTurn(false);
+        opp.score=Math.max(0, Math.round(aiScore));
+        opp.locks=aiLocks;
+        updateBattleHud();
+        if (aiTurns===1) toast('🤖 AI가 움직이기 시작합니다');
+    }catch(e){
+        if (window.console) console.warn('AI 오류', e);
+    }
+    aiBusy=false;
+    if (mode==='ai' && !battleEnded) aiScheduleTurn();
+}
+
+/* ---------------------------------------------------------
+   공격 주고받기
+   --------------------------------------------------------- */
+function aiAttackPlayer(n, chain){
+    n=clamp(n|0, 1, ATK_MAX);
+    var got=lockRandomCells(n);
+    recvAttacks+=n;
+    if (got){
+        shakeMag=Math.max(shakeMag,4.2);
+        AudioFX.noise(0,0.22,0.08,900,300,1.2);
+        AudioFX.note(180,0,0.22,'square',0.10,90);
+    }
+    showAtkNotice('⚠️ AI 콤보! 잠금 ' + n + '개!');
+    if (got) toast('🔒 AI 콤보! 잠금 ' + got + '개 — 옆 블록을 맞춰 푸세요');
+    updateBattleHud();
+    return got;
+}
+
+function aiSendAttack(n, chain){
+    var got=aiAddLocks(n);
+    sentAttacks+=n;
+    showAtkNotice('🔥 ' + chain + '콤보! AI 보드에 🔒 ' + got + '개!');
+    toast('🔒 AI 보드에 잠금 ' + got + '개 — AI가 느려집니다');
+    AudioFX.note(320,0,0.20,'sawtooth',0.09,880);
+    AudioFX.note(640,0.03,0.12,'sine',0.05,1200);
+    updateBattleHud();
+    return got;
+}
+
+/* ---------------------------------------------------------
+   라운드 시작 / 종료
+   --------------------------------------------------------- */
+async function startAiRound(diffKey){
+    if (AI_DIFFS[diffKey]) aiDiffKey=diffKey;
+    try{ localStorage.setItem(LS_AI_DIFF, aiDiffKey); }catch(e){}
+    aiStopTimer();
+    aiBusy=false;
+    gameToken++;
+    var tok=gameToken;
+    mode='ai';
+    document.body.classList.add('online');
+    battleEnded=false; battleResultShown=false; oppFin=null;
+    clearTimeout(finTimer); finTimer=null;
+    sentAttacks=0; recvAttacks=0; maxCombo=0;
+    opp.score=0; opp.locks=0; opp.combo=0;
+    aiBoardInit();
+    peerName='AI '+aiLabel();
+
+    ['aiOverlay','battleEndOverlay','overOverlay','startOverlay','pauseOverlay','lobbyOverlay']
+        .forEach(function(id){ var el=$(id); if (el) el.classList.remove('show'); });
+    closeGoalList();
+    closeGallery();
+
+    score=0; stageScore=0; stage=1; timeLeft=BATTLE_TIME;
+    started=true; state='IDLE';
+    selection=null; hint=null;
+    ghostTiles.length=0; particles.length=0; floats.length=0; beams.length=0;
+
+    /* 스테이지 퍼즐 레이어는 대전에서 쓰지 않는다 */
+    clearTimeout(puzzle.timer); puzzle.timer=null;
+    puzzle.queue.length=0;
+    puzzle.total=0; puzzle.done=true; puzzle.shown=0;
+    $('puzzleLayer').classList.remove('show');
+    $('puzzleLayer').classList.remove('done');
+    $('puzzleDone').classList.remove('show');
+
+    layout();
+    unlockAllTiles();
+    updateTime(true);
+    updateBattleHud();
+    startBattleLoops();
+
+    pickBackground();
+    await buildBoard(true);
+    if (tok!==gameToken || !started) return;
+    state='IDLE';
+    lastAction=performance.now();
+    idleBase=performance.now();
+    updateBattleHud();
+    if (!hasValidMove()) await shuffleWithToast('이동할 조합이 없어 보드를 섞었어요');
+    aiScheduleTurn(900);
+}
+
+var _aiOnTimeUp = onTimeUp;
+onTimeUp = function(){
+    if (mode!=='ai'){ _aiOnTimeUp(); return; }
+    if (battleEnded) return;
+    battleEnded=true;
+    started=false;
+    state='GAMEOVER';
+    selection=null; hint=null;
+    aiStopTimer();
+    opp.score=Math.max(0, Math.round(aiScore));
+    opp.locks=aiLocks;
+    updateBattleHud();
+    AudioFX.gameOver();
+    clearTimeout(finTimer);
+    finTimer=setTimeout(decideBattle, 1400);
+};
+
+/* 결과 화면 버튼을 모드에 맞춘다 */
+var _aiBattleResult = battleResult;
+battleResult = function(title, msg){
+    _aiBattleResult(title, msg);
+    var isAi=(mode==='ai');
+    if ($('btnBattleDiff')) $('btnBattleDiff').classList.toggle('hidden', !isAi);
+    if ($('btnBattleSolo')) $('btnBattleSolo').classList.toggle('hidden', isAi);
+    if ($('btnBattleLobby')) $('btnBattleLobby').textContent = isAi ? '나가기' : '로비로';
+};
+
+/* 재대전 — 같은 난이도로 바로 한 판 더 */
+var _aiAskRematch = askRematch;
+askRematch = function(){
+    if (mode==='ai'){
+        AudioFX.resume();
+        $('battleEndOverlay').classList.remove('show');
+        showCountdown(function(){ startAiRound(aiDiffKey); });
+        return;
+    }
+    return _aiAskRematch();
+};
+
+/* 대전 중에는 일시정지·다시 시작 금지 */
+var _aiTogglePause = togglePause;
+togglePause = function(){
+    if (mode==='ai'){
+        if (started) toast('AI 대전 중에는 일시정지할 수 없어요');
+        return;
+    }
+    return _aiTogglePause();
+};
+
+/* 대전 중에는 스테이지 목표를 쓰지 않는다 */
+var _aiGetStageTarget = getStageTarget;
+getStageTarget = function(st){
+    if (mode==='ai') return 1e12;
+    return _aiGetStageTarget(st);
+};
+
+/* 내 콤보 → AI 보드 잠금 */
+var _aiPopCells = popCells;
+popCells = async function(cells, chain, gain){
+    if (mode==='ai' && chain>=2 && started && !battleEnded) aiSendAttack(1, chain);
+    return _aiPopCells(cells, chain, gain);
+};
+
+/* 나가기 — AI 타이머를 반드시 끊는다 */
+var _aiLeaveBattle = leaveBattle;
+leaveBattle = function(){
+    aiStopTimer();
+    aiBusy=false;
+    _aiLeaveBattle();
+};
+
+/* ---------------------------------------------------------
+   HUD — 상대 자리에 AI 이름·점수·보드 잠금
+   --------------------------------------------------------- */
+var _aiUpdateHud = updateBattleHud;
+updateBattleHud = function(){
+    if (mode==='ai'){
+        opp.score=Math.max(0, Math.round(aiScore));
+        opp.locks=aiLocks;
+    }
+    _aiUpdateHud();
+    var tag=$('bhOppLocksTag');
+    if (tag && tag.firstChild){
+        tag.firstChild.nodeValue = (mode==='ai') ? '🔒 AI 보드 ' : '🔒 상대 보드 ';
+    }
+    if (mode==='ai'){
+        if ($('bhOppName')) $('bhOppName').textContent='🤖 AI '+aiLabel();
+        var pill=$('netPill');
+        if (pill) pill.className='net-pill hidden';   // AI 전에는 연결 표시가 필요 없다
+    }
+};
+
+/* 시간 표시도 AI 대전에서 HUD에 */
+var _aiUpdateTime = updateTime;
+updateTime = function(force){
+    _aiUpdateTime(force);
+    var el=$('bhTime');
+    if (el && mode==='ai'){
+        el.textContent=fmtTime(timeLeft);
+        el.classList.toggle('low', timeLeft<=20000);
+    }
+};
+
+/* ---------------------------------------------------------
+   난이도 선택 화면
+   --------------------------------------------------------- */
+function aiStoredDiff(){
+    var v='';
+    try{ v=localStorage.getItem(LS_AI_DIFF)||''; }catch(e){}
+    return AI_DIFFS[v] ? v : 'normal';
+}
+function markAiDiff(key){
+    var btns=document.querySelectorAll('.ai-diff');
+    for (var i=0;i<btns.length;i++){
+        btns[i].classList.toggle('pick', btns[i].getAttribute('data-diff')===key);
+    }
+}
+function openAiLobby(){
+    closeNet();
+    mode='solo';
+    started=false;
+    state='IDLE';
+    document.body.classList.remove('online');
+    stopBattleLoops();
+    aiStopTimer();
+    ['overOverlay','battleEndOverlay','startOverlay','lobbyOverlay'].forEach(function(id){
+        var el=$(id); if (el) el.classList.remove('show');
+    });
+    aiDiffKey=aiStoredDiff();
+    markAiDiff(aiDiffKey);
+    $('aiOverlay').classList.add('show');
+    layout();
+}
+function closeAiLobby(){
+    $('aiOverlay').classList.remove('show');
+    if (mode!=='online') $('startOverlay').classList.add('show');
+    layout();
+}
+function pickAiDiff(key){
+    AudioFX.resume();
+    key=AI_DIFFS[key] ? key : 'normal';
+    $('aiOverlay').classList.remove('show');
+    showCountdown(function(){ startAiRound(key); });
+}
+
+if ($('btnAi')) $('btnAi').addEventListener('click', function(){ AudioFX.resume(); openAiLobby(); });
+if ($('btnLobbyAi')) $('btnLobbyAi').addEventListener('click', function(){ AudioFX.resume(); openAiLobby(); });
+if ($('aiBack')) $('aiBack').addEventListener('click', function(){ closeAiLobby(); });
+var aiDiffBtns=document.querySelectorAll('.ai-diff');
+for (var aiBi=0; aiBi<aiDiffBtns.length; aiBi++){
+    aiDiffBtns[aiBi].addEventListener('click', function(ev){
+        var b=ev.currentTarget;
+        pickAiDiff(b.getAttribute('data-diff'));
+    });
+}
+if ($('btnBattleDiff')) $('btnBattleDiff').addEventListener('click', function(){
+    leaveBattle();
+    openAiLobby();
+});
+if ($('aiOverlay')) $('aiOverlay').addEventListener('click', function(e){
+    if (e.target===$('aiOverlay')) closeAiLobby();
+});
+
+/* ---------------------------------------------------------
+   검증용 핸들 (게임 동작에는 관여하지 않음)
+   --------------------------------------------------------- */
+window.__m3ai = {
+    diffs: Object.keys(AI_DIFFS),
+    get diff(){ return aiDiffKey; },
+    get tick(){ return (AI_DIFFS[aiDiffKey]||AI_DIFFS.normal).tick; },
+    get slowFactor(){ return 1+0.07*aiLockCount(); },
+    get attackChance(){ return (AI_DIFFS[aiDiffKey]||AI_DIFFS.normal).atk; },
+    get diffLabel(){ return aiLabel(); },
+    get state(){
+        return {diff:aiDiffKey, label:aiLabel(), score:Math.round(aiScore), locks:aiLocks,
+                lockCount:aiLockCount(), maxCombo:aiMaxCombo, turns:aiTurns,
+                board:aiGrid.map(function(row){ return row.slice(); }),
+                locked:aiLocked.map(function(row){ return row.map(function(v){ return v?1:0; }); }),
+                interval:aiInterval(), last:aiLast};
+    },
+    start: startAiRound,
+    openLobby: openAiLobby,
+    pick: pickAiDiff,
+    turn: function(){ if (mode!=='ai' || battleEnded) return null; return aiResolveTurn(false); },
+    bench: function(diffKey, turns){
+        var keep={key:aiDiffKey, grid:aiGrid, locked:aiLocked, score:aiScore,
+                  locks:aiLocks, turns:aiTurns, combo:aiMaxCombo};
+        aiDiffKey=AI_DIFFS[diffKey]?diffKey:'normal';
+        aiBoardInit();
+        var chains=[], atk=0, maxc=0, secs=0, gains=[], d=AI_DIFFS[aiDiffKey];
+        for (var i=0;i<(turns||200);i++){
+            var r=aiResolveTurn(true);
+            chains.push(r.chain);
+            gains.push(r.gain);
+            atk+=r.attacked;
+            secs+=(d.tick+r.gain*d.gainMs)/1000;
+            if (r.maxChain>maxc) maxc=r.maxChain;
+        }
+        var avg=0; for (var j=0;j<chains.length;j++) avg+=chains[j];
+        gains.sort(function(a,b){return a-b;});
+        var out={diff:aiDiffKey, turns:aiTurns, score:Math.round(aiScore), maxChain:maxc,
+                 attackLocks:atk, comboRate:(chains.filter(function(c){return c>=2;}).length/chains.length),
+                 avgChain:avg/chains.length, secs:Math.round(secs),
+                 perSec:Math.round(aiScore/secs),
+                 proj180:Math.round(aiScore/secs*180),
+                 medianGain:gains[Math.floor(gains.length/2)]};
+        aiDiffKey=keep.key; aiGrid=keep.grid; aiLocked=keep.locked; aiScore=keep.score;
+        aiLocks=keep.locks; aiTurns=keep.turns; aiMaxCombo=keep.combo;
+        return out;
+    },
+    clearLocks: function(){
+        for (var r=0;r<G;r++) for (var c=0;c<G;c++) aiLocked[r][c]=false;
+        aiLockCount(); updateBattleHud(); return aiLocks;
+    },
+    forceAttack: function(n, chain){ return aiAttackPlayer(n||2, chain||3); },
+    sendAttack: function(n, chain){ return aiSendAttack(n||1, chain||2); },
+    waitIdle: function(){ return !aiBusy; }
 };
 
 /* 디버그/검증용 핸들 (게임 동작에는 관여하지 않음) */
