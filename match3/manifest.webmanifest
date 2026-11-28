@@ -1,0 +1,42 @@
+{
+ "id": "./",
+ "name": "매치 3 낙하형 · 젬 퍼즐",
+ "short_name": "매치 3 낙하",
+ "description": "3칸 젬 블록을 떨어뜨려 맞추는 낙하형 퍼즐 게임",
+ "lang": "ko",
+ "dir": "ltr",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "display_override": [
+  "fullscreen",
+  "standalone"
+ ],
+ "orientation": "portrait",
+ "background_color": "#05070f",
+ "theme_color": "#05070f",
+ "categories": [
+  "games",
+  "puzzle"
+ ],
+ "icons": [
+  {
+   "src": "./icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "./icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "./icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
