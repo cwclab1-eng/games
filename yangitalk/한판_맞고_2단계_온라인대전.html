@@ -701,6 +701,92 @@ body.embed .lobbyNote{display:none}
   box-shadow:0 5px 14px rgba(201,150,47,.3)}
 .speedOpt.on small{color:rgba(42,29,7,.78)}
 
+/* ================= 목소리 스튜디오 (v22) ================= */
+.voiceBtn{justify-content:center;gap:6px}
+.voiceBtn b{font-weight:700;color:#F2D489;max-width:56%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#studio{overflow-y:auto;-webkit-overflow-scrolling:touch;display:none}
+#studio.active{display:flex}
+#studio h3{color:#FBF4E4;text-shadow:0 2px 8px rgba(0,0,0,.55);margin:10px 0 2px;font-size:14px}
+.vsBody{display:flex;flex-direction:column;gap:8px;padding:8px 0 20px}
+.vsCount{font-size:11px;font-weight:700;color:rgba(251,244,228,.72)}
+.vsCount b{color:#F2D489;font-size:13px}
+.vsLead{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(251,244,228,.16),rgba(251,244,228,.07));
+  border:1px solid rgba(251,244,228,.24)}
+.vsLead b{font-size:15px;color:#FFF6DE;letter-spacing:-.2px}
+.vsLead span{font-size:11px;color:rgba(251,244,228,.75);line-height:1.4}
+.vsPackList{display:flex;flex-direction:column;gap:6px}
+.vsPack{background:rgba(251,244,228,.97);border-radius:13px;padding:9px 11px;border:1.5px solid transparent}
+.vsPack.on{border-color:#C9962F;box-shadow:0 0 0 2px rgba(235,198,106,.35)}
+.vsPackTop{display:flex;flex-direction:column;gap:1px;min-width:0}
+.vsPackName{font-size:13.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:5px;min-width:0}
+.vsPackName .vsTag{font-size:9px;font-weight:800;color:#2a1d07;background:linear-gradient(160deg,#F5D98F,#C9962F);
+  padding:1px 5px;border-radius:6px;flex:0 0 auto}
+.vsPackName .vsTag.mine{background:#DDEBD8;color:#33502f}
+.vsPackName .vsTag.imp{background:#DCE6F2;color:#2C5F8A}
+.vsPackMeta{font-size:10.5px;color:var(--ink2)}
+.vsPackActs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.vsPAct{font-size:11px;font-weight:700;color:#3a2c18;background:rgba(58,42,24,.07);
+  border:1px solid rgba(58,42,24,.16);border-radius:9px;padding:5px 9px}
+.vsPAct.pick{background:linear-gradient(160deg,#F5D98F,#C9962F);color:#2a1d07;border-color:#C9962F}
+.vsPAct.cur{background:rgba(201,150,47,.16);color:#7a5a10;border-color:rgba(201,150,47,.5)}
+.vsPAct.del{background:#B23A3A;color:#FFF3EF;border-color:#8f2c2c}
+.vsRow,.vsRow2{display:flex;gap:6px;align-items:stretch}
+.vsRow2{flex-wrap:wrap}
+.vsRow2 .vsBtn{flex:1 1 0;min-width:0}
+.vsInput{flex:1 1 auto;min-width:0;width:100%;padding:10px 11px;border-radius:11px;font-size:13px;color:var(--ink);
+  background:#FFFDF7;border:1px solid rgba(34,28,23,.18)}
+.vsInput::placeholder{color:rgba(34,28,23,.4)}
+.vsInput:focus{outline:none;border-color:#C9962F;box-shadow:0 0 0 2px rgba(201,150,47,.22)}
+.vsBtn{font-size:12.5px;font-weight:700;color:#FBF4E4;background:rgba(251,244,228,.16);
+  border:1px solid rgba(251,244,228,.3);border-radius:11px;padding:10px 12px;white-space:nowrap}
+.vsBtn.gold{background:linear-gradient(160deg,#F5D98F,#C9962F);color:#2a1d07;border-color:#C9962F}
+.vsBtn:active{transform:scale(.98)}
+.vsNote{font-size:10.5px;line-height:1.5;color:rgba(251,244,228,.7)}
+.vsNote b{color:#F2D489}
+.vsFile{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0);left:0;top:0;pointer-events:none}
+.vsFbRow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10.5px;color:rgba(251,244,228,.75)}
+.vsFb{font-size:10.5px;font-weight:700;color:rgba(251,244,228,.8);border:1px solid rgba(251,244,228,.26);
+  border-radius:99px;padding:4px 9px;background:rgba(10,16,11,.35)}
+.vsFb.on{background:linear-gradient(160deg,#F5D98F,#C9962F);color:#2a1d07;border-color:#C9962F}
+.vsCloudState{font-size:10.5px;line-height:1.5;color:rgba(251,244,228,.8);border-radius:11px;padding:9px 11px;
+  background:rgba(10,16,11,.42);border:1px solid rgba(251,244,228,.18);word-break:break-all}
+.vsCloudState.ok{color:#F3E7C6;border-color:rgba(235,198,106,.4)}
+.vsCloudState b{color:#F2D489}
+.vsCloudState .vsMsg{color:rgba(251,244,228,.72)}
+.vsCloudList{display:flex;flex-direction:column;gap:6px}
+.vsCp{background:rgba(251,244,228,.97);border-radius:12px;padding:8px 10px}
+.vsCpTop{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:12px;color:var(--ink);min-width:0}
+.vsCpTop b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vsCpTop span{font-size:10px;color:var(--ink2);white-space:nowrap}
+.vsCpActs{display:flex;gap:5px;margin-top:5px}
+.vsRecBar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px 11px;border-radius:11px;font-size:11px;
+  color:#FFF3EF;background:rgba(178,58,58,.85);border:1px solid rgba(255,214,206,.55)}
+.vsRecBar b{font-weight:800}
+.vsRecBar em{font-style:normal;font-weight:700;color:#FFE1DA}
+.vsRecBar i{font-style:normal;opacity:.8;font-size:10px}
+.vsItems{display:flex;flex-direction:column;gap:4px}
+.vsItem{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:11px;
+  background:rgba(251,244,228,.94);border:1px solid rgba(34,28,23,.08)}
+.vsItem.mine{background:rgba(245,226,180,.97);border-color:rgba(201,150,47,.5)}
+.vsK{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.vsK b{font-size:12.5px;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsK small{font-size:9px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsSt{flex:0 0 auto;font-size:9px;font-weight:800;padding:2px 6px;border-radius:7px;white-space:nowrap}
+.vsSt.default{background:rgba(34,28,23,.08);color:#5B5147}
+.vsSt.pack{background:#33502f;color:#F4FFEF}
+.vsSt.tts{background:#DCE6F2;color:#2C5F8A}
+.vsActs{flex:0 0 auto;display:flex;gap:3px}
+.vsAct{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;font-size:14px;line-height:1;
+  background:rgba(34,28,23,.06);border:1px solid rgba(34,28,23,.12)}
+.vsAct.on{background:#B23A3A;color:#FFF3EF;border-color:#8f2c2c}
+@media (max-width:360px){
+  .vsAct{width:28px;height:28px;font-size:13px;border-radius:8px}
+  .vsItem{gap:4px;padding:5px 6px}
+  .vsK b{font-size:12px}
+  .vsPackActs .vsPAct{font-size:10.5px;padding:5px 7px}
+}
+
 /* ================= 가로 모드 (모바일 가로 · 짧은 화면) ================= */
 @media (orientation: landscape) and (max-height: 620px){
   #app{max-width:none}
@@ -709,13 +795,14 @@ body.embed .lobbyNote{display:none}
   #home.active{
     display:grid;
     grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
-    grid-template-rows:auto minmax(0,1fr) auto auto auto auto;
+    grid-template-rows:auto minmax(0,1fr) auto auto auto auto auto;
     grid-template-areas:
       "top  top"
       "hero diff"
       "hero start"
       "hero online"
       "hero row2"
+      "hero voice"
       "foot foot";
     gap:6px 10px;
     padding:calc(env(safe-area-inset-top,0px) + 6px) calc(env(safe-area-inset-right,0px) + 12px) calc(env(safe-area-inset-bottom,0px) + 6px) calc(env(safe-area-inset-left,0px) + 12px);
@@ -726,6 +813,7 @@ body.embed .lobbyNote{display:none}
   #home #btnStart{grid-area:start;padding:12px 16px}
   #home #btnOnline{grid-area:online;padding:11px 14px;font-size:13px}
   #home .row2{grid-area:row2}
+  #home #btnVoice{grid-area:voice;padding:8px 14px;font-size:12.5px}
   #home .homefoot{grid-area:foot}
   #home #refillBox{grid-column:2;grid-row:4;align-self:start;font-size:11px;padding:7px 10px}
   .heroCard{flex-direction:row}
@@ -866,6 +954,8 @@ body.embed .lobbyNote{display:none}
       <button class="bigbtn ghost" id="btnGallery">배경 갤러리 <b id="galCount">0/50</b></button>
       <button class="bigbtn ghost" id="btnRules">규칙·족보</button>
     </div>
+
+    <button class="bigbtn ghost voiceBtn" id="btnVoice">🎙️ 목소리 <b id="voicePackName">기본 (정석호 님)</b></button>
 
     <div id="refillBox" class="refill hidden">
       <div>냥이 모자랍니다 · <b><span id="refillAmt">2,000</span>냥 무료 충전</b><br><small>오늘 <span id="refillLeft">5</span>회 남음 · 스테이지가 오를수록 충전액도 커집니다</small></div>
@@ -1050,6 +1140,58 @@ body.embed .lobbyNote{display:none}
         <button data-speed="normal" class="speedOpt" role="radio">보통<small>×1.55 · 기본</small></button>
         <button data-speed="fast" class="speedOpt" role="radio">빠름<small>×1 · 예전</small></button>
       </div>
+    </div>
+  </section>
+  <!-- ================= VOICE STUDIO (v22) ================= -->
+  <section id="studio" class="screen">
+    <header class="topbar">
+      <button class="iconbtn" id="vsBack" aria-label="뒤로">←</button>
+      <div class="brand small">🎙️ 목소리 스튜디오</div>
+      <div class="vsCount"><b id="vsPackN">2</b> 팩</div>
+    </header>
+    <div class="vsBody">
+      <div class="vsLead">
+        <b id="vsCurName">기본 (정석호 님)</b>
+        <span id="vsCurSub">정석호 님 녹음 30개가 그대로 나갑니다</span>
+      </div>
+      <div class="vsRecBar hidden" id="vsRecBar" role="status"></div>
+
+      <h3>목소리 팩</h3>
+      <div class="vsPackList" id="vsPackList"></div>
+      <div class="vsRow">
+        <input id="vsNewName" class="vsInput" maxlength="24" placeholder="새 팩 이름 (예: 내 목소리)" aria-label="새 목소리 팩 이름" autocomplete="off">
+        <button class="vsBtn gold" id="vsNew">+ 만들기</button>
+      </div>
+      <div class="vsRow2">
+        <button class="vsBtn" id="vsExport">📤 내보내기</button>
+        <button class="vsBtn" id="vsImportBtn">📥 불러오기</button>
+        <input type="file" id="vsImport" class="vsFile" accept=".json,.matgovoice.json,application/json" aria-label="목소리 팩 파일 불러오기">
+      </div>
+      <div class="vsNote">내보낸 파일(.matgovoice.json)을 친구에게 보내면, 친구가 ‘불러오기’로 넣어 들어 보고 골라 쓸 수 있어요.</div>
+
+      <div class="vsFbRow">
+        <span>팩에 없는 항목은</span>
+        <button class="vsFb on" id="vsFbDef" role="radio" aria-checked="true">정석호 님 목소리</button>
+        <button class="vsFb" id="vsFbTts" role="radio" aria-checked="false">표준어 TTS</button>
+      </div>
+
+      <h3>공용 목소리 서버</h3>
+      <div class="vsRow">
+        <input id="vsCloudUrl" class="vsInput" placeholder="https://xxx.firebaseio.com" aria-label="공용 서버 주소" autocomplete="off" spellcheck="false">
+        <button class="vsBtn gold" id="vsCloudConnect">연결</button>
+      </div>
+      <div class="vsCloudState off" id="vsCloudState">공용 서버 주소가 아직 연결되지 않았어요 · 아래 ‘내보내기/불러오기’로 친구와 바로 주고받을 수 있어요</div>
+      <div class="vsRow2">
+        <button class="vsBtn hidden" id="vsCloudUpload">☁️ 현재 팩 올리기</button>
+        <button class="vsBtn hidden" id="vsCloudReload">🔄 목록 새로고침</button>
+        <button class="vsBtn hidden" id="vsCloudOff">연결 해제</button>
+      </div>
+      <div class="vsCloudList" id="vsCloudList"></div>
+
+      <h3>외침 30개</h3>
+      <div class="vsNote">바꿀 외침의 <b>🎙️</b> 로 직접 녹음하거나 <b>📁</b> 로 파일을 올리세요. <b>▶</b> 는 지금 팩의 소리, <b>↺</b> 는 그 항목만 기본 목소리로 되돌립니다.</div>
+      <div class="vsItems" id="vsItems"></div>
+      <input type="file" id="vsFile" class="vsFile" accept="audio/*" aria-label="목소리 파일 올리기">
     </div>
   </section>
 </main>
@@ -2619,6 +2761,7 @@ window.HP.STAGE = 2;
     return keys.length;
   };
   V.clipReady = function (key) { return !!VO.buf[key]; };
+  V.actx = function () { return ctx(); };
   function stopClips() {
     for (var i = 0; i < VO.playing.length; i++) {
       try { VO.playing[i].stop(); } catch (e) { }
@@ -2626,12 +2769,22 @@ window.HP.STAGE = 2;
     VO.playing.length = 0;
   }
   V.stopClips = stopClips;
-  /* 녹음이 있으면 그 소리를 낸다. 없으면 false → 부르는 쪽이 TTS 로 넘어간다 */
-  V.playClip = function (key) {
-    if (!VO.use || muted) return false;
-    var b = VO.buf[key];
-    if (!b) { loadClip(key); return false; }
-    var a = ctx(); if (!a) return false;
+  /* =========================================================
+     목소리 팩 갈래 (42_voice_studio.js 가 채운다)
+     · VO.pack.resolve(key) → {mode:'clip', buf} | {mode:'tts'} | {mode:'default'}
+         clip    그 팩에 올린 내 목소리
+         tts     녹음을 끄고 표준어 TTS 로
+         default 정석호 님 기본 녹음 — 팩에 없는 항목이 자연스럽게 이어지는 자리
+     · 팩이 없으면(VO.pack 없음) 예전처럼 VO.buf 만 쓴다
+     ========================================================= */
+  VO.pack = null;
+  function packSource(key) {
+    var pk = VO.pack;
+    if (!pk || !pk.resolve) return null;
+    try { return pk.resolve(key) || null; } catch (e) { return null; }
+  }
+  function playBuffer(b, key, tag) {
+    var a = ctx(); if (!a || !b) return false;
     try {
       var src = a.createBufferSource(), g = a.createGain();
       src.buffer = b; g.gain.value = 1;
@@ -2642,10 +2795,20 @@ window.HP.STAGE = 2;
       };
       src.start(0);
       VO.playing.push(src);
-      VO.log.push({ key: key, at: Date.now() });
+      VO.log.push({ key: key || '', at: Date.now(), dur: Math.round(b.duration * 1000) / 1000, src: tag || 'buffer' });
       if (VO.log.length > 60) VO.log.shift();
       return true;
     } catch (e) { return false; }
+  }
+  V.playBuffer = playBuffer;
+  /* 녹음이 있으면 그 소리를 낸다. 없으면 false → 부르는 쪽이 TTS 로 넘어간다 */
+  V.playClip = function (key) {
+    if (!VO.use || muted) return false;
+    var ps = packSource(key);
+    if (ps && ps.mode === 'tts') return false;          // TTS 팩 — 소리 없이 돌려주고 TTS 로 넘긴다
+    var b = (ps && ps.mode === 'clip' && ps.buf) ? ps.buf : VO.buf[key];
+    if (!b) { loadClip(key); return false; }
+    return playBuffer(b, key, (ps && ps.mode === 'clip') ? 'pack' : 'default');
   };
 
   /* 첫 터치 워밍업 — 무음 한 마디로 모바일 브라우저의 음성 잠금을 푼다 */
@@ -2715,7 +2878,8 @@ window.HP.STAGE = 2;
     opts = opts || {};
     var pri = opts.pri || 1;
     var now = Date.now();
-    var hasClip = !!(opts.clip && VO.buf[opts.clip]);
+    var ps = opts.clip ? packSource(opts.clip) : null;
+    var hasClip = ps ? (ps.mode === 'clip' || ps.mode === 'default') : !!(opts.clip && VO.buf[opts.clip]);
     var ok = !muted && (hasClip || V.available());
     V.req.push({ t: text, pri: pri, at: now, ok: ok, clip: opts.clip || null });
     if (V.req.length > 80) V.req.shift();
@@ -2828,6 +2992,954 @@ window.HP.STAGE = 2;
   };
   /* 처음부터 미리 풀어 둔다 — 첫 터치에 바로 녹음이 나가도록 (잠금은 ctx 가 푼다) */
   try { V.preload(); } catch (e) { }
+})();
+
+/* ===== 42_voice_studio.js ===== */
+/* ===== 한판 맞고 · 목소리 스튜디오 (v22) =====
+   정석호 님 요청 — "목소리를 직접 녹음해서 바꾸고, 여러 목소리 팩을 들어 보고
+   골라서 친구와 주고받을 수 있게".
+
+   · 홈의 🎙️ 목소리 버튼 → 이 화면 (1단계 AI대전 · 2단계 온라인대전 · 양이톡 안에서 모두 같다)
+   · 외침 30개마다  🎙️ 직접 녹음 · 📁 파일 올리기 · ▶ 미리듣기 · ↺ 기본 복원
+   · 목소리 팩 — 기본(정석호 님) · 기본 TTS(표준어) · 내가 만든 팩 여러 개
+     저장은 IndexedDB(hanpan_voice_v1) 가 본체, 못 쓰는 브라우저는 localStorage 로 내려간다
+   · 친구와 주고받기 — .matgovoice.json 파일 내보내기 / 불러오기
+   · 공용 서버(Firebase Realtime Database REST) — 주소를 넣으면 저장·목록·미리듣기·적용.
+     공개 저장소에 남의 DB 키를 박지 않는다 — 주소는 localStorage · URL(?vdb=) · 입력칸으로만 받는다.
+
+   40_audio.js 의 VO.pack 훅으로 재생 갈래를 바꾼다:
+     clip    이 팩에 올린 목소리
+     tts     녹음을 끄고 표준어 TTS
+     default 정석호 님 기본 녹음 (팩에 없는 항목이 자연스럽게 이어지는 자리)
+*/
+(function () {
+  'use strict';
+  var HP = window.HP;
+  if (!HP || !HP.voice || !HP.voice.rec) return;
+  var V = HP.voice, VO = V.rec;
+
+  function $(id) { return document.getElementById(id); }
+  function toast(m) { if (HP.toast) HP.toast(m); }
+
+  /* ---------- 외침 30개 (실제로 게임이 부르는 키와 1:1) ---------- */
+  var CAT = [
+    { k: 'go1', n: '1고', s: '원고' }, { k: 'go2', n: '2고', s: '투고' },
+    { k: 'go3', n: '3고', s: '쓰리고' }, { k: 'go4', n: '4고', s: '포고' },
+    { k: 'go5', n: '5고', s: '파이브고' }, { k: 'go6', n: '6고', s: '식스고' },
+    { k: 'go7', n: '7고', s: '세븐고' }, { k: 'go8', n: '8고', s: '에잇고' },
+    { k: 'stop', n: '스톱', s: '스톱이여' }, { k: 'bomb', n: '폭탄', s: '폭탄이다' },
+    { k: 'sweep', n: '쓸', s: '쓸었당께' }, { k: 'bbeok', n: '뻑', s: '아따 쌌다' },
+    { k: 'ddadak', n: '따닥', s: '따닥이여' }, { k: 'jjok', n: '쪽', s: '쪽이다' },
+    { k: '고도리', n: '고도리', s: '고도리여' }, { k: '홍단', n: '홍단', s: '홍단이다' },
+    { k: '청단', n: '청단', s: '청단이다' }, { k: '초단', n: '초단', s: '초단이다' },
+    { k: '삼광', n: '삼광', s: '삼광이여' }, { k: '사광', n: '사광', s: '사광이다' },
+    { k: '오광', n: '오광', s: '오광이여' }, { k: '비삼광', n: '비광', s: '비삼광이여' },
+    { k: 'parkPi', n: '피박', s: '피박이여' }, { k: 'parkGwang', n: '광박', s: '광박이다' },
+    { k: 'mangtta', n: '멍따', s: '멍따여' }, { k: 'shake', n: '흔들기', s: '흔들었당께' },
+    { k: 'bonus', n: '보너스', s: '보너스여' }, { k: 'bbeokFirst', n: '첫뻑', s: '첫뻑이여' },
+    { k: 'selfBbeok', n: '자뻑', s: '자뻑이다' }, { k: 'gobak', n: '고박', s: '고박이여' }
+  ];
+  var KEY_OF = {};
+  CAT.forEach(function (c) { KEY_OF[c.k] = c; });
+
+  var DB_NAME = 'hanpan_voice_v1', DB_VER = 1, S_PACKS = 'packs', S_META = 'meta';
+  var LS_KEY = 'hanpan1.voicepack', LS_CLOUD = 'hanpan1.vdb';
+  var MAX_CLIP = 600 * 1024;               // 한 항목 파일 크기 상한 (넘으면 5초 WAV 로 줄여 담는다)
+  var MAX_SEC = 5;                         // 녹음·저장 길이 상한 (초)
+  var MAX_PACK = 1.5 * 1024 * 1024;        // 공용 서버에 올릴 수 있는 팩 크기 (1.5MB)
+  var AUTHOR = '정석호 님';
+
+  var BUILTIN = [
+    { id: 'builtin:jungseogho', name: '기본 (정석호 님)', author: AUTHOR, desc: '직접 녹음한 외침 30개',
+      builtin: true, mode: 'record', clips: null },
+    { id: 'builtin:tts', name: '기본 TTS (표준어)', author: '브라우저 음성', desc: '녹음 없이 표준어 음성',
+      builtin: true, mode: 'tts', clips: null }
+  ];
+
+  var ST = {
+    packs: [], cur: 'builtin:jungseogho', cloud: '', fallback: 'default',
+    clips: {}, bufs: {}, loading: {}, inited: false, busy: false,
+    pv: 0, delId: '', cloudPacks: [], cloudMsg: '', cloudBusy: false, last: null
+  };
+  var REC = { on: false, key: null, rec: null, stream: null, chunks: [], timer: null, t0: 0 };
+  var PICK = null;      // 📁 를 누른 항목 (하나뿐인 파일 입력칸이 어느 항목으로 갈지)
+  var idb = null, idbBad = false;
+
+  /* ---------- 작은 도구 ---------- */
+  function newId() { return 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36); }
+  function packOf(id) { for (var i = 0; i < ST.packs.length; i++) if (ST.packs[i].id === id) return ST.packs[i]; return null; }
+  function activePack() { return packOf(ST.cur) || ST.packs[0] || BUILTIN[0]; }
+  function countClips(p) { return (p && p.clips) ? Object.keys(p.clips).length : 0; }
+  function customPacks() { return ST.packs.filter(function (p) { return !p.builtin; }); }
+  function bytesOf(o) { try { return new Blob([typeof o === 'string' ? o : JSON.stringify(o)]).size; } catch (e) { return JSON.stringify(o).length; } }
+  function safeName(s) { return String(s || '목소리').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 30) || '목소리'; }
+  function speakText(key) {
+    if (/^go\d$/.test(key)) { var g = V.goLine ? V.goLine(parseInt(key.slice(2), 10)) : null; return (g && g.text) || key; }
+    return V.line(key) || (KEY_OF[key] ? KEY_OF[key].s : key);
+  }
+
+  /* ---------- IndexedDB (없으면 localStorage) ---------- */
+  function openDB() {
+    return new Promise(function (res) {
+      if (idb || idbBad || !window.indexedDB) { res(idb); return; }
+      var req;
+      try { req = window.indexedDB.open(DB_NAME, DB_VER); } catch (e) { idbBad = true; res(null); return; }
+      req.onupgradeneeded = function () {
+        var d = req.result;
+        try {
+          if (!d.objectStoreNames.contains(S_PACKS)) d.createObjectStore(S_PACKS, { keyPath: 'id' });
+          if (!d.objectStoreNames.contains(S_META)) d.createObjectStore(S_META, { keyPath: 'k' });
+        } catch (e) { }
+      };
+      req.onsuccess = function () { idb = req.result; res(idb); };
+      req.onerror = function () { idbBad = true; res(null); };
+      req.onblocked = function () { };
+    });
+  }
+  function dbReq(store, mode, fn) {
+    return openDB().then(function (d) {
+      if (!d) return null;
+      return new Promise(function (res) {
+        var out = null, done = false;
+        function fin(v) { if (!done) { done = true; res(v); } }
+        try {
+          var t = d.transaction(store, mode), r = fn(t.objectStore(store));
+          if (r) { r.onsuccess = function () { out = r.result; }; }
+          t.oncomplete = function () { fin(r ? out : true); };
+          t.onerror = function () { fin(null); };
+          t.onabort = function () { fin(null); };
+        } catch (e) { fin(null); }
+      });
+    });
+  }
+  function dbAll() { return dbReq(S_PACKS, 'readonly', function (s) { return s.getAll(); }); }
+  function dbPut(rec) { return dbReq(S_PACKS, 'readwrite', function (s) { return s.put(rec); }); }
+  function dbDel(id) { return dbReq(S_PACKS, 'readwrite', function (s) { return s.delete(id); }); }
+
+  function readMeta() {
+    var o = {};
+    try { o = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch (e) { o = {}; }
+    return o;
+  }
+  function writeMeta() {
+    var o = readMeta();
+    o.cur = ST.cur; o.cloud = ST.cloud; o.fallback = ST.fallback;
+    o.packs = customPacks().map(function (p) {
+      var r = { id: p.id, name: p.name, author: p.author || '', desc: p.desc || '', created: p.created || 0, n: countClips(p) };
+      if (idbBad || !idb) r.clips = p.clips || {};
+      return r;
+    });
+    try { localStorage.setItem(LS_KEY, JSON.stringify(o)); } catch (e) { }
+  }
+  function savePack(p) {
+    p.n = countClips(p);
+    var rec = { id: p.id, name: p.name, author: p.author || '', desc: p.desc || '', created: p.created || Date.now(), n: p.n, clips: p.clips || {} };
+    return dbPut(rec).then(function (r) {
+      if (r === null) { idbBad = true; }
+      writeMeta();
+    });
+  }
+
+  function normPack(o) {
+    if (!o || !o.id) return null;
+    var clips = {};
+    if (o.clips) Object.keys(o.clips).forEach(function (k) { if (typeof o.clips[k] === 'string' && /^data:audio\//.test(o.clips[k])) clips[k] = o.clips[k]; });
+    return { id: String(o.id), name: String(o.name || '목소리 팩').slice(0, 24), author: String(o.author || '').slice(0, 20),
+      desc: String(o.desc || '').slice(0, 80), created: o.created || 0, clips: clips,
+      n: Object.keys(clips).length, builtin: false, imported: !!o.imported };
+  }
+
+  function load() {
+    var meta = readMeta();
+    ST.cur = meta.cur || 'builtin:jungseogho';
+    ST.fallback = meta.fallback === 'tts' ? 'tts' : 'default';
+    /* 공용 서버 주소 — 링크로 받은 ?vdb= 가 가장 세고, 그다음 저장해 둔 주소 */
+    var fromUrl = normCloud(paramOf('vdb') || '');
+    ST.cloud = fromUrl || normCloud(meta.cloud || '') || normCloud(localStorage.getItem(LS_CLOUD) || '') || '';
+    if (ST.cloud) { try { localStorage.setItem(LS_CLOUD, ST.cloud); } catch (e) { } }
+    return dbAll().then(function (rows) {
+      var list = [];
+      if (rows && rows.length) {
+        rows.forEach(function (r) { var p = normPack(r); if (p) list.push(p); });
+        var missKeys = (meta.packs || []).filter(function (m) { return m && m.clips && Object.keys(m.clips).length; });
+        missKeys.forEach(function (m) { if (!list.some(function (p) { return p.id === m.id; })) list.push(normPack(m)); });
+      } else {
+        (meta.packs || []).forEach(function (m) { var p = normPack(m); if (p) list.push(p); });
+      }
+      list.sort(function (a, b) { return (a.created || 0) - (b.created || 0); });
+      ST.packs = BUILTIN.concat(list);
+      if (!packOf(ST.cur)) ST.cur = BUILTIN[0].id;
+      return ST.packs;
+    });
+  }
+
+  function paramOf(name) {
+    try {
+      var txt = (location.search || '') + '&' + (location.hash || '');
+      var m = new RegExp('[?&]' + name + '=([^&#]*)').exec(txt);
+      return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
+    } catch (e) { return ''; }
+  }
+
+  /* ---------- 재생 갈래 (40_audio 의 VO.pack 이 부른다) ---------- */
+  function resolve(key) {
+    var p = activePack();
+    if (!p) return { mode: 'default' };
+    if (p.mode === 'tts') return { mode: 'tts' };
+    if (p.builtin) return { mode: 'default' };
+    if (ST.bufs[key]) return { mode: 'clip', buf: ST.bufs[key] };
+    if (p.clips && p.clips[key]) { decodeClip(key); return { mode: 'default' }; }  // 아직 푸는 중 — 기본으로 이어진다
+    return { mode: ST.fallback === 'tts' ? 'tts' : 'default' };
+  }
+
+  function audioCtx() {
+    if (V.actx) { try { return V.actx(); } catch (e) { } }
+    return null;
+  }
+  function b64Bytes(uri) {
+    var b64 = String(uri), c = b64.indexOf(',');
+    if (c >= 0) b64 = b64.slice(c + 1);
+    var bin = window.atob(b64), n = bin.length, out = new Uint8Array(n);
+    for (var i = 0; i < n; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function decodeURI(uri) {
+    return new Promise(function (res) {
+      var a = audioCtx();
+      if (!a || !a.decodeAudioData) { res(null); return; }
+      var bytes;
+      try { bytes = b64Bytes(uri); } catch (e) { res(null); return; }
+      var done = false;
+      function fin(b) { if (!done) { done = true; res(b || null); } }
+      try {
+        var p = a.decodeAudioData(bytes.buffer, fin, function () { fin(null); });
+        if (p && typeof p.then === 'function') p.then(fin, function () { fin(null); });
+      } catch (e) { fin(null); }
+      setTimeout(function () { fin(null); }, 8000);
+    });
+  }
+  function decodeBlob(blob) {
+    return new Promise(function (res) {
+      try {
+        var fr = new FileReader();
+        fr.onload = function () { decodeBytes(fr.result).then(res); };
+        fr.onerror = function () { res(null); };
+        fr.readAsArrayBuffer(blob);
+      } catch (e) { res(null); }
+    });
+  }
+  function decodeBytes(ab) {
+    return new Promise(function (res) {
+      var a = audioCtx();
+      if (!a || !a.decodeAudioData) { res(null); return; }
+      var done = false;
+      function fin(b) { if (!done) { done = true; res(b || null); } }
+      try {
+        var p = a.decodeAudioData(ab, fin, function () { fin(null); });
+        if (p && typeof p.then === 'function') p.then(fin, function () { fin(null); });
+      } catch (e) { fin(null); }
+      setTimeout(function () { fin(null); }, 8000);
+    });
+  }
+  function decodeClip(key) {
+    var p = activePack();
+    if (!p || p.builtin || !p.clips || !p.clips[key] || ST.bufs[key] || ST.loading[key]) return;
+    ST.loading[key] = true;
+    decodeURI(p.clips[key]).then(function (b) {
+      ST.loading[key] = false;
+      if (b) { ST.bufs[key] = b; }
+    });
+  }
+  function decodeAll() {
+    var p = activePack();
+    ST.bufs = {}; ST.loading = {};
+    if (!p || p.builtin || !p.clips) return;
+    Object.keys(p.clips).forEach(decodeClip);
+  }
+
+  /* ---------- 우리말 WAV 만들기 (길거나 큰 파일을 5초·모노로 줄일 때) ---------- */
+  function wavURI(buf, maxSec) {
+    var sr = 16000, n = Math.min(buf.length, Math.floor((maxSec || MAX_SEC) * buf.sampleRate));
+    var chs = buf.numberOfChannels || 1, data = new Float32Array(n), c0, c1, i;
+    c0 = buf.getChannelData(0);
+    c1 = chs > 1 ? buf.getChannelData(1) : null;
+    for (i = 0; i < n; i++) data[i] = c1 ? (c0[i] + c1[i]) / 2 : c0[i];
+    var outN = Math.max(1, Math.round(n * sr / buf.sampleRate)), out = new Float32Array(outN);
+    for (i = 0; i < outN; i++) {
+      var t = i * buf.sampleRate / sr, i0 = Math.floor(t), f = t - i0;
+      out[i] = (data[i0] || 0) * (1 - f) + (data[i0 + 1] || 0) * f;
+    }
+    var bytes = new Uint8Array(44 + outN * 2), dv = new DataView(bytes.buffer);
+    function str(off, s) { for (var j = 0; j < s.length; j++) bytes[off + j] = s.charCodeAt(j); }
+    str(0, 'RIFF'); dv.setUint32(4, 36 + outN * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, sr, true); dv.setUint32(28, sr * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+    str(36, 'data'); dv.setUint32(40, outN * 2, true);
+    for (i = 0; i < outN; i++) {
+      var s = Math.max(-1, Math.min(1, out[i]));
+      dv.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    }
+    var bin = '', CH = 0x8000;
+    for (i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+    return 'data:audio/wav;base64,' + window.btoa(bin);
+  }
+  function blobURI(blob) {
+    return new Promise(function (res) {
+      try {
+        var fr = new FileReader();
+        fr.onload = function () { res(String(fr.result)); };
+        fr.onerror = function () { res(''); };
+        fr.readAsDataURL(blob);
+      } catch (e) { res(''); }
+    });
+  }
+
+  /* ---------- 팩 저장·전환 ---------- */
+  function apply() {
+    var p = activePack();
+    ST.clips = (p && !p.builtin && p.clips) ? p.clips : {};
+    decodeAll();
+    VO.pack = { resolve: resolve, active: activePack };
+    return ST;
+  }
+  function selectPack(id) {
+    if (!packOf(id)) return false;
+    ST.cur = id; writeMeta(); apply(); render();
+    var p = activePack();
+    toast('“' + p.name + '” 팩을 적용했습니다');
+    return true;
+  }
+  function makePack(name) {
+    var nm = String(name || '').trim().slice(0, 24) || ('내 목소리 ' + (customPacks().length + 1));
+    var p = { id: newId(), name: nm, author: AUTHOR, desc: AUTHOR + ' 목소리 팩', created: Date.now(), n: 0, clips: {} };
+    ST.packs.push(p);
+    ST.cur = p.id;
+    savePack(p); apply(); render();
+    toast('“' + nm + '” 팩을 만들었습니다');
+    return p;
+  }
+  function ensureCustom() {
+    var p = activePack();
+    if (p && !p.builtin) return p;
+    return makePack('내 목소리');
+  }
+  function dupPack(id) {
+    var src = packOf(id);
+    if (!src) return null;
+    var p = { id: newId(), name: (src.name + ' 복사').slice(0, 24), author: AUTHOR,
+      desc: src.desc || '', created: Date.now(), clips: {}, n: 0 };
+    if (src.clips) Object.keys(src.clips).forEach(function (k) { p.clips[k] = src.clips[k]; });
+    ST.packs.push(p);
+    savePack(p); render();
+    toast('“' + p.name + '” 팩으로 복제했습니다');
+    return p;
+  }
+  function delPack(id) {
+    var i = -1;
+    for (var j = 0; j < ST.packs.length; j++) if (ST.packs[j].id === id) i = j;
+    if (i < 0) return false;
+    var p = ST.packs[i];
+    if (p.builtin) return false;
+    ST.packs.splice(i, 1);
+    ST.delId = '';
+    dbDel(id);
+    if (ST.cur === id) ST.cur = BUILTIN[0].id;
+    writeMeta(); apply(); render();
+    toast('“' + p.name + '” 팩을 지웠습니다');
+    return true;
+  }
+
+  /* ---------- 항목 하나 바꾸기·되돌리기 ---------- */
+  function putClip(key, uri, buf) {
+    var p = ensureCustom();
+    p.clips = p.clips || {};
+    p.clips[key] = uri;
+    if (buf) ST.bufs[key] = buf;
+    ST.clips = p.clips;
+    return savePack(p).then(function () { render(); });
+  }
+  function applyBlob(key, blob, how) {
+    var p = ensureCustom();
+    return decodeBlob(blob).then(function (buf) {
+      if (!buf) { toast('이 소리를 읽지 못했어요 — mp3·wav·m4a·ogg 파일을 써 주세요'); return false; }
+      if (buf.duration < 0.05) { toast('소리가 너무 짧습니다 — 다시 해 주세요'); return false; }
+      var keep = blob.size <= MAX_CLIP && buf.duration <= MAX_SEC + 1;
+      var uriP = keep ? blobURI(blob) : Promise.resolve(wavURI(buf, MAX_SEC));
+      return uriP.then(function (uri) {
+        if (!uri) { toast('소리를 담지 못했어요 — 다른 파일로 해 보세요'); return false; }
+        return putClip(key, uri, buf).then(function () {
+          var nm = KEY_OF[key] ? KEY_OF[key].n : key;
+          toast(nm + (how === 'record' ? ' — 녹음했습니다' : ' — 파일을 넣었습니다'));
+          return true;
+        });
+      });
+    });
+  }
+  function resetKey(key) {
+    var p = activePack();
+    if (!p || p.builtin) { toast('기본 목소리 그대로입니다'); return false; }
+    if (!p.clips || !p.clips[key]) { toast((KEY_OF[key] ? KEY_OF[key].n : key) + ' — 원래 기본 목소리입니다'); return false; }
+    delete p.clips[key];
+    delete ST.bufs[key];
+    ST.clips = p.clips;
+    savePack(p).then(render);
+    toast((KEY_OF[key] ? KEY_OF[key].n : key) + ' — 기본 목소리로 되돌렸습니다');
+    return true;
+  }
+
+  /* ---------- 미리듣기 ---------- */
+  function stopPreview() { ST.pv++; try { V.stopClips(); } catch (e) { } }
+  function previewKey(key) {
+    stopPreview();
+    V.lastText = '';
+    var r = resolve(key);
+    if (r.mode === 'tts') { V.say(speakText(key), { pri: 2, rate: 1.04, pitch: 1.08 }); return 'tts'; }
+    if (V.playClip(key)) return r.mode;
+    V.say(speakText(key), { pri: 2 });
+    return 'tts';
+  }
+  function previewClips(clips, tag) {
+    stopPreview();
+    var token = ST.pv, seq = ['go1', 'bomb', 'stop'], bufs = [], ments = [];
+    var chain = Promise.resolve();
+    seq.forEach(function (k) {
+      chain = chain.then(function () {
+        if (clips && clips[k]) return decodeURI(clips[k]).then(function (b) { if (b) { bufs.push(b); ments.push(k); } });
+        if (VO.buf[k]) { bufs.push(VO.buf[k]); ments.push(k); }
+      });
+    });
+    chain.then(function () {
+      if (!bufs.length) { toast('이 팩에는 아직 들려줄 소리가 없어요'); return; }
+      var i = 0;
+      (function next() {
+        if (token !== ST.pv || i >= bufs.length) return;
+        var b = bufs[i], key = ments[i];
+        i++;
+        V.playBuffer(b, key, tag || 'pack');
+        setTimeout(next, Math.max(340, b.duration * 1000 + 180));
+      })();
+    });
+    return true;
+  }
+  function previewPack(p) {
+    if (!p) return false;
+    if (p.mode === 'tts') {
+      stopPreview();
+      var seq = ['go1', 'bomb', 'stop'], i = 0;
+      (function next() {
+        if (i >= seq.length) return;
+        V.lastText = '';
+        V.say(speakText(seq[i]), { pri: i === 0 ? 2 : 1 });
+        i++;
+        setTimeout(next, 1100);
+      })();
+      return 'tts';
+    }
+    if (p.builtin) return previewClips(null, 'default');
+    return previewClips(p.clips, 'pack');
+  }
+
+  /* ---------- 녹음 ---------- */
+  function pickMime() {
+    if (!window.MediaRecorder || !window.MediaRecorder.isTypeSupported) return '';
+    var list = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+    for (var i = 0; i < list.length; i++) { try { if (window.MediaRecorder.isTypeSupported(list[i])) return list[i]; } catch (e) { } }
+    return '';
+  }
+  function stopStream(s) { try { (s || {}).getTracks().forEach(function (t) { t.stop(); }); } catch (e) { } }
+  function toggleRec(key) {
+    if (REC.on && REC.key === key) { stopRec(); return; }
+    if (REC.on) stopRec();
+    startRec(key);
+  }
+  function startRec(key) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+      toast('이 브라우저에서는 녹음이 안 됩니다 — 📁 파일 올리기를 써 주세요');
+      return;
+    }
+    ensureCustom();
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      var mime = pickMime(), mr = null;
+      try { mr = mime ? new window.MediaRecorder(stream, { mimeType: mime }) : new window.MediaRecorder(stream); }
+      catch (e) { try { mr = new window.MediaRecorder(stream); } catch (e2) { mr = null; } }
+      if (!mr) { stopStream(stream); toast('녹음을 시작하지 못했어요 — 📁 파일 올리기를 써 주세요'); return; }
+      REC = { on: true, key: key, rec: mr, stream: stream, chunks: [], timer: null, t0: Date.now() };
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) REC.chunks.push(e.data); };
+      mr.onstop = function () { finishRec(); };
+      try { mr.start(); } catch (e) { stopStream(stream); REC = { on: false, key: null, chunks: [] }; toast('녹음을 시작하지 못했어요'); return; }
+      REC.timer = setInterval(function () {
+        if (!REC.on) return;
+        var t = (Date.now() - REC.t0) / 1000;
+        if (t >= MAX_SEC) { stopRec(); return; }
+        renderRecBar();
+      }, 200);
+      render(); renderRecBar();
+      toast('녹음 중 — 최대 5초, 다시 누르면 끝납니다');
+    }, function (err) {
+      var denied = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError');
+      toast(denied ? '마이크 권한이 거부되었습니다 — 브라우저 설정에서 허용해 주세요'
+        : '마이크를 열지 못했어요 — 📁 파일 올리기를 써 주세요');
+    });
+  }
+  function stopRec() {
+    if (!REC.on || !REC.rec) return;
+    try { REC.rec.stop(); } catch (e) { finishRec(); }
+  }
+  function finishRec() {
+    var r = REC;
+    REC = { on: false, key: null, rec: null, stream: null, chunks: [], timer: null, t0: 0 };
+    if (r.timer) clearInterval(r.timer);
+    stopStream(r.stream);
+    var key = r.key, blob = null;
+    try { if (r.chunks && r.chunks.length) blob = new Blob(r.chunks, { type: (r.rec && r.rec.mimeType) || 'audio/webm' }); } catch (e) { blob = null; }
+    render(); renderRecBar();
+    if (!blob || !blob.size) { toast('녹음된 소리가 없습니다 — 다시 해 주세요'); return; }
+    applyBlob(key || 'go1', blob, 'record');
+  }
+
+  /* ---------- 파일 내보내기 / 불러오기 ---------- */
+  function packJSON(p) {
+    p = p || activePack();
+    return {
+      format: 'hanpan-voice-pack', version: 1,
+      name: p.name, author: p.author || AUTHOR, desc: p.desc || '',
+      created: p.created || Date.now(), app: '한판 맞고', clips: p.clips || {}
+    };
+  }
+  function exportPack(p) {
+    p = p || activePack();
+    if (p.builtin) { toast('기본 팩은 앱에 들어 있어요 — 내 팩을 만들어 내보내 주세요'); return false; }
+    var json = packJSON(p), txt = JSON.stringify(json);
+    var name = safeName(p.name) + '.matgovoice.json';
+    try {
+      var blob = new Blob([txt], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.rel = 'noopener';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { } }, 5000);
+      ST.last = { name: name, size: blob.size, json: json };
+      toast('내보냈습니다 — ' + name);
+    } catch (e) {
+      toast('내보내지 못했어요 — 브라우저 저장 공간을 확인해 주세요');
+      return false;
+    }
+    return true;
+  }
+  function importJSON(txt, fileName) {
+    var j = null;
+    try { j = JSON.parse(String(txt)); } catch (e) { j = null; }
+    if (!j || j.format !== 'hanpan-voice-pack' || !j.clips || typeof j.clips !== 'object') {
+      toast('한판 맞고 목소리 팩 파일이 아닙니다');
+      return null;
+    }
+    var clips = {}, n = 0;
+    Object.keys(j.clips).forEach(function (k) {
+      var v = j.clips[k];
+      if (typeof v === 'string' && /^data:audio\//.test(v) && v.length <= MAX_CLIP * 1.4) { clips[k] = v; n++; }
+    });
+    if (!n) { toast('팩에 쓸 수 있는 목소리가 없습니다'); return null; }
+    var p = {
+      id: newId(), name: String(j.name || (fileName || '불러온 팩')).replace(/\.matgovoice\.json$/i, '').slice(0, 24),
+      author: String(j.author || '친구').slice(0, 20), desc: String(j.desc || '').slice(0, 80),
+      created: Date.now(), clips: clips, n: n, imported: true
+    };
+    ST.packs.push(p);
+    savePack(p);
+    render();
+    toast('“' + p.name + '” 팩을 불러왔습니다 — ▶ 로 들어 보고 선택하세요');
+    return p;
+  }
+  function importFile(file) {
+    if (!file) return;
+    try {
+      var fr = new FileReader();
+      fr.onload = function () { importJSON(fr.result, file.name); };
+      fr.onerror = function () { toast('파일을 읽지 못했어요'); };
+      fr.readAsText(file);
+    } catch (e) { toast('파일을 읽지 못했어요'); }
+  }
+
+  /* ---------- 공용 서버 (Firebase Realtime Database REST) ---------- */
+  function normCloud(u) {
+    u = String(u == null ? '' : u).trim();
+    if (!u) return '';
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    u = u.replace(/\/+$/, '').replace(/\/voice_packs(\.json)?$/i, '');
+    return u;
+  }
+  var Cloud = {
+    on: function () { return !!ST.cloud; },
+    base: function () { return ST.cloud; },
+    url: function (path) { return ST.cloud + '/voice_packs' + (path ? '/' + encodeURIComponent(path) : '') + '.json'; },
+    req: function (method, path, body) {
+      var opt = { method: method, cache: 'no-store' };
+      if (body !== undefined) { opt.headers = { 'Content-Type': 'application/json' }; opt.body = JSON.stringify(body); }
+      return fetch(Cloud.url(path), opt).then(function (r) {
+        return r.text().then(function (t) {
+          var j = null;
+          try { j = t ? JSON.parse(t) : null; } catch (e) { j = null; }
+          if (!r.ok) {
+            var err = new Error('HTTP ' + r.status); err.status = r.status; err.body = t;
+            throw err;
+          }
+          return j;
+        });
+      });
+    },
+    list: function () {
+      return Cloud.req('GET').then(function (j) {
+        var out = [];
+        if (j && typeof j === 'object') {
+          Object.keys(j).forEach(function (id) {
+            var v = j[id];
+            if (!v || !v.clips) return;
+            out.push({ id: id, name: String(v.name || '이름 없는 팩').slice(0, 24), author: String(v.author || '').slice(0, 20),
+              desc: String(v.desc || '').slice(0, 80), created: v.created || 0, n: Object.keys(v.clips).length, clips: v.clips });
+          });
+        }
+        out.sort(function (a, b) { return (b.created || 0) - (a.created || 0); });
+        return out;
+      });
+    },
+    upload: function (json) { return Cloud.req('POST', null, json); },
+    get: function (id) { return Cloud.req('GET', id); },
+    remove: function (id) { return Cloud.req('DELETE', id); }
+  };
+
+  function connectCloud(url) {
+    var u = normCloud(url);
+    if (!u) { toast('서버 주소를 확인해 주세요 — https://xxx.firebaseio.com'); return Promise.resolve(false); }
+    ST.cloud = u;
+    try { localStorage.setItem(LS_CLOUD, u); } catch (e) { }
+    writeMeta(); render();
+    return loadCloud(true);
+  }
+  function disconnectCloud() {
+    ST.cloud = ''; ST.cloudPacks = []; ST.cloudMsg = '';
+    try { localStorage.removeItem(LS_CLOUD); } catch (e) { }
+    writeMeta(); render();
+    toast('공용 서버 연결을 끊었습니다');
+    return Promise.resolve(true);
+  }
+  function loadCloud(loud) {
+    if (!ST.cloud) return Promise.resolve(false);
+    ST.cloudBusy = true; ST.cloudMsg = '목록을 불러오는 중…'; renderCloud();
+    return Cloud.list().then(function (list) {
+      ST.cloudBusy = false; ST.cloudPacks = list;
+      ST.cloudMsg = list.length ? '' : '아직 올라온 팩이 없어요 — 첫 팩을 올려 보세요';
+      renderCloud();
+      if (loud) toast(list.length ? ('공용 팩 ' + list.length + '개를 불러왔습니다') : '연결되었습니다 — 아직 올라온 팩이 없어요');
+      return true;
+    }, function (err) {
+      ST.cloudBusy = false; ST.cloudPacks = [];
+      ST.cloudMsg = '목록을 불러오지 못했어요 (' + (err && err.status ? 'HTTP ' + err.status : '연결 실패') + ') — 주소와 서버 규칙을 확인해 주세요';
+      renderCloud();
+      if (loud) toast('공용 서버에 연결하지 못했어요');
+      return false;
+    });
+  }
+  function uploadCurrent() {
+    if (!ST.cloud) { toast('공용 서버 주소를 먼저 연결해 주세요'); return Promise.resolve(false); }
+    var p = activePack();
+    if (p.builtin) { toast('기본 팩은 올릴 수 없어요 — 내 팩을 만들어 주세요'); return Promise.resolve(false); }
+    if (!countClips(p)) { toast('올릴 목소리가 없어요 — 먼저 녹음하거나 파일을 올려 주세요'); return Promise.resolve(false); }
+    var json = packJSON(p), size = bytesOf(json);
+    if (size > MAX_PACK) {
+      toast('팩이 너무 큽니다 (' + Math.round(size / 1024) + 'KB) — 1.5MB 이하로 줄여 주세요');
+      return Promise.resolve(false);
+    }
+    ST.cloudBusy = true; renderCloud();
+    return Cloud.upload(json).then(function () {
+      ST.cloudBusy = false;
+      return loadCloud(false).then(function () {
+        toast('“' + p.name + '” 팩을 공용 서버에 올렸습니다');
+        return true;
+      });
+    }, function (err) {
+      ST.cloudBusy = false; renderCloud();
+      toast('올리지 못했어요 (' + (err && err.status ? 'HTTP ' + err.status : '연결 실패') + ') — 서버 쓰기 규칙을 확인해 주세요');
+      return false;
+    });
+  }
+  function cloudApply(id, name) {
+    return Cloud.get(id).then(function (j) {
+      if (!j || !j.clips) { toast('팩을 받지 못했어요'); return false; }
+      return importJSON(JSON.stringify({
+        format: 'hanpan-voice-pack', version: 1, name: (j.name || name || '공용 팩'),
+        author: j.author || '공용', desc: j.desc || '', created: j.created || Date.now(), clips: j.clips
+      }), null);
+    }).then(function (p) {
+      if (p) selectPack(p.id);
+      return !!p;
+    }, function () { toast('팩을 받지 못했어요 — 연결을 확인해 주세요'); return false; });
+  }
+
+  /* ---------- 화면 ---------- */
+  function curSub(p) {
+    if (!p) return '';
+    if (p.mode === 'tts') return '녹음 없이 브라우저 표준어 음성으로 나갑니다';
+    if (p.builtin) return '정석호 님 녹음 30개가 그대로 나갑니다';
+    var n = countClips(p);
+    return n + '개 항목 녹음 · 나머지는 ' + (ST.fallback === 'tts' ? '표준어 TTS' : '정석호 님 기본 목소리');
+  }
+  function itemState(key) {
+    var p = activePack();
+    if (!p) return { t: 'default', label: '기본' };
+    if (p.mode === 'tts') return { t: 'tts', label: 'TTS' };
+    if (p.builtin) return { t: 'default', label: '기본' };
+    if (p.clips && p.clips[key]) return { t: 'pack', label: '내 목소리' };
+    return ST.fallback === 'tts' ? { t: 'tts', label: 'TTS' } : { t: 'default', label: '기본' };
+  }
+
+  function renderHomeLabel() {
+    var el = $('voicePackName');
+    if (!el) return;
+    var p = activePack();
+    el.textContent = p ? p.name : '기본 (정석호 님)';
+  }
+
+  function renderPacks() {
+    var box = $('vsPackList');
+    if (!box) return;
+    var html = '';
+    ST.packs.forEach(function (p) {
+      var on = p.id === ST.cur;
+      var tag = p.builtin ? '<span class="vsTag">내장</span>' : (p.imported ? '<span class="vsTag imp">불러옴</span>' : '<span class="vsTag mine">내 팩</span>');
+      var n = p.mode === 'tts' ? 'TTS' : (countClips(p) + '/30');
+      html += '<div class="vsPack' + (on ? ' on' : '') + '" data-id="' + p.id + '">' +
+        '<div class="vsPackTop"><div class="vsPackName">' + esc(p.name) + ' ' + tag + '</div>' +
+        '<div class="vsPackMeta">' + esc(p.author || '') + ' · ' + n + '</div></div>' +
+        '<div class="vsPackActs">' +
+        '<button class="vsPAct" data-pact="preview" data-id="' + p.id + '">▶ 들어보기</button>' +
+        (on ? '<button class="vsPAct cur" data-pact="sel" data-id="' + p.id + '">적용중</button>'
+          : '<button class="vsPAct pick" data-pact="sel" data-id="' + p.id + '">선택</button>') +
+        '<button class="vsPAct" data-pact="dup" data-id="' + p.id + '">복제</button>' +
+        (p.builtin ? '' : (ST.delId === p.id
+          ? '<button class="vsPAct del" data-pact="del" data-id="' + p.id + '">정말 삭제</button>'
+          : '<button class="vsPAct" data-pact="delask" data-id="' + p.id + '">삭제</button>')) +
+        '</div></div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function renderCloud() {
+    var box = $('vsCloudState');
+    if (!box) return;
+    var url = $('vsCloudUrl');
+    if (url && document.activeElement !== url) url.value = ST.cloud || '';
+    $('vsPackN').textContent = ST.packs.length;
+    var up = $('vsCloudUpload'), off = $('vsCloudOff'), rf = $('vsCloudReload');
+    if (!ST.cloud) {
+      box.className = 'vsCloudState off';
+      box.innerHTML = '공용 서버 주소가 아직 연결되지 않았어요 · 아래 ‘내보내기/불러오기’로 친구와 바로 주고받을 수 있어요';
+      if (up) up.classList.add('hidden');
+      if (off) off.classList.add('hidden');
+      if (rf) rf.classList.add('hidden');
+      $('vsCloudList').innerHTML = '';
+      return;
+    }
+    box.className = 'vsCloudState ok';
+    var host = ST.cloud.replace(/^https?:\/\//i, '');
+    box.innerHTML = '연결됨 · <b>' + esc(host) + '</b>' + (ST.cloudMsg ? '<br><span class="vsMsg">' + esc(ST.cloudMsg) + '</span>' : '');
+    if (up) up.classList.remove('hidden');
+    if (off) off.classList.remove('hidden');
+    if (rf) rf.classList.remove('hidden');
+    var box2 = $('vsCloudList');
+    if (!ST.cloudPacks.length) { box2.innerHTML = ''; return; }
+    var html = '';
+    ST.cloudPacks.forEach(function (p) {
+      html += '<div class="vsCp" data-cid="' + p.id + '">' +
+        '<div class="vsCpTop"><b>' + esc(p.name) + '</b><span>' + esc(p.author || '') + ' · ' + p.n + '개</span></div>' +
+        '<div class="vsCpActs"><button class="vsPAct" data-cact="preview" data-cid="' + p.id + '">▶ 미리듣기</button>' +
+        '<button class="vsPAct pick" data-cact="apply" data-cid="' + p.id + '">내 게임에 적용</button></div></div>';
+    });
+    box2.innerHTML = html;
+  }
+
+  function renderItems() {
+    var box = $('vsItems');
+    if (!box) return;
+    var html = '';
+    CAT.forEach(function (c) {
+      var st = itemState(c.k);
+      var rec = REC.on && REC.key === c.k;
+      html += '<div class="vsItem' + (st.t === 'pack' ? ' mine' : '') + '" data-key="' + c.k + '">' +
+        '<div class="vsK"><b>' + c.n + '</b><small>' + c.s + '</small></div>' +
+        '<div class="vsSt ' + st.t + '">' + (rec ? '● 녹음중' : st.label) + '</div>' +
+        '<div class="vsActs">' +
+        '<button class="vsAct' + (rec ? ' on' : '') + '" data-act="rec" data-key="' + c.k + '" aria-label="' + c.n + ' 녹음">' + (rec ? '■' : '🎙️') + '</button>' +
+        '<button class="vsAct" data-act="file" data-key="' + c.k + '" aria-label="' + c.n + ' 파일 올리기">📁</button>' +
+        '<button class="vsAct" data-act="play" data-key="' + c.k + '" aria-label="' + c.n + ' 미리듣기">▶</button>' +
+        '<button class="vsAct" data-act="reset" data-key="' + c.k + '" aria-label="' + c.n + ' 기본 복원">↺</button>' +
+        '</div></div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function renderRecBar() {
+    var bar = $('vsRecBar');
+    if (!bar) return;
+    if (!REC.on) { bar.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
+    var t = Math.min(MAX_SEC, (Date.now() - REC.t0) / 1000);
+    var nm = KEY_OF[REC.key] ? KEY_OF[REC.key].n : REC.key;
+    bar.innerHTML = '<b>● 녹음 중</b> <span>' + nm + '</span> <em>' + t.toFixed(1) + '초 / 최대 ' + MAX_SEC + '초</em> <i>다시 누르면 끝납니다</i>';
+  }
+
+  function renderFb() {
+    var d = $('vsFbDef'), t = $('vsFbTts');
+    if (!d || !t) return;
+    d.classList.toggle('on', ST.fallback !== 'tts');
+    t.classList.toggle('on', ST.fallback === 'tts');
+    d.setAttribute('aria-checked', ST.fallback !== 'tts' ? 'true' : 'false');
+    t.setAttribute('aria-checked', ST.fallback === 'tts' ? 'true' : 'false');
+  }
+
+  function render() {
+    if (!$('studio')) return;
+    var p = activePack();
+    if ($('vsCurName')) $('vsCurName').textContent = p ? p.name : '기본 (정석호 님)';
+    if ($('vsCurSub')) $('vsCurSub').textContent = curSub(p);
+    if ($('vsPackN')) $('vsPackN').textContent = ST.packs.length;
+    renderPacks(); renderCloud(); renderItems(); renderRecBar(); renderFb(); renderHomeLabel();
+  }
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  }); }
+
+  /* ---------- 열기·닫기 ---------- */
+  function open() {
+    if (HP.show) HP.show('studio');
+    render();
+    if (ST.cloud) loadCloud(false);
+    return true;
+  }
+  function close() {
+    stopPreview();
+    if (REC.on) stopRec();
+    if (HP.show) { HP.show('home'); }
+    if (HP.renderHome) HP.renderHome();
+  }
+
+  /* ---------- 연결 ---------- */
+  function bind() {
+    var back = $('vsBack');
+    if (back) back.addEventListener('click', function () { HP.play && HP.play('click'); close(); });
+
+    var list = $('vsPackList');
+    if (list) list.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-pact]') : null;
+      if (!b) return;
+      var id = b.getAttribute('data-id'), act = b.getAttribute('data-pact');
+      var p = packOf(id);
+      if (!p) return;
+      if (act === 'preview') { previewPack(p); return; }
+      if (act === 'sel') { if (ST.cur !== id) selectPack(id); return; }
+      if (act === 'dup') { dupPack(id); return; }
+      if (act === 'delask') { ST.delId = id; renderPacks(); return; }
+      if (act === 'del') { delPack(id); return; }
+    });
+
+    var nb = $('vsNew');
+    if (nb) nb.addEventListener('click', function () {
+      var nm = $('vsNewName') ? $('vsNewName').value : '';
+      makePack(nm);
+      if ($('vsNewName')) $('vsNewName').value = '';
+    });
+
+    var ex = $('vsExport');
+    if (ex) ex.addEventListener('click', function () { exportPack(); });
+    var ib = $('vsImportBtn'), ifl = $('vsImport');
+    if (ib && ifl) ib.addEventListener('click', function () { ifl.click(); });
+    if (ifl) ifl.addEventListener('change', function () { var f = ifl.files && ifl.files[0]; ifl.value = ''; if (f) importFile(f); });
+
+    var fd = $('vsFbDef'), ft = $('vsFbTts');
+    if (fd) fd.addEventListener('click', function () { ST.fallback = 'default'; writeMeta(); apply(); render(); toast('팩에 없는 항목은 정석호 님 목소리로 나갑니다'); });
+    if (ft) ft.addEventListener('click', function () { ST.fallback = 'tts'; writeMeta(); apply(); render(); toast('팩에 없는 항목은 표준어 TTS 로 나갑니다'); });
+
+    var cc = $('vsCloudConnect');
+    if (cc) cc.addEventListener('click', function () {
+      var u = $('vsCloudUrl') ? $('vsCloudUrl').value : '';
+      connectCloud(u);
+    });
+    var co = $('vsCloudOff');
+    if (co) co.addEventListener('click', function () { disconnectCloud(); });
+    var cr = $('vsCloudReload');
+    if (cr) cr.addEventListener('click', function () { loadCloud(true); });
+    var cu = $('vsCloudUpload');
+    if (cu) cu.addEventListener('click', function () { uploadCurrent(); });
+
+    var cl = $('vsCloudList');
+    if (cl) cl.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-cact]') : null;
+      if (!b) return;
+      var id = b.getAttribute('data-cid'), act = b.getAttribute('data-cact');
+      var p = null;
+      ST.cloudPacks.forEach(function (x) { if (x.id === id) p = x; });
+      if (!p) return;
+      if (act === 'preview') { previewClips(p.clips, 'cloud'); return; }
+      if (act === 'apply') { cloudApply(id, p.name); return; }
+    });
+
+    var items = $('vsItems');
+    if (items) items.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-act]') : null;
+      if (!b) return;
+      var key = b.getAttribute('data-key'), act = b.getAttribute('data-act');
+      if (act === 'rec') { toggleRec(key); return; }
+      if (act === 'file') {
+        PICK = key;
+        var fi = $('vsFile');
+        if (fi) fi.click();
+        return;
+      }
+      if (act === 'play') { previewKey(key); return; }
+      if (act === 'reset') { resetKey(key); return; }
+    });
+    var fi2 = $('vsFile');
+    if (fi2) fi2.addEventListener('change', function () {
+      var f = fi2.files && fi2.files[0];
+      fi2.value = '';
+      var key = PICK; PICK = null;
+      if (f && key) applyBlob(key, f, 'file');
+    });
+  }
+
+  function init() {
+    return load().then(function () {
+      apply();
+      bind();
+      render();
+      ST.inited = true;
+      return ST;
+    });
+  }
+
+  /* ---------- 바깥에 내주는 것 (다른 모듈·검사에서 씀) ---------- */
+  HP.voiceStudio = {
+    init: init, open: open, close: close, render: render,
+    cat: function () { return CAT.slice(); },
+    packs: function () { return ST.packs.slice(); },
+    cur: function () { return ST.cur; },
+    curName: function () { var p = activePack(); return p ? p.name : ''; },
+    clips: function () { return ST.clips; },
+    state: function () {
+      return { cur: ST.cur, cloud: ST.cloud, fallback: ST.fallback, rec: REC.on, recKey: REC.key,
+        packs: ST.packs.map(function (p) { return { id: p.id, name: p.name, builtin: !!p.builtin, mode: p.mode || 'record', n: countClips(p) }; }),
+        clips: Object.keys(ST.clips || {}), bufs: Object.keys(ST.bufs || {}), cloudPacks: ST.cloudPacks.length };
+    },
+    resolve: resolve, select: selectPack, make: makePack, dup: dupPack, del: delPack,
+    applyFile: applyBlob, resetKey: resetKey, previewKey: previewKey, previewPack: previewPack,
+    export: exportPack, importJSON: importJSON, importFile: importFile, lastExport: function () { return ST.last; },
+    cloud: Cloud, connect: connectCloud, disconnect: disconnectCloud, loadCloud: loadCloud, upload: uploadCurrent,
+    cloudPacks: function () { return ST.cloudPacks.slice(); },
+    CAT: CAT
+  };
 })();
 
 /* ===== 45_fx.js ===== */
@@ -3379,7 +4491,7 @@ window.HP.STAGE = 2;
   function show(name) {
     var prev = APP.screen;
     APP.screen = name;
-    ['home', 'table', 'gallery', 'rules', 'lobby'].forEach(function (s) {
+    ['home', 'table', 'gallery', 'rules', 'lobby', 'studio'].forEach(function (s) {
       var el = $(s);
       if (el) el.classList.toggle('active', s === name);
     });
@@ -3451,6 +4563,10 @@ window.HP.STAGE = 2;
     $('challengeStake').textContent = '판돈 ' + fmt(stakeNow()) + '냥';
     $('galCount').textContent = d.unlocked.length + '/50';
     $('statLine').textContent = '도전 ' + d.stats.games + '회 · 승 ' + d.stats.wins + ' · 올인 ' + d.stats.allins;
+    if (HP.voiceStudio && HP.voiceStudio.curName) {
+      var vp = $('voicePackName');
+      if (vp) vp.textContent = HP.voiceStudio.curName() || '기본 (정석호 님)';
+    }
     document.querySelectorAll('#diffRow .diff').forEach(function (b) {
       b.classList.toggle('active', b.dataset.level === APP.level);
       b.setAttribute('aria-checked', b.dataset.level === APP.level ? 'true' : 'false');
@@ -4753,6 +5869,11 @@ window.HP.STAGE = 2;
     });
     $('btnGallery').addEventListener('click', function () { show('gallery'); renderGallery(); });
     $('btnRules').addEventListener('click', function () { show('rules'); });
+    var vb = $('btnVoice');
+    if (vb) vb.addEventListener('click', function () {
+      HP.play('click');
+      if (HP.voiceStudio && HP.voiceStudio.open) HP.voiceStudio.open(); else show('studio');
+    });
     $('btnGalBack').addEventListener('click', function () { show('home'); renderHome(); });
     $('btnRulesBack').addEventListener('click', function () { show('home'); renderHome(); });
     $('btnSoundHome').addEventListener('click', toggleSound);
@@ -6922,6 +8043,9 @@ window.HP.STAGE = 2;
     } catch (e) { console.error('sprite', e); }
     HP.loadStore();
     HP.bindUI();
+    if (HP.voiceStudio && HP.voiceStudio.init) {
+      try { HP.voiceStudio.init(); } catch (e) { console.error('voiceStudio', e); }
+    }
     if (HP.online && HP.online.boot) HP.online.boot();
     HP.show('home');
     HP.renderHome();
