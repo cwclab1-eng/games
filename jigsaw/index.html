@@ -2108,17 +2108,20 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   }
 
   /* ---------------- 6. 스냅 ---------------- */
-  /* 그룹을 tol(보드 단위) 안에서 가장 가까운 정답 위치로 붙인다.
-     ① 정답 절대 좌표 ② 이웃 그룹과의 정확한 상대 위치 — 둘 다 아니면 그대로 둔다. */
-  function trySnap(s, gid, tol) {
-    var g = s.groups[gid];
-    if (!g) return { snapped: false };
+  /* 그룹이 tol(보드 단위) 안에서 붙을 수 있는 가장 가까운 정답 자리(상태는 그대로 둔다).
+     ① 정답 절대 좌표 ② 이웃 그룹과의 정확한 상대 위치 — 둘 다 아니면 null.
+     반환: { x, y, absolute, d } — x,y 는 그룹 앵커의 좌표.
+
+     화면(드래그) 쪽도 이 함수를 그대로 써서 '지금 놓으면 어디에 붙는지'를 미리 보여 준다.
+     판정과 미리보기가 같은 함수를 쓰므로 "빛나는 자리에 찰싹"이 구조적으로 보장된다. */
+  J.snapCandidate = function (s, gid, tol) {
+    var g = s && s.groups ? s.groups[gid] : null;
+    if (!g || !(tol > 0)) return null;
     var a = s.pieces[g.anchor];
     var ax = a.c * s.pw, ay = a.r * s.ph;
-    if (Math.abs(g.x - ax) <= tol && Math.abs(g.y - ay) <= tol) {
-      g.x = ax; g.y = ay;
-      var m1 = coalesce(s);
-      return { snapped: true, absolute: true, merged: m1 };
+    var dx0 = Math.abs(g.x - ax), dy0 = Math.abs(g.y - ay);
+    if (dx0 <= tol && dy0 <= tol) {
+      return { x: ax, y: ay, absolute: true, d: Math.max(dx0, dy0) };
     }
     var best = null, k, d, pid, p, q, qp, qpos, rx, ry, dd;
     for (k = 0; k < g.pieces.length; k++) {
@@ -2133,15 +2136,46 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         rx = qpos.x + (p.c - qp.c) * s.pw - (p.c - a.c) * s.pw;
         ry = qpos.y + (p.r - qp.r) * s.ph - (p.r - a.r) * s.ph;
         dd = Math.max(Math.abs(rx - g.x), Math.abs(ry - g.y));
-        if (dd <= tol && (!best || dd < best.d)) best = { d: dd, x: rx, y: ry };
+        if (dd <= tol && (!best || dd < best.d)) best = { d: dd, x: rx, y: ry, absolute: false };
       }
     }
-    if (best) {
-      g.x = best.x; g.y = best.y;
-      var m2 = coalesce(s);
-      return { snapped: true, absolute: false, merged: m2 };
+    return best;
+  };
+
+  /* 아직 트레이에 있는 낱개 조각을 (x,y)(좌상단)에 놓으려 할 때 붙을 자리.
+     드래그 중 미리보기 전용 — 보드에 이미 놓인 이웃 조각과의 상대 위치만 본다. */
+  J.pieceSnapCandidate = function (s, pid, x, y, tol) {
+    if (!s || !(tol > 0)) return null;
+    var p = s.pieces[pid | 0];
+    if (!p) return null;
+    var ax = p.c * s.pw, ay = p.r * s.ph;
+    var dx0 = Math.abs(x - ax), dy0 = Math.abs(y - ay);
+    if (dx0 <= tol && dy0 <= tol) return { x: ax, y: ay, absolute: true, d: Math.max(dx0, dy0) };
+    var best = null, d, q, qp, qpos, rx, ry, dd;
+    for (d = 0; d < 4; d++) {
+      q = J.neighbor(s, pid, DIRS[d]);
+      if (q == null) continue;
+      qp = s.pieces[q];
+      if (!qp.g) continue;
+      qpos = J.piecePos(s, q);
+      if (!qpos) continue;
+      rx = qpos.x - (p.c - qp.c) * s.pw;
+      ry = qpos.y - (p.r - qp.r) * s.ph;
+      dd = Math.max(Math.abs(rx - x), Math.abs(ry - y));
+      if (dd <= tol && (!best || dd < best.d)) best = { d: dd, x: rx, y: ry, absolute: false };
     }
-    return { snapped: false };
+    return best;
+  };
+
+  /* 그룹을 tol 안의 정답 자리로 자석처럼 붙인다(없으면 그대로). */
+  function trySnap(s, gid, tol) {
+    var g = s.groups[gid];
+    if (!g) return { snapped: false };
+    var c = J.snapCandidate(s, gid, tol);
+    if (!c) return { snapped: false };
+    g.x = c.x; g.y = c.y;
+    var m = coalesce(s);
+    return { snapped: true, absolute: !!c.absolute, merged: m };
   }
 
   /* ---------------- 7. 완성·진행률 ---------------- */
@@ -2872,6 +2906,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   /* ---------- 조각 비트맵 ---------- */
   function pieceMargin(s) { return 0.22 * Math.min(s.pw, s.ph) * 1.2 + 3; }
+  /* 조각 하나가 차지하는 보드 단위 크기(돌기 여백 포함) — 드래그 고스트를 보드와 1:1로 그릴 때 쓴다 */
+  R.pieceBox = function (s) {
+    var m = pieceMargin(s);
+    return { m: m, w: s.pw + 2 * m, h: s.ph + 2 * m };
+  };
 
   function patternFor(ctx, s) {
     if (!R.imgReady) return null;
@@ -2988,7 +3027,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   /**
    * @param s  직소 상태
-   * @param ui {guide, drag:{gid,lift}, rings:[{x,y,t0}], shake:{gid,t0}, pop:[{pid,t0}]}
+   * @param ui {guide, drag:{gid}, rings:[{x,y,t0}], shake:{gid,t0}, magnet:{anchor,pieces,x,y}}
+   *           · drag.gid  : 지금 끌고 있는 그룹(그림자·맨 위) — 위치는 이미 상태에 반영돼 있다
+   *           · magnet    : 지금 놓으면 붙을 자리(미리보기). (x,y) = 앵커의 좌상단
    * @param t  현재 시각(ms)
    */
   R.draw = function (s, ui, t) {
@@ -3034,9 +3075,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     }
 
     var dragGid = ui.drag ? ui.drag.gid : 0;
-    var lift = ui.drag ? (ui.drag.lift == null ? R.lift : ui.drag.lift) : 0;
     var shake = ui.shake && (t - ui.shake.t0) < 220 ? ui.shake : null;
     var i, k, g, e, q, offX = 0, offY = 0;
+    var pm = pieceMargin(s);          // 비트맵이 정답 칸보다 여백(pm)만큼 크게 구워져 있다
 
     /* 그룹 그리기 — 순서는 J.zOrder 하나로만 정한다.
        제자리 그룹(바닥) → 조각 수 적은 그룹 → 큰 그룹 → 끌고 있는 그룹(맨 위). */
@@ -3047,7 +3088,6 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       if (!g) continue;
       var isDrag = dragGid && g.id === dragGid;
       offX = 0; offY = 0;
-      if (isDrag) offY = -lift;
       if (shake && shake.gid === g.id) offX = Math.sin((t - shake.t0) / 18) * 2.4 * (1 - (t - shake.t0) / 220);
 
       // 제자리에 맞은 그룹은 조각 윤곽을 따라 은은한 금빛 (완성 힌트)
@@ -3073,7 +3113,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         if (!q) continue;
         e = R.bitmap(s, pid);
         if (!e) continue;
-        var dx = q.x * sc + px + offX, dy = q.y * sc + py + offY;
+        // 비트맵의 (0,0)은 보드 좌표 (정답칸 - 여백) 이다 → 여백만큼 당겨서 그려야
+        //  조각 그림·윤곽이 '상태의 좌표'와 정확히 일치한다(가이드·힌트와 어긋남 0).
+        var dx = (q.x - pm) * sc + px + offX, dy = (q.y - pm) * sc + py + offY;
         var dw = e.bw * sc, dh = e.bh * sc;
         if (isDrag) {
           c.save();
@@ -3086,6 +3128,31 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
           c.drawImage(e.cv, dx, dy, dw, dh);
         }
       }
+    }
+
+    // 자석 미리보기 — 지금 놓으면 붙을 자리를 금빛 윤곽으로 은은히 비춘다
+    if (ui.magnet && ui.magnet.pieces && ui.magnet.pieces.length) {
+      var mg = ui.magnet;
+      var ma = s.pieces[mg.anchor != null ? mg.anchor : mg.pieces[0]];
+      var mpulse = 0.55 + 0.35 * Math.sin(t / 190);
+      c.save();
+      c.shadowColor = 'rgba(255,214,102,.95)';
+      c.shadowBlur = Math.max(6, sc * 16);
+      c.strokeStyle = 'rgba(255,226,150,' + mpulse.toFixed(3) + ')';
+      c.lineWidth = Math.max(1.6, sc * 7 / R.dpr);
+      for (k = 0; k < mg.pieces.length; k++) {
+        var mpid = mg.pieces[k];
+        var mp = s.pieces[mpid];
+        var mpath = R.paths[mpid];
+        if (!mp || !mpath || !ma) continue;
+        var mx = mg.x + (mp.c - ma.c) * s.pw, my = mg.y + (mp.r - ma.r) * s.ph;
+        c.setTransform(R.dpr * sc, 0, 0, R.dpr * sc,
+                       R.dpr * (px + (mx - mp.c * s.pw) * sc),
+                       R.dpr * (py + (my - mp.r * s.ph) * sc));
+        c.stroke(mpath);
+      }
+      c.restore();
+      c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
     }
 
     // 스냅 빛 파동
@@ -5400,10 +5467,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   var cur = { stage: 1, rank: 'easy' };
   var U = {
     guide: 0.25, filter: 'all', sortBy: 'shape',
-    rings: [], sparks: [], shake: null, preview: false,
+    rings: [], sparks: [], shake: null, preview: false, magnet: null,
     doneAt: 0, colors: null, now: 0, lastSave: 0, lastHud: 0, zoomTip: 0
   };
-  var D = { gid: 0, px0: 0, py0: 0, gx0: 0, gy0: 0, moved: false, id: null, sx0: 0, sy0: 0 };
+  var D = { gid: 0, px0: 0, py0: 0, gx0: 0, gy0: 0, moved: false, id: null, sx0: 0, sy0: 0,
+            bx: 0, by: 0, liftT0: 0 };
   var P = { ptr: {}, pinch: null, pan: null };
   var items = {}, resultOpen = false, ghost = null;
   var BOX_ALL = { x0: -400, y0: -400, x1: 1400, y1: 1400 };
@@ -5416,9 +5484,14 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
   /* ---------------- dp·좌표 유틸 ---------------- */
+  /* 자석 스냅 허용 반경(보드 단위).
+     조각 화면 크기의 36%, 최소 26dp·최대 46dp.
+     예전 14dp 고정은 폰에서 너무 좁아 "눈으로 거의 맞닿았는데도 안 붙는" 일이 잦았다. */
   function tolBoard() {
-    // 14dp 허용 반경 → 보드 단위 (줌이 커지면 화면 기준으로 좁아진다)
-    return 14 / Math.max(0.02, R.fit * R.view.zoom);
+    var sc = Math.max(0.02, R.fit * R.view.zoom);        // CSS px / 보드 단위
+    var piece = (S ? Math.min(S.pw, S.ph) : 200) * sc;   // 조각 한 변의 화면 크기
+    var px = Math.max(26, Math.min(46, piece * 0.36));
+    return px / sc;
   }
   function safeBox() {
     var a = R.toBoard(0, 0), b = R.toBoard(R.cssW, R.cssH);
@@ -5467,10 +5540,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     C.active = true;
     resultOpen = false;
 
-    U.rings = []; U.sparks = []; U.shake = null; U.preview = false;
+    U.rings = []; U.sparks = []; U.shake = null; U.preview = false; U.magnet = null;
     U.doneAt = 0; U.colors = null; U.filter = 'all'; U.sortBy = 'shape';
     U.guide = Store.settings.guide == null ? 0.25 : Store.settings.guide;
-    D.gid = 0; D.moved = false; P.ptr = {}; P.pinch = null; P.pan = null;
+    D.gid = 0; D.moved = false; D.liftT0 = 0; P.ptr = {}; P.pinch = null; P.pan = null;
     items = {};
 
     $('#playTitle').textContent = st.title;
@@ -5551,10 +5624,44 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (!S) return;
     R.draw(S, {
       guide: U.guide, preview: U.preview,
-      drag: D.gid ? { gid: D.gid, lift: R.lift } : null,
+      drag: D.gid ? { gid: D.gid } : null,
+      magnet: U.magnet,
       rings: U.rings, sparks: U.sparks, shake: U.shake,
       doneAt: U.doneAt
     }, U.now || now());
+  }
+
+  /* ---------------- 드래그 들림(lift) ----------------
+     조각은 손가락에 가려 보이지 않으니 잡으면 조금(기본 26px) 들려 위에 그린다.
+     이때 **그룹 좌표 자체를 그만큼 올려 둔다** — 즉 "화면에 보이는 자리 == 상태의 자리".
+     그래서 손을 뗀 순간의 판정·자석 스냅이 사용자가 눈으로 맞춘 바로 그 자리에서 일어난다.
+     (예전에는 상태는 손가락 밑, 그림만 26px 위 → 눈으로 맞춰 놓고 손을 떼면 26px 떨어져
+      힌트·가이드와 어긋난 채 멈췄다 — 2026-11-28 수정) */
+  function liftPx() {
+    var k = D.liftT0 ? (now() - D.liftT0) / 110 : 1;
+    return R.lift * Math.min(1, Math.max(0, k));
+  }
+  function liftBoard() { return liftPx() / Math.max(0.02, R.scale()); }
+
+  /* 끌고 있는 그룹을 '손가락 이동량 - 들림' 자리에 둔다(화면에 보이는 그 자리) */
+  function applyDragPos() {
+    if (!S || !D.gid || !D.moved) return;
+    J.applyAction(S, {
+      type: 'dragMove', gid: D.gid,
+      x: D.gx0 + (D.bx - D.px0),
+      y: D.gy0 + (D.by - D.py0) - liftBoard(),
+      box: safeBox()
+    });
+  }
+
+  /* 지금 놓으면 자석처럼 붙을 자리를 미리 잡아 둔다(판정과 같은 함수를 쓴다) */
+  function refreshMagnet() {
+    U.magnet = null;
+    if (!S || !D.gid || !D.moved) return;
+    var g = S.groups[D.gid];
+    if (!g) return;
+    var c = J.snapCandidate(S, D.gid, tolBoard());
+    if (c) U.magnet = { anchor: g.anchor, pieces: g.pieces.slice(), x: c.x, y: c.y, d: c.d };
   }
 
   function updateHud() {
@@ -5633,6 +5740,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     e.preventDefault();
     SFX.unlock();
     var startX = e.clientX, startY = e.clientY, dragging = false, scrolling = false;
+    var lastX = startX, lastY = startY, gw = 0, gh = 0;
     var SLOP = 6, TAP_SLOP = 16;
     try { node.setPointerCapture(e.pointerId); } catch (err) {}
     var sz = itemSize();
@@ -5645,15 +5753,40 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     } catch (err) { axis = 'x'; }
 
     function makeGhost() {
-      var im = R.thumb(S, pid, sz.w * 1.5, sz.h * 1.5, Math.min(2, root.devicePixelRatio || 2));
+      // 보드와 1:1 배율로 그린다 — 눈으로 가이드/힌트에 맞춘 그 자리에 그대로 놓인다
+      var pb = R.pieceBox(S), sc = R.scale();
+      gw = pb.w * sc; gh = pb.h * sc;
+      var im = R.thumb(S, pid, pb.w, pb.h, Math.min(2, root.devicePixelRatio || 2));
       im.className = 'drag-ghost';
-      im.style.width = sz.w * 1.5 + 'px';
-      im.style.height = 'auto';
+      im.style.width = gw + 'px';
+      im.style.height = gh + 'px';
       doc.body.appendChild(im);
       return im;
     }
+    /* 고스트 = 손가락에서 lift 만큼 띄운 조각. 이 중심이 곧 놓일 자리다. */
+    function ghostCenter() { return { x: lastX, y: lastY - R.lift }; }
+    function ghostAt() {
+      if (!ghost) return;
+      ghost.style.left = (lastX - gw / 2) + 'px';
+      ghost.style.top = (lastY - R.lift - gh / 2) + 'px';
+      var r = R.canvas.getBoundingClientRect();
+      var cx = lastX - r.left, cy = lastY - R.lift - r.top;
+      ghost.classList.toggle('over', cx > 0 && cx < r.width && cy > 0 && cy < r.height);
+    }
+    /* 놓일 자리가 지금 자석으로 붙을 자리인지 미리 보여 준다(보드 드래그와 같은 판정) */
+    function ghostMagnet() {
+      if (!S) return;
+      var r = R.canvas.getBoundingClientRect();
+      var c = ghostCenter();
+      var b = R.toBoard(c.x - r.left, c.y - r.top);
+      var cand = J.pieceSnapCandidate(S, pid, b[0] - S.pw / 2, b[1] - S.ph / 2, tolBoard());
+      var was = U.magnet;
+      U.magnet = cand ? { anchor: pid, pieces: [pid], x: cand.x, y: cand.y, d: cand.d } : null;
+      if (!!was !== !!U.magnet || (was && U.magnet && (was.x !== U.magnet.x || was.y !== U.magnet.y))) draw();
+    }
     function place(x, y) {
       if (ghost) { ghost.remove(); ghost = null; }
+      U.magnet = null;
       var b = R.toBoard(x, y);
       var res = J.applyAction(S, {
         type: 'take', pid: pid, x: b[0] - S.pw / 2, y: b[1] - S.ph / 2,
@@ -5667,6 +5800,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     function onMove(ev) {
       if (ev.pointerId !== e.pointerId) return;
       var dx = ev.clientX - startX, dy = ev.clientY - startY;
+      lastX = ev.clientX; lastY = ev.clientY;
       if (!dragging && !scrolling) {
         var adx = Math.abs(dx), ady = Math.abs(dy);
         var along = axis === 'x' ? adx : ady;      // 트레이 스크롤 방향
@@ -5675,6 +5809,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
           dragging = true;                         // 트레이 밖으로 끌기 = 조각 집기
           node.classList.add('lift');
           ghost = makeGhost();
+          ghostAt(); ghostMagnet();
           SFX.select();
           try { api.haptic(8); } catch (err) {}
         } else if (along > SLOP + 4 && along > across * 1.35) {
@@ -5685,13 +5820,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       }
       if (dragging) {
         if (ev.cancelable) ev.preventDefault();
-        if (ghost) {
-          ghost.style.left = (ev.clientX - sz.w * 0.75) + 'px';
-          ghost.style.top = (ev.clientY - sz.h * 1.1 - R.lift) + 'px';
-          var r = R.canvas.getBoundingClientRect();
-          var over = ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom;
-          ghost.classList.toggle('over', over);
-        }
+        if (ghost) { ghostAt(); ghostMagnet(); }
       }
       void scrolling;
     }
@@ -5706,11 +5835,15 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         else renderTray(false);
         return;
       }
+      lastX = ev.clientX; lastY = ev.clientY;
       var r = R.canvas.getBoundingClientRect();
-      if (ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom) {
-        place(ev.clientX - r.left, ev.clientY - r.top);
+      var c = ghostCenter();                        // 고스트(눈에 보이는 조각)의 중심
+      var inside = function (x, y) { return x > r.left && x < r.right && y > r.top && y < r.bottom; };
+      if (inside(c.x, c.y) || inside(ev.clientX, ev.clientY)) {
+        place(c.x - r.left, c.y - r.top);
       } else {
         if (ghost) { ghost.remove(); ghost = null; }
+        U.magnet = null; draw();
         renderTray(false);
       }
     }
@@ -5719,6 +5852,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       cleanup();
       node.classList.remove('lift');
       if (ghost) { ghost.remove(); ghost = null; }
+      U.magnet = null; draw();
       renderTray(false);
     }
     function cleanup() {
@@ -5784,8 +5918,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var g = S.groups[gid];
       D.gid = gid; D.moved = false; D.id = id;
       D.px0 = b2[0]; D.py0 = b2[1];
+      D.bx = b2[0]; D.by = b2[1];
       D.gx0 = g.x; D.gy0 = g.y;
       D.sx0 = p.x; D.sy0 = p.y;
+      D.liftT0 = 0;
+      U.magnet = null;
       SFX.select();
       try { api.haptic(8); } catch (err) {}
       e.preventDefault();
@@ -5824,14 +5961,16 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       return;
     }
     if (D.gid && D.id === e.pointerId) {
+      var b = R.toBoard(p.x, p.y);
+      D.bx = b[0]; D.by = b[1];
       if (!D.moved) {
         if (Math.abs(p.x - D.sx0) + Math.abs(p.y - D.sy0) < 7) return;
         D.moved = true;
+        D.liftT0 = now();          // 잡은 조각이 살짝 떠오르는 시간(그 사이 좌표도 같이 올라간다)
         SFX.select();
       }
-      var b = R.toBoard(p.x, p.y);
-      var nx = D.gx0 + (b[0] - D.px0), ny = D.gy0 + (b[1] - D.py0);
-      J.applyAction(S, { type: 'dragMove', gid: D.gid, x: nx, y: ny, box: safeBox() });
+      applyDragPos();
+      refreshMagnet();
       draw();
       e.preventDefault();
     }
@@ -5852,9 +5991,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (P.pan && P.pan.id === id) { P.pan = null; return; }
     if (!D.gid || D.id !== id) return;
     var gid = D.gid, moved = D.moved;
-    D.gid = 0; D.moved = false; D.id = null;
+    if (moved) applyDragPos();       // 손을 떼는 순간의 '눈에 보이는 자리'로 마지막 보정
+    D.gid = 0; D.moved = false; D.id = null; D.liftT0 = 0;
+    U.magnet = null;
     if (!S) return;
-    if (!moved) return;   // 보드 위 조각 탭은 아무 일도 하지 않는다(실수 방지)
+    if (!moved) { draw(); return; }   // 보드 위 조각 탭은 아무 일도 하지 않는다(실수 방지)
     var q = J.piecePos(S, S.groups[gid] ? S.groups[gid].anchor : 0);
     var res = J.applyAction(S, { type: 'drop', gid: gid, tol: tolBoard(), box: safeBox() });
     if (q && res.ok) afterAction(res, q.x + S.pw / 2, q.y + S.ph / 2);
@@ -6073,6 +6214,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (U.rings.length) U.rings = U.rings.filter(function (r) { return t - r.t0 < 560; });
     if (U.sparks.length) U.sparks = U.sparks.filter(function (r) { return t - r.t0 < 660; });
     if (U.shake && t - U.shake.t0 > 240) U.shake = null;
+    if (D.gid && D.moved) { applyDragPos(); refreshMagnet(); }   // 들림 애니메이션·자석 미리보기
     draw();
     if (t - U.lastHud > 110) { updateHud(); U.lastHud = t; }
     if (!ONLINE && !S.finished && t - U.lastSave > 1500) { Store.saveJigsaw(S); U.lastSave = t; }
@@ -6137,6 +6279,19 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       drawOrder: function () { return (R.lastOrder || []).slice(); },
       locked: function (gid) { return S ? J.isLockedGroup(S, gid) : false; },
       online: function () { return ONLINE; },
+      /* 드래그 고스트(눈에 보이는 조각)가 손가락에서 떠 있는 거리 = 놓일 자리 보정값 */
+      ghostOffset: function () { return { dx: 0, dy: -R.lift }; },
+      lift: function () { return R.lift; },
+      /* 지금 놓으면 붙을 자리(미리보기) — 없으면 null */
+      magnet: function () {
+        return U.magnet ? { x: U.magnet.x, y: U.magnet.y, anchor: U.magnet.anchor,
+                           n: U.magnet.pieces.length, d: U.magnet.d } : null;
+      },
+      tolDp: function () { return tolBoard() * Math.max(0.02, R.scale()); },
+      snapCandidate: function (gid) {
+        var c = S ? J.snapCandidate(S, gid, tolBoard()) : null;
+        return c ? { x: c.x, y: c.y, absolute: !!c.absolute, d: c.d } : null;
+      },
       /* 테스트: 초기화 없이 클래식 판을 직접 시작(온라인 모드 포함) */
       startClassic: function (stage, rank, opts) {
         C.start(stage || 1, rank || 'easy', null, opts || null);
