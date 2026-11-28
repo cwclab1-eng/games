@@ -408,6 +408,23 @@ h1 em {
   .rcard { min-height: 54px; }
 }
 
+/* ── 초대 공유: 문자(SMS) · 카톡/공유 ── */
+.sharebar {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  width: 100%; margin-top: 2px;
+}
+.sharebar .btn {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 10px 8px; border-radius: 11px; font-size: 12.5px;
+  white-space: nowrap; text-decoration: none; letter-spacing: -.2px;
+}
+.btn.share.sms {
+  background: rgba(120, 255, 200, .13); border-color: rgba(120, 255, 200, .34); color: #c9ffe8;
+}
+.btn.share.kakao {
+  background: rgba(255, 224, 130, .15); border-color: rgba(255, 224, 130, .38); color: #ffeaa8;
+}
+
 </style>
 </head>
 <body>
@@ -505,6 +522,10 @@ h1 em {
         <div class="codelab">방 코드</div>
         <div class="codebig" id="roomCode">····</div>
         <button class="btn lite" id="btnCopyLink" type="button">🔗 초대 링크 복사</button>
+        <div class="sharebar" id="shareBar">
+          <a class="btn share sms" id="btnSms" href="#" role="button">✉️ 문자(SMS)</a>
+          <button class="btn share kakao" id="btnShare" type="button">💬 카톡/공유</button>
+        </div>
       </div>
 
       <div class="namebar" id="lobbyNameBar">
@@ -2088,6 +2109,145 @@ h1 em {
 
 </script>
 <script>
+/* ===== 한판 사다리 · share: 초대 문자(SMS) · 카톡 공유 ===== */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ;
+  var GAME = '한판 사다리';
+
+  /* 테스트·디버그용 상태 — 마지막으로 OS에 넘긴 값과 폴백 사유를 남긴다 */
+  var S = { lastSms: '', lastShare: null, shareCalls: 0, why: '' };
+
+  function invText(code) { return '[' + GAME + '] 같이 해요! 방 코드 ' + code; }
+  function invFull(code) { return invText(code) + '\n' + HJ.net.roomLink(code); }
+
+  function isIOS() {
+    var ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) return true;
+    /* iPadOS 13+ 는 MacIntel 로 보인다 */
+    return navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
+  }
+  function isMobile() {
+    var ua = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|iPod|Mobile|SamsungBrowser/i.test(ua)) return true;
+    return (navigator.maxTouchPoints || 0) > 1 && /Mac/.test(navigator.platform || '');
+  }
+  /* Android 는 sms:?body=, iOS 는 sms:&body= 가 안전하다(둘 다 문자 앱 본문에 그대로 들어간다) */
+  function smsHref(body) {
+    return (isIOS() ? 'sms:&body=' : 'sms:?body=') + encodeURIComponent(body);
+  }
+
+  var toastT = null;
+  function toast(msg, ms) {
+    var t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { t.classList.add('hidden'); }, ms || 2400);
+  }
+
+  function copyRaw(txt, cb) {
+    var done = function (ok) { cb(!!ok); };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(function () { done(true); }, function () { done(fallback()); });
+        return;
+      }
+    } catch (e) {}
+    done(fallback());
+    function fallback() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) { return false; }
+    }
+  }
+
+  /* ✉️ 문자(SMS) — 모바일은 문자 앱을 바로 열고, PC는 문구를 복사해 준다 */
+  function sendSms(code) {
+    if (!code) { toast('먼저 방을 만들어 주세요'); return ''; }
+    var body = invFull(code);
+    var href = smsHref(body);
+    S.lastSms = href;
+    if (!isMobile()) {
+      S.why = 'desktop-copy';
+      copyRaw(body, function (ok) {
+        toast(ok ? 'PC에는 문자 앱이 없어요. 초대 문구를 복사했어요 — 문자·카톡에 붙여넣어 보내세요'
+                 : '초대 문구를 복사하지 못했어요. 초대 링크를 길게 눌러 복사해 주세요', 4200);
+      });
+      return href;
+    }
+    S.why = 'sms';
+    try { location.href = href; } catch (e) { S.why = 'sms-error'; }
+    return href;
+  }
+
+  /* 💬 카톡/공유 — navigator.share(공유 시트) 우선, 없으면 문구 복사 안내 */
+  function openShare(code) {
+    if (!code) { toast('먼저 방을 만들어 주세요'); return null; }
+    var text = invText(code);
+    var link = HJ.net.roomLink(code);
+    var data = { title: GAME, text: text, url: link };
+
+    function copyFallback(reason) {
+      S.why = reason;
+      copyRaw(text + '\n' + link, function (ok) {
+        toast(ok ? '초대 문구를 복사했어요! 카카오톡에 붙여넣어 보내세요'
+                 : '초대 링크를 길게 눌러 복사해 주세요', 3800);
+      });
+    }
+
+    if (navigator.share) {
+      S.shareCalls++;
+      S.lastShare = data;
+      S.why = 'share';
+      var p = null;
+      try { p = navigator.share(data); } catch (e) { p = null; }
+      if (p && typeof p.then === 'function') {
+        p.then(function () { S.why = 'share-done'; }, function (err) {
+          if (err && (err.name === 'AbortError' || err.name === 'NotAllowedError')) { S.why = 'share-abort'; return; }
+          copyFallback('share-failed-copy');
+        });
+      }
+      return data;
+    }
+    copyFallback('no-share-copy');
+    return data;
+  }
+
+  /* 방 코드가 바뀔 때 문자 버튼의 href 도 실제 sms: 주소로 맞춰 둔다 */
+  function syncHref(code) {
+    var a = document.getElementById('btnSms');
+    if (!a) return;
+    if (!code) { a.setAttribute('href', '#'); return; }
+    a.setAttribute('href', smsHref(invFull(code)));
+  }
+
+  HJ.share = {
+    game: GAME,
+    text: invText,
+    body: invFull,
+    smsHref: smsHref,
+    isMobile: isMobile,
+    isIOS: isIOS,
+    sendSms: sendSms,
+    openShare: openShare,
+    syncHref: syncHref,
+    state: function () {
+      return { lastSms: S.lastSms, lastShare: S.lastShare, shareCalls: S.shareCalls, why: S.why, mobile: isMobile() };
+    }
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
 /* ===== 한판 사다리 · app: 화면 · 로비 · 사다리 애니메이션 · 결과 발표 ===== */
 (function (root) {
   'use strict';
@@ -2271,6 +2431,7 @@ h1 em {
 
     go('room');
     $('roomCode').textContent = room.code;
+    HJ.share.syncHref(room.code);
     $('roomTitle').textContent = o.role === 'host' ? '방 만들기' : '방 참가';
     $('roomSub').textContent = '연결하는 중…';
     $('roomPill').textContent = '연결 중';
@@ -2310,6 +2471,7 @@ h1 em {
     }
     Renderer.stop();
     App.game = null;
+    if (HJ.share) HJ.share.syncHref('');
   }
 
   /* ═════════════ 로비 상태 반영 ═════════════ */
@@ -2351,6 +2513,7 @@ h1 em {
     var room = App.room;
     if (!room) return;
     $('roomCode').textContent = room.code;
+    HJ.share.syncHref(room.code);
     var mine = room.role === 'host' ? room.uid : room.uid;
     var players = st.players || [];
     var meP = players.filter(function (p) { return p && p.uid === mine; })[0];
@@ -3023,7 +3186,11 @@ h1 em {
       createRoom: createRoom,
       joinRoom: joinRoom,
       setConfig: function (c) { if (App.room) App.room.setConfig(c); },
-      pick: function (s) { if (App.room) App.room.pick(s); }
+      pick: function (s) { if (App.room) App.room.pick(s); },
+      share: function () { return HJ.share ? HJ.share.state() : null; },
+      smsHref: function () { var a = $('btnSms'); return a ? a.getAttribute('href') : ''; },
+      smsClick: function () { var a = $('btnSms'); if (a) a.click(); return HJ.share.state().lastSms; },
+      shareClick: function () { var b = $('btnShare'); if (b) b.click(); return HJ.share.state(); }
     };
   }
 
@@ -3062,6 +3229,17 @@ h1 em {
       if (!App.room) return;
       var link = HJ.net.roomLink(App.room.code);
       copyText(link);
+    };
+    $('btnSms').addEventListener('click', function (e) {
+      e.preventDefault();
+      if (!App.room) return;
+      HJ.share.sendSms(App.room.code);
+      HJ.sfx.tick();
+    });
+    $('btnShare').onclick = function () {
+      if (!App.room) return;
+      HJ.share.openShare(App.room.code);
+      HJ.sfx.tick();
     };
     $('roomSeats').addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('.seat') : null;

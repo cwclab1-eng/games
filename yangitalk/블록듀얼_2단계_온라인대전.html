@@ -1150,6 +1150,63 @@ button.primary:disabled, button.ghost:disabled { opacity: 0.55; cursor: default;
   .kmKey { padding: 7px 8px; }
 }
 
+/* ── 초대 공유: 문자(SMS) · 카톡/공유 ── */
+.shareBar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+.shareBar .shareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border-radius: 11px;
+  font-size: 12.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+  width: auto;
+  box-shadow: none;
+}
+.shareBar .shareBtn.sms {
+  color: #c7ffe8;
+  background: rgba(52, 211, 153, 0.13);
+  border: 1px solid rgba(52, 211, 153, 0.34);
+}
+.shareBar .shareBtn.kakao {
+  color: #ffe9a8;
+  background: rgba(255, 214, 102, 0.14);
+  border: 1px solid rgba(255, 214, 102, 0.36);
+}
+.shareBar .shareBtn:active { transform: translateY(1px); }
+
+.lobbyToast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translate(-50%, 8px);
+  max-width: min(92vw, 430px);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+  color: #eafcff;
+  background: rgba(8, 16, 32, 0.94);
+  border: 1px solid rgba(120, 220, 255, 0.32);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 80;
+}
+.lobbyToast.on { opacity: 1; transform: translate(-50%, 0); }
+
 </style>
 </head>
 <body>
@@ -1225,6 +1282,10 @@ button.primary:disabled, button.ghost:disabled { opacity: 0.55; cursor: default;
           <div class="roomHint">친구에게 이 코드나 초대 링크를 보내세요</div>
           <input id="roomLinkInput" class="roomLink" readonly>
           <button id="btnCopyLink" class="ghost">🔗 초대 링크 복사</button>
+          <div class="shareBar" id="shareBar">
+            <a id="btnSms" class="ghost shareBtn sms" href="#" role="button">✉️ 문자(SMS)</a>
+            <button id="btnShare" class="ghost shareBtn kakao" type="button">💬 카톡/공유</button>
+          </div>
           <div id="waitLine" class="waitLine"></div>
         </div>
       </div>
@@ -1237,6 +1298,7 @@ button.primary:disabled, button.ghost:disabled { opacity: 0.55; cursor: default;
       </div>
 
       <div id="lobbyNote" class="lobbyNote"></div>
+      <div id="lobbyToast" class="lobbyToast" role="status" aria-live="polite"></div>
     </div>
   </section>
 
@@ -4895,6 +4957,7 @@ const App = {
   autoJoinCode: '',
   lobbyBusy: false,
   roomLink: '',
+  shareState: { lastSms: '', lastShare: null, shareCalls: 0, why: '' },
 
   init() {
     this.cache();
@@ -4936,7 +4999,7 @@ const App = {
   cache() {
     const ids = ['startScreen', 'gameScreen', 'diffSeg', 'itemToggle', 'itemChips', 'btnStart', 'btnLocal', 'btnOnline',
       'lobbyScreen', 'lobbyBack', 'lobbyTab', 'nickInput', 'btnCreate', 'roomBox', 'roomCode', 'roomLinkInput',
-      'btnCopyLink', 'waitLine', 'createPane', 'joinPane', 'codeInput', 'btnJoin', 'lobbyNote', 'netBadge', 'netPill', 'ovHint',
+      'btnCopyLink', 'btnSms', 'btnShare', 'shareBar', 'lobbyToast', 'waitLine', 'createPane', 'joinPane', 'codeInput', 'btnJoin', 'lobbyNote', 'netBadge', 'netPill', 'ovHint',
       'timerText', 'roundText', 'btnMute', 'btnPause', 'btnHome', 'statusLine',
       'holdCanvas', 'next0', 'next1', 'next2', 'scoreText', 'linesText', 'levelText',
       'boardWrap', 'boardCanvas', 'sideRight', 'oppName', 'oppScore', 'oppBoardWrap', 'oppCanvas',
@@ -5110,6 +5173,8 @@ const App = {
     });
     e.nickInput.addEventListener('change', function () { self.saveNick(); });
     e.btnCopyLink.addEventListener('click', function () { self.copyRoomLink(); });
+    e.btnSms.addEventListener('click', function (ev) { ev.preventDefault(); self.sendSmsInvite(); });
+    e.btnShare.addEventListener('click', function () { self.shareInvite(); });
     e.roomLinkInput.addEventListener('focus', function () { try { e.roomLinkInput.select(); } catch (err) {} });
   },
 
@@ -5196,6 +5261,7 @@ const App = {
     this.els.roomBox.classList.remove('hidden');
     this.els.roomCode.textContent = net.code;
     this.roomLink = netRoomLink(net.code);
+    this.syncShareHref();
     try { this.els.roomLinkInput.value = decodeURI(this.roomLink); }
     catch (e) { this.els.roomLinkInput.value = this.roomLink; }
     if (location.protocol === 'file:') {
@@ -5312,6 +5378,124 @@ const App = {
       this.els.roomLinkInput.select();
       this.setLobbyNote('링크를 길게 눌러 직접 복사해 주세요.', true);
     }
+  },
+
+  /* ── 초대 공유: 문자(SMS) · 카톡/공유 ───────────────── */
+  inviteCode() {
+    let c = (this.net && this.net.code) || (this.els.roomCode ? this.els.roomCode.textContent : '');
+    c = String(c || '').trim().toUpperCase();
+    return /^[A-Z0-9]{4}$/.test(c) ? c : '';
+  },
+
+  inviteText(code) { return '[블록 듀얼] 같이 대전해요! 방 코드 ' + code; },
+  inviteBody(code) { return this.inviteText(code) + '\n' + this.roomLink; },
+
+  isIOSUA() {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) return true;
+    return navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
+  },
+
+  isMobileUA() {
+    const ua = navigator.userAgent || '';
+    if (/Android|iPhone|iPad|iPod|Mobile|SamsungBrowser/i.test(ua)) return true;
+    return (navigator.maxTouchPoints || 0) > 1 && /Mac/.test(navigator.platform || '');
+  },
+
+  smsHrefFor(body) {
+    /* Android 는 sms:?body=, iOS 는 sms:&body= 가 안전하다 */
+    return (this.isIOSUA() ? 'sms:&body=' : 'sms:?body=') + encodeURIComponent(body);
+  },
+
+  syncShareHref() {
+    const a = this.els.btnSms;
+    if (!a) return;
+    const code = this.inviteCode();
+    a.setAttribute('href', code ? this.smsHrefFor(this.inviteBody(code)) : '#');
+  },
+
+  lobbyToast(msg, ms) {
+    const t = this.els.lobbyToast;
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(this._lobbyToastT);
+    const self = this;
+    this._lobbyToastT = setTimeout(function () { t.classList.remove('on'); }, ms || 2400);
+  },
+
+  copyRaw(txt, cb) {
+    const done = function (ok) { cb(!!ok); };
+    const fallback = function () {
+      try {
+        const t = document.createElement('textarea');
+        t.value = txt;
+        t.style.position = 'fixed';
+        t.style.opacity = '0';
+        document.body.appendChild(t);
+        t.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(t);
+        return ok;
+      } catch (e) { return false; }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { done(true); }, function () { done(fallback()); });
+      return;
+    }
+    done(fallback());
+  },
+
+  sendSmsInvite() {
+    const code = this.inviteCode();
+    if (!code) { this.lobbyToast('먼저 방을 만들어 주세요'); return ''; }
+    const body = this.inviteBody(code);
+    const href = this.smsHrefFor(body);
+    this.shareState.lastSms = href;
+    if (!this.isMobileUA()) {
+      this.shareState.why = 'desktop-copy';
+      const self = this;
+      this.copyRaw(body, function (ok) {
+        self.lobbyToast(ok ? 'PC에는 문자 앱이 없어요. 초대 문구를 복사했어요 — 문자·카톡에 붙여넣어 보내세요'
+                           : '초대 문구를 복사하지 못했어요. 초대 링크를 길게 눌러 복사해 주세요', 4200);
+      });
+      return href;
+    }
+    this.shareState.why = 'sms';
+    try { location.href = href; } catch (e) { this.shareState.why = 'sms-error'; }
+    return href;
+  },
+
+  shareInvite() {
+    const code = this.inviteCode();
+    if (!code) { this.lobbyToast('먼저 방을 만들어 주세요'); return null; }
+    const text = this.inviteText(code);
+    const link = this.roomLink;
+    const data = { title: '블록 듀얼', text: text, url: link };
+    const self = this;
+    const copyFallback = function (reason) {
+      self.shareState.why = reason;
+      self.copyRaw(text + '\n' + link, function (ok) {
+        self.lobbyToast(ok ? '초대 문구를 복사했어요! 카카오톡에 붙여넣어 보내세요'
+                           : '초대 링크를 길게 눌러 복사해 주세요', 3800);
+      });
+    };
+    if (navigator.share) {
+      this.shareState.shareCalls++;
+      this.shareState.lastShare = data;
+      this.shareState.why = 'share';
+      let p = null;
+      try { p = navigator.share(data); } catch (e) { p = null; }
+      if (p && typeof p.then === 'function') {
+        p.then(function () { self.shareState.why = 'share-done'; }, function (err) {
+          if (err && (err.name === 'AbortError' || err.name === 'NotAllowedError')) { self.shareState.why = 'share-abort'; return; }
+          copyFallback('share-failed-copy');
+        });
+      }
+      return data;
+    }
+    copyFallback('no-share-copy');
+    return data;
   },
 
   attachNet(net) {

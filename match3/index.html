@@ -546,6 +546,13 @@
     .room-hint{font-size:10.5px;color:#8b98b8;line-height:1.45}
     .room-link{width:100%;padding:8px 9px;border-radius:10px;font-size:10.5px;color:#bcd4ff;
         background:rgba(120,150,255,.10);border:1px solid rgba(150,175,255,.24)}
+    .share-bar{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+    .share-bar .share-btn{display:flex;align-items:center;justify-content:center;gap:5px;
+        padding:9px 6px;border-radius:10px;font-size:12px;font-weight:800;white-space:nowrap;
+        text-decoration:none;letter-spacing:-.2px;box-shadow:none}
+    .share-bar .share-btn.sms{color:#c9ffe8;background:rgba(52,211,153,.13);border:1px solid rgba(52,211,153,.34)}
+    .share-bar .share-btn.kakao{color:#ffeaa8;background:rgba(255,214,102,.14);border:1px solid rgba(255,214,102,.36)}
+    .share-bar .share-btn:active{transform:scale(.985)}
     .wait-line{font-size:11px;color:#bcd4ff;display:flex;align-items:center;gap:6px;min-height:16px}
     .wait-line.hot{color:#ffd76a}
     .code-input{width:100%;text-align:center;font-size:28px;font-weight:900;letter-spacing:10px;padding:10px;
@@ -778,6 +785,10 @@
                 <div class="room-hint">친구에게 이 코드나 초대 링크를 보내세요</div>
                 <input class="room-link" id="roomLinkInput" readonly>
                 <button class="btn ghost" id="btnCopyLink">🔗 초대 링크 복사</button>
+                <div class="share-bar" id="shareBar">
+                    <a class="btn ghost share-btn sms" id="btnSms" href="#" role="button">✉️ 문자(SMS)</a>
+                    <button class="btn ghost share-btn kakao" id="btnShare" type="button">💬 카톡/공유</button>
+                </div>
                 <div class="wait-line" id="waitLine"></div>
             </div>
         </div>
@@ -4598,6 +4609,7 @@ function showRoom(room){
     $('roomCode').textContent=room.code;
     roomLink=MN.roomLink(room.code);
     try{ $('roomLinkInput').value=decodeURI(roomLink); }catch(e){ $('roomLinkInput').value=roomLink; }
+    syncShareHref();
     var wl=$('waitLine');
     if (location.protocol==='file:'){
         wl.className='wait-line hot';
@@ -4684,6 +4696,104 @@ function fallbackCopy(v, cb){
         $('roomLinkInput').focus(); $('roomLinkInput').select();
         setLobbyNote('링크를 길게 눌러 직접 복사해 주세요.', true);
     }
+}
+
+function copyRawText(txt, cb){
+    var done=function(ok){ cb(!!ok); };
+    var fallback=function(){
+        try{
+            var t=document.createElement('textarea');
+            t.value=txt; t.style.position='fixed'; t.style.opacity='0';
+            document.body.appendChild(t); t.select();
+            var ok=document.execCommand('copy');
+            document.body.removeChild(t);
+            return ok;
+        }catch(e){ return false; }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(function(){ done(true); }, function(){ done(fallback()); });
+        return;
+    }
+    done(fallback());
+}
+
+/* ── 초대 공유: 문자(SMS) · 카톡/공유 ─────────────────────── */
+var shareState={lastSms:'', lastShare:null, shareCalls:0, why:''};
+var SHARE_GAME='매치3 낙하형';
+
+function inviteCode(){
+    var c=(net && net.code) || ($('roomCode') ? $('roomCode').textContent : '');
+    c=String(c||'').trim().toUpperCase();
+    return /^[A-Z0-9]{4}$/.test(c) ? c : '';
+}
+function inviteText(code){ return '['+SHARE_GAME+'] 같이 해요! 방 코드 '+code; }
+function inviteBody(code){ return inviteText(code)+'\n'+roomLink; }
+function isIOSUA(){
+    var ua=navigator.userAgent||'';
+    if (/iPhone|iPad|iPod/i.test(ua)) return true;
+    return navigator.platform==='MacIntel' && (navigator.maxTouchPoints||0)>1;
+}
+function isMobileUA(){
+    var ua=navigator.userAgent||'';
+    if (/Android|iPhone|iPad|iPod|Mobile|SamsungBrowser/i.test(ua)) return true;
+    return (navigator.maxTouchPoints||0)>1 && /Mac/.test(navigator.platform||'');
+}
+function smsHrefFor(body){
+    /* Android 는 sms:?body=, iOS 는 sms:&body= 가 안전하다 */
+    return (isIOSUA() ? 'sms:&body=' : 'sms:?body=')+encodeURIComponent(body);
+}
+function syncShareHref(){
+    var a=$('btnSms');
+    if (!a) return;
+    var c=inviteCode();
+    a.setAttribute('href', c ? smsHrefFor(inviteBody(c)) : '#');
+}
+function sendSmsInvite(){
+    var code=inviteCode();
+    if (!code){ setLobbyNote('먼저 방을 만들어 주세요'); return ''; }
+    var body=inviteBody(code);
+    var href=smsHrefFor(body);
+    shareState.lastSms=href;
+    if (!isMobileUA()){
+        shareState.why='desktop-copy';
+        copyRawText(body, function(ok){
+            setLobbyNote(ok ? 'PC에는 문자 앱이 없어요. 초대 문구를 복사했어요 — 문자·카톡에 붙여넣어 보내세요'
+                            : '초대 문구를 복사하지 못했어요. 초대 링크를 길게 눌러 복사해 주세요');
+        });
+        return href;
+    }
+    shareState.why='sms';
+    try{ location.href=href; }catch(e){ shareState.why='sms-error'; }
+    return href;
+}
+function shareInvite(){
+    var code=inviteCode();
+    if (!code){ setLobbyNote('먼저 방을 만들어 주세요'); return null; }
+    var text=inviteText(code), link=roomLink;
+    var data={title:SHARE_GAME, text:text, url:link};
+    var copyFallback=function(reason){
+        shareState.why=reason;
+        copyRawText(text+'\n'+link, function(ok){
+            setLobbyNote(ok ? '초대 문구를 복사했어요! 카카오톡에 붙여넣어 보내세요'
+                            : '초대 링크를 길게 눌러 복사해 주세요');
+        });
+    };
+    if (navigator.share){
+        shareState.shareCalls++;
+        shareState.lastShare=data;
+        shareState.why='share';
+        var p=null;
+        try{ p=navigator.share(data); }catch(e){ p=null; }
+        if (p && typeof p.then==='function'){
+            p.then(function(){ shareState.why='share-done'; }, function(err){
+                if (err && (err.name==='AbortError' || err.name==='NotAllowedError')){ shareState.why='share-abort'; return; }
+                copyFallback('share-failed-copy');
+            });
+        }
+        return data;
+    }
+    copyFallback('no-share-copy');
+    return data;
 }
 
 /* ── 연결 붙이기 ────────────────────────────────────────── */
@@ -5135,6 +5245,8 @@ if ($('codeInput')){
 }
 if ($('nickInput')) $('nickInput').addEventListener('change', function(){ saveNick(); });
 if ($('btnCopyLink')) $('btnCopyLink').addEventListener('click', function(){ copyRoomLink(); });
+if ($('btnSms')) $('btnSms').addEventListener('click', function(ev){ ev.preventDefault(); sendSmsInvite(); });
+if ($('btnShare')) $('btnShare').addEventListener('click', function(){ shareInvite(); });
 if ($('roomLinkInput')) $('roomLinkInput').addEventListener('focus', function(){
     try{ $('roomLinkInput').select(); }catch(e){}
 });
@@ -5269,6 +5381,12 @@ window.__drop = {
         saving:saving, lastSave:lastSave}; },
     openGallery: openGallery,
     closeGallery: closeGallery,
+    get share(){ return {lastSms:shareState.lastSms, lastShare:shareState.lastShare,
+        shareCalls:shareState.shareCalls, why:shareState.why, mobile:isMobileUA(),
+        code:inviteCode(), text:inviteCode()?inviteText(inviteCode()):'', body:inviteCode()?inviteBody(inviteCode()):''}; },
+    smsHref: function(){ var a=$('btnSms'); return a?a.getAttribute('href'):''; },
+    sendSms: sendSmsInvite,
+    shareInvite: shareInvite,
     galleryStep: galleryStep,
     setGalleryAdmire: setGalleryAdmire,
     get online(){ return onlineDebug(); },
