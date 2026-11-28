@@ -2825,7 +2825,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var prev = null;
     try { prev = c.getTransform ? c.getTransform() : null; } catch (e) { prev = null; }
     c.setTransform(1, 0, 0, 1, 0, 0);
-    var order = J.zOrder(s, null), zr = {}, i, k, g, pth, pid, hit = -1;
+    var order = J.zOrder(s, null), zr = {}, i, k, g, pth, pid, q, hit = -1;
     for (i = 0; i < order.length; i++) zr[order[i]] = i;
 
     // 1) 윤곽을 정확히 밟은 조각 — 위 레이어부터
@@ -2852,7 +2852,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       for (i = 0; i < s.pieces.length; i++) {
         pid = s.pieces[i].id;
         if (!s.pieces[i].g || J.isLockedGroup(s, s.pieces[i].g)) continue;
-        var q = J.piecePos(s, pid);
+        q = J.piecePos(s, pid);
         if (!q) continue;
         var dx = Math.max(q.x - bx, 0, bx - (q.x + s.pw));
         var dy = Math.max(q.y - by, 0, by - (q.y + s.ph));
