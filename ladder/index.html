@@ -119,6 +119,87 @@ h1 em {
 .hint.center { text-align: center; }
 .hint b { color: #cfdcff; }
 
+/* ── 이름 입력 하이라이트 박스 ── */
+.namebox {
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 11px 12px 12px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 203, 77, .17), rgba(255, 203, 77, .05));
+  border: 2px solid rgba(255, 203, 77, .6);
+  box-shadow: 0 0 0 3px rgba(255, 203, 77, .07), 0 8px 20px rgba(0, 0, 0, .3);
+}
+.namelab { font-size: 13.5px; font-weight: 900; color: #ffe6a8; letter-spacing: -.01em; }
+.namelab em, .namelab2 em { font-style: normal; font-size: 11.5px; font-weight: 700; color: #ffd97a; }
+.namelab2 { font-size: 13px; color: #ffe6a8; }
+.inp.namebig {
+  font-size: 19px; font-weight: 800; text-align: center; letter-spacing: -.01em;
+  padding: 15px 14px; color: #fff8e6;
+  background: rgba(4, 8, 16, .66); border: 1.5px solid rgba(255, 203, 77, .45);
+}
+.inp.namebig::placeholder { color: #9b8757; }
+.inp.namebig:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255, 203, 77, .22); }
+.namebox.need { border-color: var(--red); box-shadow: 0 0 0 3px rgba(255, 122, 122, .18); animation: nameShake .44s; }
+.namebar.need { border-color: var(--red); box-shadow: 0 0 0 3px rgba(255, 122, 122, .18); animation: nameShake .44s; }
+@keyframes nameShake {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* ── 초대 링크 빠른 입장 카드 ── */
+.invite {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 15px 15px 12px; border-radius: 20px;
+  background:
+    linear-gradient(160deg, rgba(255, 203, 77, .22), rgba(177, 140, 255, .14) 58%, rgba(90, 209, 255, .11)),
+    linear-gradient(180deg, var(--card), var(--card2));
+  border: 2px solid rgba(255, 203, 77, .55);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .42), 0 0 0 4px rgba(255, 203, 77, .06);
+  animation: invIn .45s cubic-bezier(.2, .9, .25, 1);
+}
+@keyframes invIn { from { transform: translateY(-8px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
+.invhead { display: flex; align-items: center; gap: 9px; }
+.invicon { font-size: 26px; line-height: 1; }
+.invtxt { min-width: 0; }
+.invt { font-size: 15.5px; font-weight: 900; color: #fff6dd; letter-spacing: -.02em; line-height: 1.35; }
+.invt b { color: var(--gold); letter-spacing: .08em; }
+.invs { margin-top: 3px; font-size: 12.5px; font-weight: 800; color: #ffd97a; }
+.invs b { color: #fff1c9; }
+.invlink {
+  appearance: none; border: 0; background: none; cursor: pointer; align-self: center;
+  color: #93a1bf; font: inherit; font-size: 11.5px; font-weight: 700;
+  text-decoration: underline; text-underline-offset: 2px; padding: 2px;
+}
+#scr-home.inviting .hero { padding-top: 0; }
+#scr-home.inviting h1 { font-size: 19px; margin: 8px 0 2px; line-height: 1.25; }
+#scr-home.inviting .lede { display: none; }
+#scr-home.inviting #homeHint { display: none; }
+/* 초대 카드가 주인공 — 아래 방 만들기는 보조로 춘다 */
+#scr-home.inviting #btnCreate {
+  background: rgba(255, 255, 255, .06); color: #dbe6ff; border: 1px solid var(--line);
+  box-shadow: none; font-size: 13.5px; padding: 11px 16px;
+}
+
+/* ── 로비: 내 이름 바 ── */
+.namebar {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px;
+  padding: 9px 10px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 203, 77, .15), rgba(255, 203, 77, .04));
+  border: 1.5px solid rgba(255, 203, 77, .45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .26);
+}
+.namebar .nblab { font-size: 12px; font-weight: 900; color: #ffe6a8; white-space: nowrap; }
+.namebar input {
+  width: 100%; min-width: 0; appearance: none; font: inherit;
+  font-size: 15px; font-weight: 800; color: #fff8e6; text-align: center;
+  background: rgba(4, 8, 16, .6); border: 1.5px solid rgba(255, 203, 77, .35);
+  border-radius: 10px; padding: 9px 10px; outline: none;
+}
+.namebar input::placeholder { color: #9b8757; }
+.namebar input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255, 203, 77, .18); }
+.namebar .nbbtn { padding: 9px 12px; font-size: 13px; border-radius: 10px; white-space: nowrap; }
+
 .btn {
   appearance: none; border: 1px solid rgba(255, 255, 255, .14); cursor: pointer;
   background: rgba(255, 255, 255, .07); color: var(--txt); font: inherit; font-weight: 800;
@@ -158,7 +239,12 @@ h1 em {
   background: rgba(90, 209, 255, .1); border: 1px solid rgba(90, 209, 255, .25);
   border-radius: 8px; padding: 8px 0;
 }
-.inp.nm { padding: 10px 12px; font-size: 14px; }
+.inp.nm {
+  padding: 11px 12px; font-size: 15px; font-weight: 700; color: #f4f8ff;
+  background: rgba(4, 8, 16, .62); border: 1.5px solid rgba(90, 209, 255, .3);
+}
+.inp.nm::placeholder { color: #8fa1c4; }
+.inp.nm:focus { border-color: rgba(90, 209, 255, .7); box-shadow: 0 0 0 3px rgba(90, 209, 255, .16); }
 .miniseats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .mseat {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -291,12 +377,15 @@ h1 em {
 .rbsub { font-size: 11.5px; color: var(--dim); line-height: 1.45; }
 .rbrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
 .toast {
-  position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%);
-  z-index: 9; max-width: 90%; padding: 10px 14px; border-radius: 12px;
+  position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  z-index: 99; max-width: min(90vw, 520px); padding: 10px 14px; border-radius: 12px;
+  animation: toastIn .2s ease-out;
   background: rgba(8, 12, 22, .94); border: 1px solid var(--line);
   font-size: 12.5px; font-weight: 700; color: #e6efff; text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
 }
+
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
 /* 전체화면일 때 여유 */
 :fullscreen #app, :-webkit-full-screen #app { max-width: none; height: 100dvh; padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
@@ -304,6 +393,10 @@ h1 em {
 /* 작은 화면 보정 (360px) */
 @media (max-width: 370px) {
   #app { padding-left: 10px; padding-right: 10px; }
+  .inp.namebig { font-size: 17.5px; padding: 13px 10px; }
+  .namebar .nblab { font-size: 11px; }
+  .namebar input { font-size: 14px; padding: 8px 8px; }
+  .namebar .nbbtn { padding: 8px 9px; font-size: 12px; }
   .codebig { font-size: 34px; letter-spacing: .14em; }
   .seat .sname { font-size: 10px; }
   .pseat .pt { font-size: 9.5px; }
@@ -335,9 +428,27 @@ h1 em {
 
     <!-- 온라인 -->
     <div class="panel" id="panelOnline">
+      <!-- 초대 링크(?r=CODE)로 들어왔을 때만 뜨는 빠른 입장 카드 -->
+      <div class="invite hidden" id="inviteCard" role="region" aria-label="초대받은 방">
+        <div class="invhead">
+          <span class="invicon" aria-hidden="true">🎉</span>
+          <div class="invtxt">
+            <div class="invt">방 <b id="invCode">····</b> 에 초대됐어요</div>
+            <div class="invs">내 이름을 적고 <b>바로 입장</b>하세요</div>
+          </div>
+        </div>
+        <div id="inviteNameSlot"></div>
+        <button class="btn primary wide big" id="btnInviteJoin" type="button">방 입장하기 →</button>
+        <button class="invlink" id="btnInviteSkip" type="button">새 방을 만들거나 다른 코드로 들어가기</button>
+      </div>
+
       <div class="card setup">
-        <label class="lab" for="inName">내 이름</label>
-        <input id="inName" class="inp" maxlength="8" placeholder="예: 석호" autocomplete="off" spellcheck="false">
+        <div id="setupNameSlot">
+          <div class="namebox" id="nameBox">
+            <label class="namelab" for="inName">✏️ 내 이름 입력 <em>(여기에 적으세요)</em></label>
+            <input id="inName" class="inp namebig" maxlength="8" placeholder="이름을 적어 주세요" enterkeyhint="done" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
         <button class="btn primary wide" id="btnCreate">🌐 방 만들기</button>
         <div class="or"><i></i><span>또는 초대받은 방</span><i></i></div>
         <div class="joinrow">
@@ -355,7 +466,10 @@ h1 em {
           <span class="lab">참가자</span>
           <div class="seg" id="oneCount"></div>
         </div>
-        <div class="names" id="oneNames"></div>
+        <div class="setting col">
+          <span class="lab namelab2">✏️ 참가자 이름 입력 <em>(여기에 적으세요)</em></span>
+          <div class="names" id="oneNames"></div>
+        </div>
         <div class="setting">
           <span class="lab">자리 (공석 포함 6칸)</span>
           <button class="btn ghost sm" id="btnShuffleSeats" type="button">🎲 자리 섞기</button>
@@ -391,6 +505,12 @@ h1 em {
         <div class="codelab">방 코드</div>
         <div class="codebig" id="roomCode">····</div>
         <button class="btn lite" id="btnCopyLink" type="button">🔗 초대 링크 복사</button>
+      </div>
+
+      <div class="namebar" id="lobbyNameBar">
+        <label class="nblab" for="roomName">✏️ 내 이름</label>
+        <input id="roomName" maxlength="8" placeholder="이름" autocapitalize="off" autocomplete="off" spellcheck="false">
+        <button class="btn primary nbbtn" id="btnRename" type="button">변경</button>
       </div>
 
       <div class="seatgrid" id="roomSeats" aria-label="자리 6칸"></div>
@@ -436,10 +556,10 @@ h1 em {
           <button class="btn" id="btnLeave">나가기</button>
         </div>
       </div>
-      <div class="toast hidden" id="toast"></div>
     </div>
   </section>
 
+  <div class="toast hidden" id="toast"></div>
 </div>
 
 <script>
@@ -1717,6 +1837,16 @@ h1 em {
     var changed = false;
     if (this.status !== 'connected') { this.setStatus('connected'); changed = true; }
     this.players = (st.players || []).slice(0).sort(function (a, b) { return a.seat - b.seat; });
+    /* 방장이 내 이름 변경을 아직 반영하지 않았으면 다시 보낸다(깜박임 방지) */
+    if (this._pendingName) {
+      var meNow = this._player(this.uid);
+      if (meNow && meNow.name === this._pendingName) {
+        this._pendingName = '';
+      } else if (meNow) {
+        meNow.name = this._pendingName;
+        if (this.bus) this.bus.send({ t: 'name', uid: this.uid, name: this._pendingName });
+      }
+    }
     if (st.config) this.config = st.config;
     if (st.phase) this.phase = st.phase;
     if (st.round != null) this.round = st.round;
@@ -1767,10 +1897,15 @@ h1 em {
       if (p) p.name = this.name;
       if (this.bus) this.bus.name = this.name;
       this._broadcastState(true);
+      this.emit('state', this._snapshot());
     } else if (this.bus) {
       this.bus.name = this.name;
+      var pm = this._player(this.uid);
+      if (pm) pm.name = this.name;            /* 내 화면 먼저 반영 */
+      this._pendingName = this.name;
       this.bus.send({ t: 'name', uid: this.uid, name: this.name });
       this.bus.beacon();
+      this.emit('state', this._snapshot());
     }
     return this.name;
   };
@@ -1985,6 +2120,7 @@ h1 em {
     },
     room: null,
     roomRole: 'host',
+    invite: '',
     game: null,
     src: null,
     joinWatch: null,
@@ -2028,11 +2164,7 @@ h1 em {
     var q = /[?&]r=([A-Za-z0-9]{1,8})/.exec(location.search);
     if (q) {
       var code = HJ.net.normalize(q[1]);
-      if (code) {
-        $('inCode').value = code;
-        $('homeHint').innerHTML = '초대받은 방 <b>' + esc(code) + '</b> — 이름을 넣고 <b>참가</b>를 누르세요.';
-        setTimeout(function () { try { $('inName').focus(); } catch (e) {} }, 400);
-      }
+      if (code) showInvite(code);
     }
     try {
       var nm2 = /[?&]test=bc/.test(location.search);
@@ -2040,10 +2172,62 @@ h1 em {
     } catch (e) {}
   }
 
+  /* 초대 링크로 들어오면: 이름칸을 초대 카드 안으로 옮겨 크게 보여 준다 */
+  function showInvite(code) {
+    App.invite = code;
+    $('invCode').textContent = code;
+    var box = $('nameBox'), slot = $('inviteNameSlot');
+    if (box && slot && box.parentElement !== slot) slot.appendChild(box);
+    $('inviteCard').classList.remove('hidden');
+    $('scr-home').classList.add('inviting');
+    $('inCode').value = code;
+    $('homeHint').innerHTML = '초대받은 방 <b>' + esc(code) + '</b> — 이름을 적고 <b>방 입장하기</b>를 누르세요.';
+    setTimeout(function () { if (App.screen === 'home') focusName(false); }, 350);
+  }
+
+  function hideInvite(dropParam) {
+    App.invite = '';
+    var box = $('nameBox'), slot = $('setupNameSlot');
+    if (box && slot && box.parentElement !== slot) slot.appendChild(box);
+    $('inviteCard').classList.add('hidden');
+    $('scr-home').classList.remove('inviting');
+    $('homeHint').textContent = '방을 만들면 4자리 코드와 초대 링크가 생깁니다 · 2~6명';
+    if (dropParam !== false) dropInviteParam();
+  }
+
+  function dropInviteParam() {
+    try {
+      var q = location.search.replace(/[?&]r=[A-Za-z0-9]*/g, '').replace(/^&/, '').replace(/^\?&?/, '');
+      history.replaceState(null, '', location.pathname + (q ? '?' + q : ''));
+    } catch (e) {}
+  }
+
+  /* 이름칸으로 시선·포커스 유도 (shake=true 면 빈 칸 경고) */
+  function focusName(shake) {
+    var w = $('nameBox');
+    try { $('inName').focus(); $('inName').select(); } catch (e) {}
+    if (shake && w) {
+      w.classList.remove('need'); void w.offsetWidth; w.classList.add('need');
+      setTimeout(function () { w.classList.remove('need'); }, 1500);
+    }
+  }
+
+  function currentName() { return ($('inName').value || '').replace(/\s+/g, ' ').trim().slice(0, 8); }
+
   function myName() {
-    var v = ($('inName').value || '').trim().slice(0, 8);
+    var v = currentName();
     if (v) store(LS_NAME, v);
     return v || '친구';
+  }
+
+  /* 이름을 안 적었으면 방을 열지 않고 이름칸으로 안내 */
+  function needName() {
+    var v = currentName();
+    if (v) return v;
+    focusName(true);
+    toast('내 이름을 먼저 적어 주세요 ✏️');
+    HJ.sfx.error();
+    return '';
   }
 
   function roomUid(code) {
@@ -2054,7 +2238,8 @@ h1 em {
   }
 
   function createRoom() {
-    var name = myName();
+    var name = needName();
+    if (!name) return;
     var code = HJ.net.newCode();
     openRoom({ role: 'host', code: code, name: name, uid: roomUid(code) });
   }
@@ -2062,7 +2247,9 @@ h1 em {
   function joinRoom(codeRaw) {
     var code = HJ.net.normalize(codeRaw);
     if (code.length !== 4) { toast('방 코드 4자리를 넣어 주세요'); HJ.sfx.error(); return; }
-    openRoom({ role: 'guest', code: code, name: myName(), uid: roomUid(code) });
+    var name = needName();
+    if (!name) return;
+    openRoom({ role: 'guest', code: code, name: name, uid: roomUid(code) });
   }
 
   function openRoom(o) {
@@ -2164,9 +2351,13 @@ h1 em {
     var room = App.room;
     if (!room) return;
     $('roomCode').textContent = room.code;
-    var hostId = st.hostSid;
     var mine = room.role === 'host' ? room.uid : room.uid;
     var players = st.players || [];
+    var meP = players.filter(function (p) { return p && p.uid === mine; })[0];
+
+    /* 내 이름 입력 바 — 지금 내 이름을 채워 둔다 */
+    var rn = $('roomName');
+    if (rn && document.activeElement !== rn) rn.value = meP ? meP.name : '';
 
     /* 자리 */
     var used = {};
@@ -2215,6 +2406,39 @@ h1 em {
     $('roomHint').textContent = isHost
       ? (can ? '빈 자리를 눌러 내 자리를 옮길 수 있어요. 시작하면 모든 폰에 같은 사다리가 그려집니다.' : '2명 이상 모이면 시작할 수 있어요. 초대 링크를 보내 보세요.')
       : '방장이 시작하면 모두 같은 사다리를 함께 내려갑니다.';
+  }
+
+  /* ═════════════ 로비: 내 이름 바꾸기 ═════════════ */
+  function focusRoomName() {
+    var el = $('roomName');
+    if (!el) return;
+    try { el.focus(); el.select(); } catch (e) {}
+    var bar = $('lobbyNameBar');
+    if (bar) {
+      bar.classList.remove('need'); void bar.offsetWidth; bar.classList.add('need');
+      setTimeout(function () { bar.classList.remove('need'); }, 1400);
+    }
+  }
+
+  function renameSelf() {
+    var room = App.room;
+    if (!room) return;
+    var me = room.players.filter(function (p) { return p.uid === room.uid; })[0];
+    var v = ($('roomName').value || '').replace(/\s+/g, ' ').trim().slice(0, 8);
+    if (!v) {
+      if ($('roomName')) $('roomName').value = me ? me.name : '';
+      focusRoomName();
+      toast('내 이름을 입력해 주세요');
+      HJ.sfx.error();
+      return;
+    }
+    if (me && me.name === v) return;          /* 바뀐 게 없으면 조용히 */
+    room.setName(v);
+    store(LS_NAME, v);
+    if ($('inName')) $('inName').value = v;
+    renderLobby(room.snapshot());
+    toast('내 이름을 「' + v + '」로 바꿨습니다');
+    HJ.sfx.tick();
   }
 
   function buildPresets(box, cfg, onPick) {
@@ -2774,6 +2998,21 @@ h1 em {
         });
       },
       oneState: function () { return JSON.parse(JSON.stringify(App.one)); },
+      invite: function () { return App.invite; },
+      inviteOpen: function () { return !$('inviteCard').classList.contains('hidden'); },
+      nameInInvite: function () { return !!document.querySelector('#inviteCard #nameBox #inName'); },
+      focused: function () { return document.activeElement ? (document.activeElement.id || document.activeElement.tagName) : ''; },
+      needName: function () { return $('nameBox').classList.contains('need'); },
+      toastText: function () { return $('toast').textContent; },
+      toastVisible: function () { return !$('toast').classList.contains('hidden'); },
+      myRoomName: function () {
+        var r = App.room;
+        var me = r && r.players.filter(function (p) { return p.uid === r.uid; })[0];
+        return me ? me.name : '';
+      },
+      roomNameValue: function () { return $('roomName').value; },
+      rename: renameSelf,
+      focusRoomName: focusRoomName,
       setOneCount: setOneCount,
       shuffleSeats: shuffleSeats,
       startOne: startOne,
@@ -2796,9 +3035,23 @@ h1 em {
     }
     $('btnCreate').onclick = createRoom;
     $('btnJoin').onclick = function () { joinRoom($('inCode').value); };
+    $('btnInviteJoin').onclick = function () { joinRoom(App.invite || $('inCode').value); };
+    $('btnInviteSkip').onclick = function () {
+      hideInvite();
+      $('inCode').value = '';
+      focusName(false);
+      HJ.sfx.tick();
+    };
     $('inCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') joinRoom(this.value); });
     $('inName').addEventListener('change', function () { store(LS_NAME, this.value.trim().slice(0, 8)); });
+    $('inName').addEventListener('input', function () { $('nameBox').classList.remove('need'); });
+    $('inName').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && App.invite) { e.preventDefault(); this.blur(); joinRoom(App.invite); }
+    });
     $('inCode').addEventListener('input', function () { this.value = HJ.net.normalize(this.value); });
+    $('btnRename').onclick = renameSelf;
+    $('roomName').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+    $('roomName').addEventListener('change', function () { renameSelf(); });
     $('btnShuffleSeats').onclick = shuffleSeats;
     $('btnOneStart').onclick = startOne;
     $('oneWinText').addEventListener('change', function () { App.one.winText = this.value.trim() || '🎯 당첨'; });
@@ -2815,7 +3068,7 @@ h1 em {
       if (!b || !App.room) return;
       var seat = +b.getAttribute('data-seat');
       var mine = App.room.players.filter(function (p) { return p.uid === App.room.uid; })[0];
-      if (mine && mine.seat === seat) return;
+      if (mine && mine.seat === seat) { focusRoomName(); return; }
       if (b.classList.contains('filled')) return;
       App.room.pick(seat);
       HJ.sfx.tick();
