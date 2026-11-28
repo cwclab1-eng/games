@@ -1,0 +1,2913 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#070b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<title>한판 사다리 — 6인 온라인 사다리타기</title>
+<meta name="description" content="여섯 칸 사다리타기. 2~6명이 각자 폰으로 방에 들어와 같은 사다리·같은 결과를 동시에 봅니다. 남는 칸은 공석으로 비워 두고, 당첨은 반드시 참여한 사람 중에서만 나옵니다. 한 폰으로 2~6명이 타는 모드도 있습니다.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='86'%3E%F0%9F%AA%9C%3C/text%3E%3C/svg%3E">
+<style>
+/* ===== 한판 사다리 · style ===== */
+:root {
+  --bg: #070b14;
+  --bg2: #0d1424;
+  --card: #131c30;
+  --card2: #18233c;
+  --line: rgba(255, 255, 255, .09);
+  --txt: #eef3ff;
+  --dim: #93a1bf;
+  --gold: #ffcb4d;
+  --mint: #4ee6a8;
+  --sky: #5ad1ff;
+  --violet: #b18cff;
+  --red: #ff7a7a;
+  --r: 18px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background:
+    radial-gradient(900px 560px at 6% -8%, rgba(255, 203, 77, .13), transparent 60%),
+    radial-gradient(760px 560px at 102% 0%, rgba(90, 209, 255, .13), transparent 58%),
+    radial-gradient(900px 700px at 50% 112%, rgba(177, 140, 255, .14), transparent 62%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  color: var(--txt);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
+}
+input { -webkit-user-select: text; user-select: text; }
+#app {
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: calc(10px + env(safe-area-inset-top)) 14px calc(10px + env(safe-area-inset-bottom));
+  max-width: 560px;
+  margin: 0 auto;
+}
+.screen { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.screen.hidden, .hidden { display: none !important; }
+
+/* ── 홈 ── */
+#scr-home { overflow-y: auto; -webkit-overflow-scrolling: touch; gap: 14px; padding-bottom: 8px; }
+.hero { padding: 6px 2px 0; }
+.brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 800; letter-spacing: .12em; color: var(--gold);
+  background: rgba(255, 203, 77, .09); border: 1px solid rgba(255, 203, 77, .26);
+  padding: 6px 12px; border-radius: 999px;
+}
+.lad { width: 1.06em; height: 1.06em; vertical-align: -.15em; }
+.brand .logo { display: inline-flex; width: 17px; height: 17px; }
+.brand .logo .lad { width: 17px; height: 17px; }
+h1 {
+  margin: 12px 0 8px; font-size: clamp(26px, 8.4vw, 34px); line-height: 1.2;
+  letter-spacing: -.03em; font-weight: 900;
+}
+h1 em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--gold), #ff8a5c 48%, var(--violet));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.lede { margin: 0; color: var(--dim); font-size: 13.5px; line-height: 1.62; }
+.lede b { color: #dbe6ff; }
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--line);
+  padding: 5px; border-radius: 14px;
+}
+.tabs button {
+  appearance: none; border: 0; background: transparent; color: var(--dim);
+  font: inherit; font-size: 13.5px; font-weight: 800; padding: 10px 6px; border-radius: 10px;
+  transition: background .16s, color .16s, box-shadow .16s; cursor: pointer;
+}
+.tabs button.on {
+  color: #0a1020; background: linear-gradient(140deg, #ffe08a, var(--gold));
+  box-shadow: 0 6px 18px rgba(255, 203, 77, .25);
+}
+.panel { display: flex; flex-direction: column; gap: 12px; }
+
+.card {
+  background: linear-gradient(158deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .012)), linear-gradient(180deg, var(--card), var(--card2));
+  border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+.setup { display: flex; flex-direction: column; gap: 10px; padding: 16px; }
+.lab { font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--dim); }
+.inp {
+  width: 100%; appearance: none; border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(6, 10, 20, .55); color: var(--txt); font: inherit; font-size: 15px;
+  padding: 13px 14px; border-radius: 12px; outline: none;
+  transition: border-color .16s, box-shadow .16s;
+}
+.inp::placeholder { color: #6b7a99; }
+.inp:focus { border-color: rgba(90, 209, 255, .55); box-shadow: 0 0 0 3px rgba(90, 209, 255, .12); }
+.inp.code { text-align: center; letter-spacing: .34em; font-weight: 900; font-size: 18px; text-transform: uppercase; }
+.joinrow { display: grid; grid-template-columns: 1fr 104px; gap: 8px; }
+.or { display: flex; align-items: center; gap: 10px; color: #6d7c9c; font-size: 11.5px; font-weight: 700; margin: 2px 0; }
+.or i { flex: 1; height: 1px; background: rgba(255, 255, 255, .09); }
+.hint { margin: 2px 0 0; font-size: 12px; line-height: 1.55; color: #8592b0; }
+.hint.center { text-align: center; }
+.hint b { color: #cfdcff; }
+
+.btn {
+  appearance: none; border: 1px solid rgba(255, 255, 255, .14); cursor: pointer;
+  background: rgba(255, 255, 255, .07); color: var(--txt); font: inherit; font-weight: 800;
+  font-size: 14.5px; padding: 13px 16px; border-radius: 13px;
+  transition: transform .12s, filter .16s, opacity .16s;
+}
+.btn:active { transform: scale(.98); }
+.btn.primary {
+  border: 0; color: #0a1020;
+  background: linear-gradient(135deg, #ffe08a 0%, var(--gold) 55%, #ff9f4d 100%);
+  box-shadow: 0 10px 24px rgba(255, 170, 60, .22);
+}
+.btn.warm {
+  border: 0; color: #140a04;
+  background: linear-gradient(135deg, #ffd48a, #ff9d5c);
+}
+.btn.lite { background: rgba(90, 209, 255, .12); border-color: rgba(90, 209, 255, .3); color: #cdefff; font-size: 13px; padding: 10px 14px; }
+.btn.ghost { background: transparent; border-color: rgba(255, 255, 255, .14); color: var(--dim); }
+.btn.wide { width: 100%; }
+.btn.big { padding: 16px; font-size: 16.5px; border-radius: 15px; }
+.btn:disabled { opacity: .4; }
+.btn.sm { font-size: 12px; padding: 7px 11px; border-radius: 10px; }
+
+/* 한 폰 설정 */
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.setting.col { flex-direction: column; align-items: stretch; gap: 7px; }
+.seg { display: inline-flex; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); border-radius: 11px; padding: 3px; gap: 2px; }
+.seg button {
+  appearance: none; border: 0; background: transparent; color: var(--dim); font: inherit; font-weight: 800;
+  font-size: 12.5px; padding: 7px 11px; border-radius: 8px; cursor: pointer;
+}
+.seg button.on { background: linear-gradient(140deg, #ffe08a, var(--gold)); color: #0a1020; }
+.names { display: flex; flex-direction: column; gap: 7px; }
+.namerow { display: grid; grid-template-columns: 46px 1fr; align-items: center; gap: 8px; }
+.tagseatsm {
+  font-size: 11.5px; font-weight: 900; color: var(--sky); text-align: center;
+  background: rgba(90, 209, 255, .1); border: 1px solid rgba(90, 209, 255, .25);
+  border-radius: 8px; padding: 8px 0;
+}
+.inp.nm { padding: 10px 12px; font-size: 14px; }
+.miniseats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.mseat {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 7px 2px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .03); min-width: 0;
+}
+.mseat b { font-size: 11px; color: var(--dim); }
+.mseat span { font-size: 9.5px; color: #cfdcff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mseat.filled { border-color: rgba(90, 209, 255, .32); background: rgba(90, 209, 255, .08); }
+.mseat.filled b { color: var(--sky); }
+.mseat.empty span { color: #5c6b88; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  appearance: none; border: 1px solid var(--line); background: rgba(255, 255, 255, .05);
+  color: var(--dim); font: inherit; font-size: 12px; font-weight: 700; padding: 8px 11px;
+  border-radius: 999px; cursor: pointer;
+}
+.chip.on { color: #0a1020; background: linear-gradient(140deg, #ffe08a, var(--gold)); border-color: transparent; }
+.foot { margin: 4px 2px 10px; font-size: 11.5px; line-height: 1.7; color: #6f7d9b; text-align: center; }
+.foot b { color: #9fb0d0; }
+
+/* ── 상단바 ── */
+.topbar { display: flex; align-items: center; gap: 10px; padding: 4px 0 10px; flex: 0 0 auto; }
+.iconbtn {
+  appearance: none; width: 40px; height: 40px; flex: 0 0 auto; border-radius: 12px;
+  border: 1px solid var(--line); background: rgba(255, 255, 255, .06); color: var(--txt);
+  font-size: 22px; line-height: 1; cursor: pointer; display: grid; place-items: center;
+}
+.topctr { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.topctr b { font-size: 15.5px; font-weight: 900; letter-spacing: -.01em; }
+.topctr small { font-size: 11.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pill {
+  flex: 0 0 auto; font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--dim); background: rgba(255, 255, 255, .05);
+}
+.pill.ok { color: #04251a; background: var(--mint); border-color: transparent; }
+.pill.wait { color: #ffe6a8; background: rgba(255, 203, 77, .12); border-color: rgba(255, 203, 77, .3); }
+.pill.off { color: #ffd0d0; background: rgba(255, 122, 122, .14); border-color: rgba(255, 122, 122, .32); }
+
+/* ── 로비 ── */
+#scr-room { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.lobbybody { display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; }
+.codecard {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 16px 14px; border-radius: var(--r);
+  background: linear-gradient(158deg, rgba(90, 209, 255, .10), rgba(177, 140, 255, .06)), linear-gradient(180deg, var(--card), var(--card2));
+  border: 1px solid rgba(90, 209, 255, .2);
+}
+.codelab { font-size: 11px; font-weight: 800; letter-spacing: .16em; color: var(--dim); }
+.codebig { font-size: 40px; font-weight: 900; letter-spacing: .18em; color: #eaf6ff; text-shadow: 0 0 26px rgba(90, 209, 255, .45); margin: 2px 0 8px; }
+.seatgrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
+.seat {
+  appearance: none; position: relative; border: 1px solid rgba(255, 255, 255, .09);
+  background: rgba(255, 255, 255, .03); border-radius: 12px; padding: 9px 2px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0;
+  color: var(--dim); font: inherit; cursor: pointer;
+}
+.seat .sno { font-size: 10.5px; font-weight: 900; color: #7d8cab; }
+.seat .sname { font-size: 11px; font-weight: 800; color: #dce7ff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seat.filled { border-color: rgba(90, 209, 255, .3); background: linear-gradient(180deg, rgba(90, 209, 255, .14), rgba(90, 209, 255, .04)); }
+.seat.filled .sno { color: var(--sky); }
+.seat.me { border-color: rgba(255, 203, 77, .55); box-shadow: 0 0 0 1px rgba(255, 203, 77, .2) inset, 0 6px 16px rgba(255, 203, 77, .12); }
+.seat.me .sname { color: #ffe9b0; }
+.seat.empty { border-style: dashed; }
+.seat.empty .sname { color: #5f6e8c; }
+.seat.off { opacity: .55; }
+.seat .sdot { position: absolute; top: 6px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: transparent; }
+.seat.filled .sdot { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+.seat.off .sdot { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.guestnote { text-align: center; font-size: 12.5px; color: var(--dim); padding: 10px; border: 1px dashed var(--line); border-radius: 12px; }
+
+/* ── 플레이 ── */
+#scr-play { overflow: hidden; }
+.stage {
+  position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px;
+}
+.seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; flex: 0 0 auto; }
+.pseat {
+  display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px;
+  border-radius: 10px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .07);
+  min-width: 0; cursor: pointer; transition: background .2s, border-color .2s, transform .16s;
+}
+.pseat .pn { font-size: 9.5px; font-weight: 900; color: #7d8cab; }
+.pseat .pt { font-size: 10.5px; font-weight: 800; color: #dae6ff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pseat.empty { opacity: .45; }
+.pseat.empty .pt { color: #6b7a99; }
+.pseat.win { border-color: rgba(255, 203, 77, .7); background: linear-gradient(180deg, rgba(255, 203, 77, .28), rgba(255, 203, 77, .06)); transform: translateY(-2px); }
+.pseat.win .pt { color: #fff3cf; }
+.pseat.lose { border-color: rgba(90, 209, 255, .35); background: rgba(90, 209, 255, .1); }
+.pseat:active { transform: scale(.97); }
+.ladderwrap { position: relative; flex: 1; min-height: 0; }
+#ladder { display: block; width: 100%; height: 100%; touch-action: manipulation; }
+.results { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; flex: 0 0 auto; }
+.rcard {
+  position: relative; min-height: 46px; border-radius: 11px; padding: 6px 2px;
+  display: grid; place-items: center; text-align: center; overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .08); background: rgba(255, 255, 255, .04);
+}
+.rcard .q { font-size: 17px; font-weight: 900; color: #64748f; }
+.rcard .rv { display: none; word-break: keep-all; overflow-wrap: anywhere; font-size: 10px; font-weight: 800; line-height: 1.25; color: #e6efff; padding: 0 2px; }
+.rcard.on .q { display: none; }
+.rcard.on .rv { display: block; }
+.rcard.win.on { border-color: rgba(255, 203, 77, .75); background: linear-gradient(180deg, rgba(255, 203, 77, .3), rgba(255, 150, 70, .12)); box-shadow: 0 8px 22px rgba(255, 180, 70, .2); }
+.rcard.win.on .rv { color: #fff6dc; font-size: 10.5px; }
+.rcard.empty { opacity: .5; border-style: dashed; }
+.rcard.empty .q, .rcard.empty .rv { color: #61708d; }
+.rcard.empty.on .rv { font-size: 9.5px; }
+.countdown {
+  position: absolute; inset: 0; display: grid; place-items: center; z-index: 5;
+  font-size: 96px; font-weight: 900; color: #fff;
+  text-shadow: 0 0 40px rgba(255, 203, 77, .8), 0 8px 30px rgba(0, 0, 0, .7);
+  pointer-events: none;
+}
+.countdown.pop { animation: cdPop .5s ease-out; }
+@keyframes cdPop {
+  0% { transform: scale(.5); opacity: 0; }
+  35% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: .92; }
+}
+.resultbar {
+  position: relative; flex: 0 0 auto; z-index: 6;
+  display: flex; flex-direction: column; gap: 6px; padding: 13px 14px 12px;
+  border-radius: 18px; border: 1px solid rgba(255, 203, 77, .3);
+  background: linear-gradient(180deg, rgba(20, 28, 46, .97), rgba(12, 17, 30, .99));
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .04) inset;
+  animation: rbIn .42s cubic-bezier(.2, .9, .25, 1);
+}
+@keyframes rbIn { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.rbhead { font-size: 15px; font-weight: 900; line-height: 1.35; color: #fff3cf; letter-spacing: -.01em; }
+.rbsub { font-size: 11.5px; color: var(--dim); line-height: 1.45; }
+.rbrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.toast {
+  position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%);
+  z-index: 9; max-width: 90%; padding: 10px 14px; border-radius: 12px;
+  background: rgba(8, 12, 22, .94); border: 1px solid var(--line);
+  font-size: 12.5px; font-weight: 700; color: #e6efff; text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+}
+
+/* 전체화면일 때 여유 */
+:fullscreen #app, :-webkit-full-screen #app { max-width: none; height: 100dvh; padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+
+/* 작은 화면 보정 (360px) */
+@media (max-width: 370px) {
+  #app { padding-left: 10px; padding-right: 10px; }
+  .codebig { font-size: 34px; letter-spacing: .14em; }
+  .seat .sname { font-size: 10px; }
+  .pseat .pt { font-size: 9.5px; }
+  .tabs button { font-size: 12.5px; padding: 9px 4px; }
+  .setup { padding: 13px; }
+}
+@media (min-height: 820px) {
+  h1 { font-size: clamp(30px, 8.4vw, 38px); }
+  .rcard { min-height: 54px; }
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═════════════════ 홈 ═════════════════ -->
+  <section id="scr-home" class="screen">
+    <header class="hero">
+      <div class="brand"><span class="logo" aria-hidden="true"><svg class="lad" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 3v18M16.5 3v18M7.5 8h9M7.5 12.5h9M7.5 17h9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></span> 한판 사다리</div>
+      <h1>여섯 칸 사다리,<br><em>한 명만</em> 걸린다</h1>
+      <p class="lede">2~6명이 각자 폰으로 들어와 <b>같은 사다리</b>를 함께 내려갑니다. 남는 칸은 공석 — 당첨은 꼭 참여한 사람 중에서만 나옵니다.</p>
+    </header>
+
+    <div class="tabs" id="modeTabs" role="tablist">
+      <button type="button" data-m="online" class="on" role="tab">🌐 온라인 방</button>
+      <button type="button" data-m="one" role="tab">📱 한 폰으로 타기</button>
+    </div>
+
+    <!-- 온라인 -->
+    <div class="panel" id="panelOnline">
+      <div class="card setup">
+        <label class="lab" for="inName">내 이름</label>
+        <input id="inName" class="inp" maxlength="8" placeholder="예: 석호" autocomplete="off" spellcheck="false">
+        <button class="btn primary wide" id="btnCreate">🌐 방 만들기</button>
+        <div class="or"><i></i><span>또는 초대받은 방</span><i></i></div>
+        <div class="joinrow">
+          <input id="inCode" class="inp code" maxlength="4" placeholder="ABCD" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="방 코드 4자리">
+          <button class="btn warm" id="btnJoin">참가</button>
+        </div>
+        <p class="hint" id="homeHint">방을 만들면 4자리 코드와 초대 링크가 생깁니다 · 2~6명</p>
+      </div>
+    </div>
+
+    <!-- 한 폰으로 -->
+    <div class="panel hidden" id="panelOne">
+      <div class="card setup">
+        <div class="setting">
+          <span class="lab">참가자</span>
+          <div class="seg" id="oneCount"></div>
+        </div>
+        <div class="names" id="oneNames"></div>
+        <div class="setting">
+          <span class="lab">자리 (공석 포함 6칸)</span>
+          <button class="btn ghost sm" id="btnShuffleSeats" type="button">🎲 자리 섞기</button>
+        </div>
+        <div class="miniseats" id="oneSeats"></div>
+        <div class="setting">
+          <span class="lab">당첨 인원</span>
+          <div class="seg" id="oneWin"></div>
+        </div>
+        <div class="setting col">
+          <span class="lab">결과 문구</span>
+          <div class="chips" id="onePresets"></div>
+          <input id="oneWinText" class="inp" maxlength="24" placeholder="당첨 문구 (예: ☕ 커피 쏘기)" autocomplete="off">
+          <input id="oneLoseText" class="inp" maxlength="24" placeholder="통과 문구 (예: 😌 통과)" autocomplete="off">
+        </div>
+        <button class="btn primary wide big" id="btnOneStart"><svg class="lad" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 3v18M16.5 3v18M7.5 8h9M7.5 12.5h9M7.5 17h9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> 사다리 타기</button>
+      </div>
+    </div>
+
+    <p class="foot"><svg class="lad" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 3v18M16.5 3v18M7.5 8h9M7.5 12.5h9M7.5 17h9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> <b>한판 사다리</b> — 6칸 고정, 참여자 자리에만 결과 배치<br>공석이 당첨되는 일은 0건, 참여자 확률은 모두 똑같습니다.</p>
+  </section>
+
+  <!-- ═════════════════ 로비 ═════════════════ -->
+  <section id="scr-room" class="screen hidden">
+    <div class="topbar">
+      <button class="iconbtn" id="btnRoomBack" aria-label="나가기">‹</button>
+      <div class="topctr"><b id="roomTitle">방 코드</b><small id="roomSub">친구를 기다리는 중</small></div>
+      <div class="pill" id="roomPill">연결 중</div>
+    </div>
+
+    <div class="lobbybody">
+      <div class="codecard">
+        <div class="codelab">방 코드</div>
+        <div class="codebig" id="roomCode">····</div>
+        <button class="btn lite" id="btnCopyLink" type="button">🔗 초대 링크 복사</button>
+      </div>
+
+      <div class="seatgrid" id="roomSeats" aria-label="자리 6칸"></div>
+
+      <div class="card" id="hostPanel">
+        <div class="setting">
+          <span class="lab">당첨 인원</span>
+          <div class="seg" id="roomWin"></div>
+        </div>
+        <div class="setting col">
+          <span class="lab">결과 문구</span>
+          <div class="chips" id="roomPresets"></div>
+          <input id="roomWinText" class="inp" maxlength="24" placeholder="당첨 문구" autocomplete="off">
+          <input id="roomLoseText" class="inp" maxlength="24" placeholder="통과 문구" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="guestnote hidden" id="guestNote">방장이 결과를 고르고 시작합니다.</div>
+
+      <button class="btn primary wide big" id="btnRoomStart" disabled><svg class="lad" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 3v18M16.5 3v18M7.5 8h9M7.5 12.5h9M7.5 17h9" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> 사다리 시작</button>
+      <p class="hint center" id="roomHint">2명 이상 모이면 시작할 수 있어요.</p>
+    </div>
+  </section>
+
+  <!-- ═════════════════ 플레이 ═════════════════ -->
+  <section id="scr-play" class="screen hidden">
+    <div class="topbar">
+      <button class="iconbtn" id="btnPlayBack" aria-label="나가기">‹</button>
+      <div class="topctr"><b id="playTitle">사다리</b><small id="playSub"></small></div>
+      <button class="iconbtn" id="btnFull" aria-label="전체화면">⛶</button>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="seats" id="playSeats"></div>
+      <div class="ladderwrap"><canvas id="ladder" aria-label="사다리 판"></canvas></div>
+      <div class="results" id="playResults"></div>
+      <div class="countdown hidden" id="countdown"></div>
+      <div class="resultbar hidden" id="resultBar">
+        <div class="rbhead" id="resultHead">결과</div>
+        <div class="rbsub" id="resultSub"></div>
+        <div class="rbrow">
+          <button class="btn primary" id="btnAgain">다시 하기</button>
+          <button class="btn" id="btnLeave">나가기</button>
+        </div>
+      </div>
+      <div class="toast hidden" id="toast"></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ===== 한판 사다리 · core: 6칸 사다리 생성 · 공석 처리 · 결과 배치 =====
+   설계 원칙 (plan.md 2장)
+     · 위쪽 슬롯은 항상 6칸(0~5). 사람이 없는 칸은 '공석'.
+     · 가로줄은 6개 세로줄 전체에 정상적으로 랜덤 생성(인접 열마다 최소 1개,
+       같은 높이에서 겹치는 가로줄 금지) → endOf 는 0..5 의 일대일 순열.
+     · 결과는 '참여자가 도착하는 하단 칸'에만 놓고, 공석이 도착하는 칸은 무조건 공석.
+       → 공석 당첨은 수학적으로 0건, 당첨자는 항상 실제 참여자 중 정확히 winCount 명.
+
+   모든 함수는 시드 하나로 완전히 결정된다 — 방장이 시드를 보내면 모든 폰이
+   같은 사다리·같은 결과를 그린다. */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+
+  var COLS = 6;          // 위·아래 슬롯 6칸 고정
+  var ROWS = 10;         // 사다리 높이(가로줄을 놓을 수 있는 층 수)
+
+  var PRESETS = [
+    { id: 'coffee',  label: '☕ 커피 쏘기', win: '☕ 커피 쏘기', lose: '😌 통과' },
+    { id: 'night',   label: '🍗 야식 쏘기', win: '🍗 야식 쏘기', lose: '😌 통과' },
+    { id: 'duty',    label: '🧹 당번',      win: '🧹 당번',      lose: '😌 통과' },
+    { id: 'penalty', label: '🎯 벌칙',      win: '🎯 벌칙',      lose: '😌 통과' },
+    { id: 'custom',  label: '✍️ 직접 입력', win: '',            lose: '😌 통과' }
+  ];
+
+  /* ── 시드 난수 (문자열·숫자 모두) ─────────────────────── */
+  function hash32(str) {
+    var s = String(str), h = 2166136261 >>> 0;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function makeRng(seed) {
+    var a = (typeof seed === 'number' ? (seed >>> 0) : hash32(seed)) || 0x9e3779b9;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function randInt(r, n) { return Math.floor(r() * n) % n; }
+
+  function shuffle(r, arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = randInt(r, i + 1), t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ── 가로줄 생성 ──────────────────────────────────────── */
+  function makeRungs(r, rows, cols) {
+    var has = {}, rungs = [];
+
+    function free(row, c) {
+      // (row,c) 에 가로줄을 놓으면 (row,c-1)·(row,c+1) 과 겹친다
+      return !has[row + ':' + c] && !has[row + ':' + (c - 1)] && !has[row + ':' + (c + 1)];
+    }
+    function put(row, c) {
+      has[row + ':' + c] = 1;
+      rungs.push({ r: row, c: c });
+    }
+
+    /* 1) 모든 인접 열 쌍 (c,c+1) 에 최소 1개 — 섞인 순서로 자리를 찾는다 */
+    var pairs = [];
+    for (var c = 0; c < cols - 1; c++) pairs.push(c);
+    pairs = shuffle(r, pairs);
+    for (var pi = 0; pi < pairs.length; pi++) {
+      var pc = pairs[pi], placed = false;
+      var start = randInt(r, rows);
+      for (var k = 0; k < rows; k++) {
+        var row = (start + k) % rows;
+        if (free(row, pc)) { put(row, pc); placed = true; break; }
+      }
+      if (!placed) put(randInt(r, rows), pc);   // 이론상 도달하지 않는다
+    }
+
+    /* 2) 나머지 칸을 확률적으로 — 같은 높이 겹침은 free() 가 막는다 */
+    var density = 0.34;
+    for (var rr = 0; rr < rows; rr++) {
+      for (var cc = 0; cc < cols - 1; cc++) {
+        if (r() < density && free(rr, cc)) put(rr, cc);
+      }
+    }
+
+    rungs.sort(function (a, b) { return a.r - b.r || a.c - b.c; });
+    return rungs;
+  }
+
+  function rungIndex(rungs) {
+    var has = {};
+    for (var i = 0; i < rungs.length; i++) has[rungs[i].r + ':' + rungs[i].c] = 1;
+    return function (row, c) { return !!has[row + ':' + c]; };
+  }
+
+  /* ── 아래로 추적: 각 출발 열의 도착 열 + 지나간 자리 ────── */
+  function traceAll(rungs, rows, cols) {
+    var has = rungIndex(rungs);
+    var endOf = [], paths = [];
+    for (var c = 0; c < cols; c++) {
+      var p = c, path = [c];
+      for (var row = 0; row < rows; row++) {
+        if (has(row, p)) p++;
+        else if (p > 0 && has(row, p - 1)) p--;
+        path.push(p);
+      }
+      endOf.push(p);
+      paths.push(path);
+    }
+    return { endOf: endOf, paths: paths };
+  }
+
+  /* ── 위로 추적(역방향): 한 층의 이동은 대합(involution)이라 같은 규칙을 거꾸로 적용 */
+  function traceUp(rungs, rows, end) {
+    var has = rungIndex(rungs);
+    var p = end, path = [end];
+    for (var row = rows - 1; row >= 0; row--) {
+      if (p > 0 && has(row, p - 1)) p--;
+      else if (has(row, p)) p++;
+      path.push(p);
+    }
+    return { start: p, path: path.reverse() };
+  }
+
+  function clampInt(v, lo, hi) {
+    v = Math.round(Number(v) || 0);
+    return v < lo ? lo : (v > hi ? hi : v);
+  }
+
+  /* ── 사다리 한 판 ─────────────────────────────────────── */
+  function generate(opts) {
+    opts = opts || {};
+    var cols = clampInt(opts.cols || COLS, 2, 8);
+    var rows = clampInt(opts.rows || ROWS, 6, 16);
+    var seed = (opts.seed === undefined || opts.seed === null || opts.seed === '') ? ((Date.now() ^ (Math.random() * 4294967295)) >>> 0) : opts.seed;
+
+    var activeCols = (opts.activeCols || []).map(function (v) { return clampInt(v, 0, cols - 1); })
+      .filter(function (v, i, a) { return a.indexOf(v) === i; })
+      .sort(function (a, b) { return a - b; });
+    if (activeCols.length < 1) activeCols = [0];
+
+    var maxWin = Math.max(1, activeCols.length - 1);
+    var winCount = clampInt(opts.winCount || 1, 1, maxWin);
+
+    var winText = String(opts.winText || '').slice(0, 24) || '🎯 당첨';
+    var loseText = String(opts.loseText || '').slice(0, 24) || '😌 통과';
+    var emptyText = String(opts.emptyText || '').slice(0, 12) || '공석';
+
+    var r = makeRng('ladder|v1|' + seed);
+    var rungs = makeRungs(r, rows, cols);
+    var tr = traceAll(rungs, rows, cols);
+    var endOf = tr.endOf;
+
+    /* 결과 배치 — 참여자가 도착하는 하단 칸(activeEnds)에만 당첨/통과,
+       공석이 도착하는 칸은 무조건 공석. (당첨자는 activeEnds 중 winCount 칸) */
+    var activeEnds = [], inactiveEnds = [];
+    var isActiveEnd = {};
+    for (var i = 0; i < activeCols.length; i++) { activeEnds.push(endOf[activeCols[i]]); isActiveEnd[endOf[activeCols[i]]] = 1; }
+    for (var e = 0; e < cols; e++) if (!isActiveEnd[e]) inactiveEnds.push(e);
+
+    var winEnds = {};
+    var pick = shuffle(r, activeEnds);
+    for (var w = 0; w < winCount && w < pick.length; w++) winEnds[pick[w]] = 1;
+
+    var results = [];
+    for (var b = 0; b < cols; b++) {
+      if (isActiveEnd[b]) results.push({ type: winEnds[b] ? 'win' : 'lose', text: winEnds[b] ? winText : loseText });
+      else results.push({ type: 'empty', text: emptyText });
+    }
+
+    var names = opts.names || {};
+    var participants = activeCols.map(function (c) {
+      var res = results[endOf[c]];
+      return {
+        col: c,
+        name: names[c] || ((c + 1) + '번'),
+        end: endOf[c],
+        path: tr.paths[c],
+        type: res.type,
+        text: res.text
+      };
+    });
+
+    return {
+      seed: seed, cols: cols, rows: rows,
+      rungs: rungs,
+      endOf: endOf,
+      paths: tr.paths,
+      activeCols: activeCols,
+      activeEnds: activeEnds,
+      inactiveEnds: inactiveEnds,
+      winCount: winCount,
+      winText: winText, loseText: loseText, emptyText: emptyText,
+      results: results,
+      winners: participants.filter(function (p) { return p.type === 'win'; }).map(function (p) { return p.col; }),
+      participants: participants
+    };
+  }
+
+  /* ── 불변식 검사 (테스트·자체 점검 공용) ───────────────── */
+  function verify(g) {
+    var errs = [], i, j;
+    var cols = g.cols, rows = g.rows;
+    if (cols !== COLS) errs.push('cols != 6: ' + cols);
+    if (!g.rungs || !g.rungs.length) errs.push('가로줄 없음');
+
+    var seen = {};
+    for (i = 0; i < g.rungs.length; i++) {
+      var rung = g.rungs[i];
+      if (rung.r < 0 || rung.r >= rows) errs.push('가로줄 행 범위: ' + rung.r);
+      if (rung.c < 0 || rung.c >= cols - 1) errs.push('가로줄 열 범위: ' + rung.c);
+      var key = rung.r + ':' + rung.c;
+      if (seen[key]) errs.push('가로줄 중복: ' + key);
+      seen[key] = 1;
+      // 같은 높이에서 이웃과 겹치면 안 된다
+      if (seen[rung.r + ':' + (rung.c - 1)] || seen[rung.r + ':' + (rung.c + 1)]) errs.push('가로줄 겹침: ' + key);
+    }
+
+    // 인접 열마다 최소 1개
+    for (var c = 0; c < cols - 1; c++) {
+      var hasPair = false;
+      for (i = 0; i < g.rungs.length; i++) if (g.rungs[i].c === c) { hasPair = true; break; }
+      if (!hasPair) errs.push('인접 열 가로줄 없음: ' + c + '-' + (c + 1));
+    }
+
+    // 일대일 순열
+    var sorted = g.endOf.slice().sort(function (a, b) { return a - b; });
+    for (i = 0; i < cols; i++) if (sorted[i] !== i) { errs.push('endOf 순열 아님: ' + g.endOf.join(',')); break; }
+
+    // 순방향 추적 = 저장된 값, 역방향 추적 = 출발 칸
+    var tr = traceAll(g.rungs, rows, cols);
+    for (i = 0; i < cols; i++) {
+      if (tr.endOf[i] !== g.endOf[i]) errs.push('추적 불일치 col ' + i + ': ' + tr.endOf[i] + ' vs ' + g.endOf[i]);
+      var up = traceUp(g.rungs, rows, g.endOf[i]);
+      if (up.start !== i) errs.push('역방향 불일치 end ' + g.endOf[i] + ' → ' + up.start + ' (기대 ' + i + ')');
+      if (up.path.join(',') !== g.paths[i].join(',')) errs.push('경로 불일치 col ' + i);
+    }
+
+    // 공석/당첨 배치
+    var activeEnd = {}, inactiveEnd = {};
+    for (i = 0; i < g.activeCols.length; i++) activeEnd[g.endOf[g.activeCols[i]]] = 1;
+    for (i = 0; i < cols; i++) if (!activeEnd[i]) inactiveEnd[i] = 1;
+    var winSeen = 0;
+    for (i = 0; i < cols; i++) {
+      var res = g.results[i];
+      if (!res) { errs.push('결과 없음: ' + i); continue; }
+      if (inactiveEnd[i]) {
+        if (res.type !== 'empty') errs.push('공석 칸에 결과 배치: ' + i + ' ' + res.type);
+        if (res.text !== g.emptyText) errs.push('공석 문구 불일치: ' + res.text);
+      } else {
+        if (res.type === 'empty') errs.push('참여 칸이 공석: ' + i);
+        if (res.type === 'win') winSeen++;
+      }
+    }
+    if (winSeen !== Math.min(g.winCount, g.activeCols.length)) errs.push('당첨 칸 수 ' + winSeen + ' != ' + g.winCount);
+
+    // 참여자별 결과가 실제로 서로 다른 하단 칸에 놓였는가
+    var usedEnd = {};
+    for (i = 0; i < g.participants.length; i++) {
+      var p = g.participants[i];
+      if (usedEnd[p.end]) errs.push('참여자 도착 칸 중복: ' + p.end);
+      usedEnd[p.end] = 1;
+      if (p.type === 'empty') errs.push('참여자가 공석 결과: col ' + p.col);
+      if (g.results[p.end].type !== p.type) errs.push('참여자 결과 불일치: col ' + p.col);
+    }
+    if (g.participants.length !== g.activeCols.length) errs.push('참여자 수 불일치');
+    var winP = g.participants.filter(function (p) { return p.type === 'win'; }).length;
+    if (winP !== Math.min(g.winCount, Math.max(1, g.activeCols.length - 1))) errs.push('당첨자 수 ' + winP + ' != ' + g.winCount);
+
+    return { ok: errs.length === 0, errs: errs };
+  }
+
+  HJ.ladder = {
+    COLS: COLS, ROWS: ROWS, PRESETS: PRESETS,
+    makeRng: makeRng, hash32: hash32, shuffle: shuffle,
+    generate: generate, verify: verify,
+    traceUp: traceUp,
+    rungIndex: function (g) { return rungIndex(g.rungs); }
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* ===== 한판 사다리 · net: 4자리 방 코드 · 공개 MQTT 브로커 4곳(WSS 443) · BroadcastChannel =====
+   한판 맞고·한판 직소에서 검증한 전송 구조를 2~6인 방에 맞게 고쳤다.
+
+   · 1순위: WSS 중계(MQTT over WebSocket) — 각 폰이 브로커 4곳에 동시에 붙어
+            같은 방 토픽(ladder/v1/{CODE})으로 주고받는다. 한 곳이 막히거나 조용히
+            끊겨도 다른 곳으로 계속 간다. 443 포트만 쓴다.
+   · 2순위: BroadcastChannel — 같은 브라우저 탭끼리(테스트·폴백). ?test=bc
+
+   방 안에는 방장(h) 한 명과 참가자(p) 여럿. 모두가 서로의 존재(presence)를 보고,
+   실제 게임 상태는 방장만 보낸다(권위 서버 없는 구조에서 상태를 한 곳으로 모은다).
+   외부 라이브러리 없이 필요한 MQTT 패킷만 직접 만든다. */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+
+  var NET = {
+    version: 1,
+    topicBase: 'ladder/v1/',
+    bcPrefix: 'ladder-v1-',
+    alphabet: 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',   // 0·O·1·I 제외 32자
+    codeLen: 4,
+    relay: {
+      brokers: [
+        { name: 'TBMQ', url: 'wss://demo.tbmq.io/mqtt', user: 'demo' },      // 443
+        { name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt' },
+        { name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt' },
+        { name: 'Mosquitto', url: 'wss://test.mosquitto.org:8081/mqtt' }
+      ],
+      connectMs: 7000,
+      beatMs: 2000,
+      deadMs: 16000,
+      keepaliveS: 45,
+      only: null
+    }
+  };
+
+  /* 테스트용 유예 시간 단축 (?dead=3000) — 배포본에서는 아무도 쓰지 않는다 */
+  try {
+    var dm = /[?&]dead=(\d+)/.exec(location.search);
+    if (dm) NET.relay.deadMs = Math.min(60000, Math.max(1200, +dm[1]));
+  } catch (e) { }
+
+  /* ── 방 코드 ─────────────────────────────────────────── */
+  function netNewCode() {
+    var s = '', buf = null;
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        buf = new Uint32Array(NET.codeLen);
+        window.crypto.getRandomValues(buf);
+      }
+    } catch (e) { buf = null; }
+    for (var i = 0; i < NET.codeLen; i++) {
+      var v = buf ? buf[i] : Math.floor(Math.random() * 4294967296);
+      s += NET.alphabet.charAt(v % NET.alphabet.length);
+    }
+    return s;
+  }
+
+  function netNormalizeCode(v) {
+    if (!v) return '';
+    var up = String(v).toUpperCase(), out = '';
+    for (var i = 0; i < up.length && out.length < NET.codeLen; i++) {
+      var c = up.charAt(i);
+      if (NET.alphabet.indexOf(c) >= 0) out += c;
+    }
+    return out;
+  }
+
+  function netRoomLink(code) {
+    var base = location.href.split('#')[0].split('?')[0];
+    return base + '?r=' + code;
+  }
+
+  function netUid() {
+    var s = '', chars = 'abcdefghijklmnopqrstuvwxyz0123456789', buf = null;
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        buf = new Uint32Array(12);
+        window.crypto.getRandomValues(buf);
+      }
+    } catch (e) { buf = null; }
+    for (var i = 0; i < 12; i++) {
+      var v = buf ? buf[i] : Math.floor(Math.random() * 4294967296);
+      s += chars.charAt(v % chars.length);
+    }
+    return s;
+  }
+
+  function netErr(type, cause) {
+    var e = new Error(String(type));
+    e.type = type;
+    if (cause) e.cause = cause;
+    return e;
+  }
+
+  /* ═════════════════════════════════════════════════════════
+     전송 계층 1 — WSS 중계 (MQTT 3.1.1 over WebSocket)
+     ═════════════════════════════════════════════════════════ */
+  var NET_TXT = (typeof TextDecoder === 'function') ? new TextDecoder('utf-8') : null;
+
+  function netBytes(s) {
+    var enc = (typeof TextEncoder === 'function') ? new TextEncoder() : null;
+    var arr = enc ? enc.encode(s) : (function () {
+      var out = [], esc = unescape(encodeURIComponent(s));
+      for (var i = 0; i < esc.length; i++) out.push(esc.charCodeAt(i));
+      return out;
+    })();
+    return Array.prototype.slice.call(arr);
+  }
+
+  function netMqttStr(s) {
+    var b = netBytes(s);
+    return [b.length >> 8, b.length & 0xff].concat(b);
+  }
+
+  function netMqttLen(n) {
+    var out = [];
+    do {
+      var d = n % 128;
+      n = Math.floor(n / 128);
+      if (n > 0) d |= 0x80;
+      out.push(d);
+    } while (n > 0);
+    return out;
+  }
+
+  function netMqttPacket(type, flags, body) {
+    var rl = netMqttLen(body.length);
+    var out = new Uint8Array(1 + rl.length + body.length);
+    out[0] = (type << 4) | (flags & 0x0f);
+    out.set(rl, 1);
+    out.set(body, 1 + rl.length);
+    return out;
+  }
+
+  function MqttWs(opt) {
+    this.url = opt.url;
+    this.clientId = opt.clientId;
+    this.username = opt.username || '';
+    this.onPacket = opt.onPacket || function () {};
+    this.onClose = opt.onClose || function () {};
+    this.ws = null;
+    this.buf = new Uint8Array(0);
+    this.ready = false;
+    this.wasReady = false;
+    this._dead = false;
+    this.pid = 1;
+    this.waiters = {};
+    this.kaTimer = null;
+    this._connack = null;
+  }
+
+  MqttWs.prototype.connect = function (ms) {
+    var self = this;
+    var limit = ms || NET.relay.connectMs;
+    return new Promise(function (resolve, reject) {
+      var settled = false, timer = null;
+      var fin = function (fn, v) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        fn(v);
+      };
+      timer = setTimeout(function () {
+        fin(reject, netErr('relay-timeout'));
+        self.close();
+      }, limit);
+      var ws;
+      try { ws = new WebSocket(self.url, 'mqtt'); }
+      catch (e) { fin(reject, netErr('relay-blocked', e)); return; }
+      self.ws = ws;
+      try { ws.binaryType = 'arraybuffer'; } catch (e) {}
+      self._connack = function (code) {
+        if (code === 0) {
+          self.ready = true;
+          self.wasReady = true;
+          fin(resolve, true);
+          self._startKeepalive();
+        } else {
+          fin(reject, netErr('relay-refused'));
+          self.close();
+        }
+      };
+      ws.onopen = function () {
+        try { ws.send(self._connectPacket()); }
+        catch (e) { fin(reject, netErr('relay-send', e)); }
+      };
+      ws.onmessage = function (ev) { self._feed(ev.data); };
+      ws.onerror = function () { fin(reject, netErr('relay-error')); };
+      ws.onclose = function () {
+        fin(reject, netErr('relay-closed'));
+        self._down();
+      };
+    });
+  };
+
+  MqttWs.prototype._connectPacket = function () {
+    var flags = 0x02 | (this.username ? 0x80 : 0);
+    var body = [0, 4, 77, 81, 84, 84, 4, flags]
+      .concat([(NET.relay.keepaliveS >> 8) & 0xff, NET.relay.keepaliveS & 0xff])
+      .concat(netMqttStr(this.clientId));
+    if (this.username) Array.prototype.push.apply(body, netMqttStr(this.username));
+    return netMqttPacket(1, 0, body);
+  };
+
+  MqttWs.prototype.subscribe = function (topic) {
+    var self = this;
+    return new Promise(function (resolve, reject) {
+      if (!self.ready || !self.ws) { reject(netErr('relay-not-ready')); return; }
+      var id = self.pid++;
+      if (self.pid > 60000) self.pid = 1;
+      self.waiters[id] = { resolve: resolve, reject: reject };
+      var body = [id >> 8, id & 0xff].concat(netMqttStr(topic)).concat([0]);
+      try { self.ws.send(netMqttPacket(8, 2, body)); }
+      catch (e) { delete self.waiters[id]; reject(netErr('relay-send', e)); return; }
+      setTimeout(function () {
+        if (!self.waiters[id]) return;
+        delete self.waiters[id];
+        reject(netErr('relay-suback'));
+      }, 6000);
+    });
+  };
+
+  MqttWs.prototype.publish = function (topic, text) {
+    if (!this.ready || !this.ws || this.ws.readyState !== 1) return false;
+    var body = netMqttStr(topic).concat(netBytes(text));
+    try { this.ws.send(netMqttPacket(3, 0, body)); return true; }
+    catch (e) { return false; }
+  };
+
+  MqttWs.prototype._startKeepalive = function () {
+    var self = this;
+    this._stopKeepalive();
+    this.kaTimer = setInterval(function () {
+      if (!self.ready || !self.ws || self.ws.readyState !== 1) return;
+      try { self.ws.send(new Uint8Array([0xc0, 0x00])); } catch (e) {}
+    }, 20000);
+  };
+
+  MqttWs.prototype._stopKeepalive = function () {
+    if (this.kaTimer) { clearInterval(this.kaTimer); this.kaTimer = null; }
+  };
+
+  MqttWs.prototype._feed = function (data) {
+    var chunk;
+    if (data && typeof data === 'string') chunk = netBytes(data);
+    else if (data && data.byteLength != null) chunk = new Uint8Array(data);
+    else return;
+    if (this.buf.length) {
+      var merged = new Uint8Array(this.buf.length + chunk.length);
+      merged.set(this.buf, 0);
+      merged.set(chunk, this.buf.length);
+      this.buf = merged;
+    } else {
+      this.buf = chunk;
+    }
+    var off = 0;
+    while (this.buf.length - off >= 2) {
+      var mult = 1, len = 0, i = off + 1, ok = false;
+      for (var k = 0; k < 4 && i < this.buf.length; k++) {
+        var d = this.buf[i++];
+        len += (d & 0x7f) * mult;
+        mult *= 128;
+        if ((d & 0x80) === 0) { ok = true; break; }
+      }
+      if (!ok || this.buf.length < i + len) break;
+      var type = this.buf[off] >> 4;
+      var body = this.buf.subarray(i, i + len);
+      off = i + len;
+      this._packet(type, body);
+    }
+    if (off > 0) this.buf = this.buf.slice(off);
+  };
+
+  MqttWs.prototype._packet = function (type, body) {
+    if (type === 2) {                                  // CONNACK
+      var code = body.length > 1 ? body[1] : 255;
+      var f = this._connack;
+      this._connack = null;
+      if (f) f(code);
+      return;
+    }
+    if (type === 9) {                                  // SUBACK
+      var id = (body[0] << 8) | body[1];
+      var w = this.waiters[id];
+      if (!w) return;
+      delete this.waiters[id];
+      if (body[2] === 0x80) w.reject(netErr('relay-subfail'));
+      else w.resolve(true);
+      return;
+    }
+    if (type === 3) {                                  // PUBLISH (QoS 0)
+      if (body.length < 2) return;
+      var tl = (body[0] << 8) | body[1];
+      if (body.length < 2 + tl) return;
+      var topic = '', text = '';
+      try {
+        topic = NET_TXT ? NET_TXT.decode(body.subarray(2, 2 + tl))
+          : decodeURIComponent(escape(String.fromCharCode.apply(null, body.subarray(2, 2 + tl))));
+      } catch (e) { topic = ''; }
+      try {
+        text = NET_TXT ? NET_TXT.decode(body.subarray(2 + tl))
+          : decodeURIComponent(escape(String.fromCharCode.apply(null, body.subarray(2 + tl))));
+      } catch (e) { text = ''; }
+      if (text) this.onPacket(topic, text);
+    }
+  };
+
+  MqttWs.prototype._down = function () {
+    var was = this.wasReady;
+    this.ready = false;
+    this._stopKeepalive();
+    for (var k in this.waiters) {
+      try { this.waiters[k].reject(netErr('relay-closed')); } catch (e) {}
+    }
+    this.waiters = {};
+    if (was && !this._dead) this.onClose();
+  };
+
+  MqttWs.prototype.close = function () {
+    this._dead = true;
+    this.ready = false;
+    this._stopKeepalive();
+    try { if (this.ws) this.ws.close(); } catch (e) {}
+    this.ws = null;
+  };
+
+  /* ═════════════════════════════════════════════════════════
+     버스 — 여러 명이 같은 방 토픽으로 주고받는 통로
+     ═════════════════════════════════════════════════════════ */
+  function Bus(opt) {
+    opt = opt || {};
+    this.code = opt.code;
+    this.sid = opt.sid || ('m' + netUid());
+    this.role = opt.role === 'guest' ? 'guest' : 'host';
+    this.name = String(opt.name || '').slice(0, 10);
+    this.forceBc = !!opt.forceBc;
+    this.topic = NET.topicBase + this.code;
+    this.mode = null;
+    this.connected = false;
+    this.clients = [];
+    this.seq = 0;
+    this.seen = {};
+    this.seenN = 0;
+    this.beatTimer = null;
+    this.watchTimer = null;
+    this.visBound = false;
+    this.dead = false;
+    this.busy = false;
+    this.lastPeerAt = 0;
+    this.peerSeen = {};
+    this.onData = opt.onData || function () {};
+    this.onPresence = opt.onPresence || function () {};
+    this.onUp = opt.onUp || function () {};
+    this.onDown = opt.onDown || function () {};
+    this.bc = null;
+  }
+
+  Bus.prototype.open = function () {
+    var self = this;
+    if (this.forceBc) return this._openBc();
+    return this._connectAll().then(function (any) {
+      if (self.dead) return false;
+      if (any) {
+        self.mode = 'relay';
+        self.connected = true;
+        self._startTimers();
+        self.beacon();
+        self.onUp({ mode: 'relay' });
+        return true;
+      }
+      return self._openBc();
+    });
+  };
+
+  Bus.prototype._openBc = function () {
+    var self = this;
+    return new Promise(function (resolve, reject) {
+      if (typeof window.BroadcastChannel !== 'function') { reject(netErr('no-bc')); return; }
+      var ch;
+      try { ch = new BroadcastChannel(NET.bcPrefix + self.code); }
+      catch (e) { reject(netErr('no-bc', e)); return; }
+      self.bc = ch;
+      self.mode = 'bc';
+      self.connected = true;
+      ch.onmessage = function (ev) { self._onText(ev.data); };
+      self._startTimers();
+      self.beacon();
+      self.onUp({ mode: 'bc' });
+      resolve(true);
+    });
+  };
+
+  Bus.prototype._idxs = function () {
+    var out = [];
+    for (var i = 0; i < NET.relay.brokers.length; i++) {
+      if (NET.relay.only == null || NET.relay.only === i) out.push(i);
+    }
+    return out;
+  };
+
+  Bus.prototype._connectAll = function () {
+    var self = this, idxs = this._idxs();
+    if (!idxs.length) return Promise.resolve(false);
+    return new Promise(function (resolve) {
+      var left = idxs.length, done = false;
+      var finish = function (v) { if (!done) { done = true; resolve(v); } };
+      idxs.forEach(function (i) {
+        self._connectOne(i).then(function () { finish(true); }, function () {})
+          .then(function () { if (--left === 0) finish(false); });
+      });
+    });
+  };
+
+  Bus.prototype._connectOne = function (i) {
+    var self = this, b = NET.relay.brokers[i], cur = this.clients[i];
+    if (cur && cur.ready) return Promise.resolve(true);
+    var mq = new MqttWs({
+      url: b.url,
+      username: b.user || '',
+      clientId: 'ld1' + this.sid + i,
+      onPacket: function (topic, text) { self._onText(text); },
+      onClose: function () { self._onClientDown(i); }
+    });
+    this.clients[i] = { mq: mq, ready: false };
+    return mq.connect(NET.relay.connectMs).then(function () {
+      return mq.subscribe(self.topic);
+    }).then(function () {
+      if (self.clients[i]) self.clients[i].ready = true;
+      self._beatOne(i);
+      return true;
+    }, function (e) {
+      if (self.clients[i]) self.clients[i].ready = false;
+      try { mq.close(); } catch (err) {}
+      throw e;
+    });
+  };
+
+  Bus.prototype._onText = function (text) {
+    if (this.dead) return;
+    var m = null;
+    try { m = JSON.parse(text); } catch (e) { return; }
+    if (!m || typeof m !== 'object') return;
+    if (m.s === this.sid) return;                    // 내가 보낸 것
+    if (m.k === 'h' || m.k === 'p') {                // 존재 신호
+      var now = Date.now();
+      var was = !!this.peerSeen[m.s];
+      this.peerSeen[m.s] = now;
+      this.lastPeerAt = now;
+      if (!was) this._beat();                        // 새로 온 사람에게 바로 내 존재를 알린다
+      try { this.onPresence({ sid: m.s, kind: m.k, name: String(m.n || '').slice(0, 10) }); } catch (e) {}
+      return;
+    }
+    if (!m.d || typeof m.d !== 'object') return;
+    if (typeof m.q === 'number') {
+      var key = m.s + ':' + m.q;
+      if (this.seen[key]) return;
+      this.seen[key] = 1;
+      if (++this.seenN > 500) { this.seen = {}; this.seenN = 0; }
+    }
+    this.lastPeerAt = Date.now();
+    if (!this.peerSeen[m.s]) this._beat();
+    this.peerSeen[m.s] = Date.now();
+    try { this.onData(m.d, m.s); } catch (e) { if (root.console) console.error('[net] data', e); }
+  };
+
+  Bus.prototype._presence = function () {
+    return JSON.stringify({ s: this.sid, k: this.role === 'host' ? 'h' : 'p', n: this.name });
+  };
+
+  Bus.prototype._beatOne = function (i) {
+    var c = this.clients[i];
+    if (c && c.ready) c.mq.publish(this.topic, this._presence());
+  };
+
+  Bus.prototype._beat = function () { this.beacon(); };
+
+  Bus.prototype.beacon = function () {
+    if (this.dead) return;
+    if (this.mode === 'bc') {
+      if (this.bc) { try { this.bc.postMessage(this._presence()); } catch (e) {} }
+      return;
+    }
+    for (var i = 0; i < this.clients.length; i++) this._beatOne(i);
+  };
+
+  Bus.prototype._startTimers = function () {
+    var self = this;
+    if (!this.beatTimer) {
+      this.beatTimer = setInterval(function () { if (!self.dead) self.beacon(); }, NET.relay.beatMs);
+    }
+    if (!this.watchTimer) {
+      this.watchTimer = setInterval(function () {
+        if (self.dead || self.mode === 'bc') return;
+        if (typeof document !== 'undefined' && document.hidden) { self.lastPeerAt = Date.now(); return; }
+        var ready = 0;
+        for (var i = 0; i < self.clients.length; i++) if (self.clients[i] && self.clients[i].ready) ready++;
+        if (!ready) self._recover();
+        var now = Date.now();
+        for (var k in self.peerSeen) if (now - self.peerSeen[k] > NET.relay.deadMs) delete self.peerSeen[k];
+      }, 1000);
+    }
+    this._bindVisibility();
+  };
+
+  Bus.prototype._bindVisibility = function () {
+    if (this.visBound || typeof document === 'undefined') return;
+    this.visBound = true;
+    var self = this;
+    document.addEventListener('visibilitychange', function () {
+      if (self.dead || document.hidden) return;
+      self.beacon();
+      if (self.mode === 'relay') {
+        var ready = 0;
+        for (var i = 0; i < self.clients.length; i++) if (self.clients[i] && self.clients[i].ready) ready++;
+        if (!ready) self._recover();
+      }
+    });
+  };
+
+  Bus.prototype._recover = function () {
+    if (this.busy || this.dead || this.mode === 'bc') return;
+    var self = this;
+    this.busy = true;
+    this._connectAll().then(function (any) {
+      self.busy = false;
+      if (!any || self.dead) return;
+      self.connected = true;
+      self._startTimers();
+      self.beacon();
+      self.onUp({ mode: self.mode });
+    }, function () { self.busy = false; });
+  };
+
+  Bus.prototype._onClientDown = function (i) {
+    var c = this.clients[i];
+    if (c) c.ready = false;
+    var ready = 0;
+    for (var k = 0; k < this.clients.length; k++) if (this.clients[k] && this.clients[k].ready) ready++;
+    if (!ready) {
+      this.connected = false;
+      this.onDown({});
+      this._recover();
+    }
+  };
+
+  Bus.prototype.send = function (obj) {
+    if (this.dead) return false;
+    var text = JSON.stringify({ s: this.sid, q: ++this.seq, d: obj });
+    if (this.mode === 'bc') {
+      try { this.bc.postMessage({ s: this.sid, q: this.seq, d: obj }); return true; } catch (e) { return false; }
+    }
+    var sent = 0;
+    for (var i = 0; i < this.clients.length; i++) {
+      var c = this.clients[i];
+      if (c && c.ready && c.mq.publish(this.topic, text)) sent++;
+    }
+    return sent > 0;
+  };
+
+  Bus.prototype.reconnect = function () {
+    if (this.dead) return false;
+    if (this.mode === 'bc') { this.beacon(); return true; }
+    var ready = 0;
+    for (var i = 0; i < this.clients.length; i++) if (this.clients[i] && this.clients[i].ready) ready++;
+    if (ready) { this.beacon(); return true; }
+    this._recover();
+    return true;
+  };
+
+  Bus.prototype.close = function () {
+    this.dead = true;
+    if (this.beatTimer) { clearInterval(this.beatTimer); this.beatTimer = null; }
+    if (this.watchTimer) { clearInterval(this.watchTimer); this.watchTimer = null; }
+    for (var i = 0; i < this.clients.length; i++) {
+      var c = this.clients[i];
+      if (c && c.mq) { try { c.mq.close(); } catch (e) {} }
+    }
+    this.clients = [];
+    if (this.bc) { try { this.bc.close(); } catch (e) {} this.bc = null; }
+    this.connected = false;
+  };
+
+  HJ.net = {
+    NET: NET,
+    newCode: netNewCode,
+    normalize: netNormalizeCode,
+    roomLink: netRoomLink,
+    uid: netUid,
+    Bus: function (opt) { return new Bus(opt); },
+    MqttWs: MqttWs
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* ===== 한판 사다리 · online: 방장 권위(authoritative host) 방식 2~6인 방 =====
+   · 방장만 방 상태를 만들고(st) 뿌린다. 참가자는 join/pick/이름만 보낸다.
+   · 시작할 때 방장이 시드 + 참여자 자리 + 당첨 수 + 문구 + 시작 시각을 보내면
+     모든 폰이 core.generate 로 '완전히 같은 사다리'를 그린다.
+   · 상태는 1.2초마다 다시 뿌린다 — 한 번 유실되어도 금방 맞춰지고,
+     재접속한 폰도 현재 방 상태(sync)를 그대로 복구한다.
+*/
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+
+  var SEATS = 6;
+  var STATE_EVERY = 1200;
+  var JOIN_EVERY = 1500;
+  var DEAD_MS = 16000;
+
+  function now() { return Date.now(); }
+  function clamp(v, lo, hi) { v = Math.round(Number(v) || 0); return v < lo ? lo : (v > hi ? hi : v); }
+
+  function Room(opts) {
+    opts = opts || {};
+    this.role = opts.role === 'guest' ? 'guest' : 'host';
+    this.code = HJ.net.normalize(opts.code) || HJ.net.newCode();
+    this.uid = opts.uid || HJ.net.uid();
+    this.name = String(opts.name || '').slice(0, 10) || (this.role === 'host' ? '방장' : '친구');
+    this.forceBc = !!opts.forceBc;
+    this.bus = null;
+    this.status = 'idle';           // idle|connecting|waiting|connected|closed|error
+    this.error = '';
+    this.handlers = {};
+    this.players = [];              // [{uid,name,seat,online,sid}]
+    this.config = { winCount: 1, winText: '☕ 커피 쏘기', loseText: '😌 통과', emptyText: '공석', presetId: 'coffee' };
+    this.phase = 'lobby';           // lobby|play|result
+    this.game = null;               // {seed, startAt, winCount, winText, loseText, emptyText, activeCols, roundId}
+    this.round = 0;
+    this.hostSid = '';
+    this.seen = {};                 // sid → {at, uid}
+    this.pings = [];                // {rtt, offset}
+    this.offset = 0;
+    this.stateTimer = null;
+    this.joinTimer = null;
+    this.tickTimer = null;
+    this.pingTimer = null;
+    this.resultTimer = null;
+    this.hostGoneAt = 0;
+    this.byMe = false;
+    this.lastStateAt = 0;
+    this._collision = false;
+  }
+
+  Room.prototype.on = function (type, fn) { if (typeof fn === 'function') this.handlers[type] = fn; return this; };
+  Room.prototype.emit = function (type, data) {
+    var f = this.handlers[type];
+    if (!f) return;
+    try { f(data || {}); } catch (e) { if (root.console) console.error('[room] handler', type, e); }
+  };
+
+  Room.prototype.setStatus = function (s, note) {
+    this.status = s;
+    if (note !== undefined) this.error = note || '';
+    this.emit('status', { status: s, note: this.error, mode: this.bus ? this.bus.mode : null });
+  };
+
+  /* ── 방 열기 ─────────────────────────────────────────── */
+  Room.prototype.open = function () {
+    var self = this;
+    this.setStatus('connecting');
+    /* 방장은 1번 자리를 먼저 잡아 둔다 — 손님이 먼저 들어와도 자리가 밀리지 않게 */
+    if (this.role === 'host') this._hostAdd(this.uid, this.name, 0);
+    return this._openOnce(0).then(function (ok) {
+      if (!ok) return false;
+      self.setStatus('connected');
+      if (self.role === 'host') {
+        var me = self._player(self.uid);
+        if (me) { me.name = self.name; me.online = true; }
+        self._broadcastState(true);
+        self._startStateTimer();
+      } else {
+        self._joinLoop(true);
+      }
+      self._startTick();
+      return true;
+    });
+  };
+
+  Room.prototype._openOnce = function (tryNo) {
+    var self = this;
+    if (tryNo > 0) this.code = HJ.net.newCode();
+    this.bus = HJ.net.Bus({
+      code: this.code,
+      role: this.role,
+      name: this.name,
+      forceBc: this.forceBc,
+      onData: function (d, sid) { self._onData(d, sid); },
+      onPresence: function (p) { self._onPresence(p); },
+      onUp: function (m) { self._onUp(m); },
+      onDown: function () { self._onDown(); }
+    });
+    return this.bus.open().then(function (ok) {
+      if (!ok) { self.setStatus('error', '연결할 수 없습니다'); return false; }
+      if (self.role !== 'host') return true;
+      /* 방 코드 충돌 확인 — 처음 1.4초 안에 다른 방장이 보이면 새 코드로 */
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          if (self._collision && tryNo < 3) {
+            var old = self.bus;
+            self.bus = null;
+            try { old.close(); } catch (e) {}
+            self._collision = false;
+            self._openOnce(tryNo + 1).then(resolve);
+            return;
+          }
+          resolve(true);
+        }, 1400);
+      });
+    }, function (err) {
+      self.setStatus('error', (err && err.type) || '연결 실패');
+      return false;
+    });
+  };
+
+  Room.prototype._onUp = function () {
+    if (this.role === 'guest') {
+      if (this.status !== 'connected') this.setStatus('connected');
+      this._joinLoop(true);
+    }
+  };
+
+  Room.prototype._onDown = function () {
+    if (this.role === 'guest') this.setStatus('waiting', '다시 연결하는 중…');
+    else this.setStatus('waiting', '중계 서버에 다시 연결하는 중…');
+  };
+
+  Room.prototype._onPresence = function (p) {
+    var t = now();
+    this.seen[p.sid] = { at: t, uid: this.seen[p.sid] ? this.seen[p.sid].uid : '', kind: p.kind };
+    if (p.kind === 'h') {
+      if (this.role === 'host' && p.sid !== this.bus.sid) { this._collision = true; return; }
+      if (this.role === 'guest') {
+        if (!this.hostSid) this.hostSid = p.sid;
+        this.hostGoneAt = 0;
+      }
+    }
+    if (this.role === 'host') this._hostRefresh();
+  };
+
+  /* ── 방장: 참가자 관리 ────────────────────────────────── */
+  Room.prototype._hostAdd = function (uid, name, seat) {
+    var p = this._player(uid);
+    if (p) { p.name = name; p.online = true; return p; }
+    if (this.players.length >= SEATS) return null;
+    var used = {};
+    for (var i = 0; i < this.players.length; i++) used[this.players[i].seat] = 1;
+    var s = (seat != null && seat >= 0 && seat < SEATS && !used[seat]) ? seat : -1;
+    if (s < 0) for (var k = 0; k < SEATS; k++) if (!used[k]) { s = k; break; }
+    if (s < 0) return null;
+    p = { uid: uid, name: name, seat: s, online: true, sid: '' };
+    this.players.push(p);
+    this.players.sort(function (a, b) { return a.seat - b.seat; });
+    return p;
+  };
+
+  Room.prototype._player = function (uid) {
+    for (var i = 0; i < this.players.length; i++) if (this.players[i].uid === uid) return this.players[i];
+    return null;
+  };
+
+  Room.prototype._hostRefresh = function () {
+    /* presence 로 살아있는 sid 표시 + 오래 조용한 참가자 정리 */
+    var t = now(), changed = false;
+    var live = {};
+    for (var sid in this.seen) if (t - this.seen[sid].at < DEAD_MS) live[sid] = 1;
+    for (var i = 0; i < this.players.length; i++) {
+      var p = this.players[i];
+      if (p.uid === this.uid) continue;
+      var on = !!(p.sid && live[p.sid]);
+      if (on !== p.online) { p.online = on; changed = true; }
+      if (!p.online && this.phase === 'lobby' && t - (this.seen[p.sid] ? this.seen[p.sid].at : 0) > DEAD_MS) {
+        /* 로비에서 끊긴 사람은 자리를 비워 준다(공석) — 다시 들어오면 새 자리 */
+        this.players.splice(i, 1); i--; changed = true;
+      }
+    }
+    if (changed) this._broadcastState(true);
+  };
+
+  Room.prototype._hostSeats = function () {
+    var out = [];
+    for (var i = 0; i < this.players.length; i++) out.push(this.players[i].seat);
+    return out.sort(function (a, b) { return a - b; });
+  };
+
+  Room.prototype._clampWin = function () {
+    var n = Math.max(2, this.players.length);
+    var max = Math.max(1, Math.min(n, this.players.length) - 1);
+    if (this.config.winCount > max) this.config.winCount = max;
+    if (this.config.winCount < 1) this.config.winCount = 1;
+  };
+
+  /* ── 방 상태 뿌리기 ──────────────────────────────────── */
+  Room.prototype._snapshot = function () {
+    return {
+      code: this.code,
+      hostSid: this.bus ? this.bus.sid : this.hostSid,
+      phase: this.phase,
+      round:	this.round,
+      config: {
+        winCount: this.config.winCount,
+        winText: this.config.winText,
+        loseText: this.config.loseText,
+        emptyText: this.config.emptyText,
+        presetId: this.config.presetId
+      },
+      players: this.players.map(function (p) {
+        return { uid: p.uid, name: p.name, seat: p.seat, online: !!p.online };
+      }),
+      game: this.game,
+      hostName: (function (self) {
+        var h = self._player(self.uid);
+        return h ? h.name : '방장';
+      })(this),
+      ts: now()
+    };
+  };
+
+  Room.prototype._broadcastState = function (force) {
+    if (this.role !== 'host' || !this.bus) return;
+    var t = now();
+    if (!force && t - this.lastStateAt < 260) return;
+    this.lastStateAt = t;
+    this.bus.send({ t: 'st', v: 1, st: this._snapshot() });
+    this.emit('state', this._snapshot());
+  };
+
+  Room.prototype._startStateTimer = function () {
+    var self = this;
+    if (this.stateTimer) return;
+    this.stateTimer = setInterval(function () {
+      if (!self.bus) return;
+      if (self.role === 'host') {
+        self._hostRefresh();
+        self._broadcastState(false);
+      }
+    }, STATE_EVERY);
+  };
+
+  /* ── 참가자: 입장 반복 ───────────────────────────────── */
+  Room.prototype._joinLoop = function (immediate) {
+    var self = this;
+    if (this.joinTimer) { if (!immediate) return; }
+    var send = function () {
+      if (!self.bus || self.byMe) return;
+      if (self.phase !== 'lobby') return;      // 이미 방 상태를 받았다
+      self.bus.send({ t: 'join', uid: self.uid, name: self.name, v: 1 });
+    };
+    send();
+    if (this.joinTimer) clearInterval(this.joinTimer);
+    this.joinTimer = setInterval(function () {
+      if (!self.bus || self.byMe) return;
+      if (self.phase !== 'lobby') return;
+      if (now() - self.lastStateAt > 4000) send();
+    }, JOIN_EVERY);
+    this._startPing();
+  };
+
+  Room.prototype._startPing = function () {
+    var self = this;
+    if (this.pingTimer) return;
+    var ping = function () {
+      if (!self.bus || self.role !== 'guest' || !self.hostSid) return;
+      if (self.pings.length >= 8) return;
+      self.bus.send({ t: 'pn', ts: now() });
+    };
+    ping();
+    this.pingTimer = setInterval(ping, 2200);
+  };
+
+  /* ── 수신 ───────────────────────────────────────────── */
+  Room.prototype._onData = function (d, sid) {
+    if (!d || typeof d.t !== 'string') return;
+    var t = d.t;
+    if (this.seen[sid]) { this.seen[sid].at = now(); if (d.uid) this.seen[sid].uid = d.uid; }
+
+    if (t === 'pn' && this.role === 'host') { this.bus.send({ t: 'pg', to: sid, ts: d.ts, hts: now() }); return; }
+    if (t === 'pg' && this.role === 'guest' && d.to === this.bus.sid) {
+      var rtt = now() - d.ts;
+      if (rtt >= 0 && rtt < 8000) {
+        this.pings.push({ rtt: rtt, offset: d.hts + rtt / 2 - now() });
+        if (this.pings.length > 8) this.pings.shift();
+        var best = this.pings.slice().sort(function (a, b) { return a.rtt - b.rtt; })[0];
+        this.offset = best.offset;
+      }
+      return;
+    }
+
+    if (this.role === 'host') {
+      if (t === 'join') { this._hostOnJoin(d, sid); return; }
+      if (t === 'pick') { this._hostOnPick(d); return; }
+      if (t === 'name') { this._hostOnName(d); return; }
+      if (t === 'bye') { this._hostOnBye(d); return; }
+      return;
+    }
+
+    /* 참가자 */
+    if (t === 'st' && d.st) {
+      this._onState(d.st, sid);
+      return;
+    }
+    if (t === 'full') { this.emit('full', d); return; }
+  };
+
+  Room.prototype._hostOnJoin = function (d, sid) {
+    var uid = String(d.uid || '').slice(0, 24);
+    if (!uid) return;
+    var name = String(d.name || '친구').slice(0, 10) || '친구';
+    var p = this._player(uid);
+    if (!p) {
+      if (this.phase !== 'lobby') {
+        /* 이미 시작한 방: 자리가 남아 있으면 관전이 아니라 결과만 볼 수 있게 넣지 않는다 */
+        this.bus.send({ t: 'full', why: 'playing' });
+        return;
+      }
+      if (this.players.length >= SEATS) { this.bus.send({ t: 'full', why: 'full' }); return; }
+    }
+    if (this.phase !== 'lobby' && !p) return;
+    p = this._hostAdd(uid, name, d.seat);
+    if (!p) { this.bus.send({ t: 'full', why: 'full' }); return; }
+    p.sid = sid;
+    p.online = true;
+    this.seen[sid] = { at: now(), uid: uid };
+    this._clampWin();
+    this._broadcastState(true);
+    this.emit('joined', { uid: uid, name: name });
+  };
+
+  Room.prototype._hostOnPick = function (d) {
+    var p = this._player(String(d.uid || ''));
+    if (!p || this.phase !== 'lobby') return;
+    var seat = clamp(d.seat, 0, SEATS - 1);
+    for (var i = 0; i < this.players.length; i++) {
+      if (this.players[i].seat === seat) {
+        if (this.players[i].uid === p.uid) return;
+        /* 이미 있는 자리 — 방장이면 자리를 맞바꾼다(참가자끼리는 빈 자리만) */
+        if (p.uid === this.uid) {
+          this.players[i].seat = p.seat;
+        } else {
+          return;
+        }
+      }
+    }
+    p.seat = seat;
+    this.players.sort(function (a, b) { return a.seat - b.seat; });
+    this._broadcastState(true);
+  };
+
+  Room.prototype._hostOnName = function (d) {
+    var p = this._player(String(d.uid || ''));
+    if (!p) return;
+    p.name = String(d.name || p.name).slice(0, 10) || p.name;
+    if (p.uid === this.uid) this.name = p.name;
+    this._broadcastState(true);
+  };
+
+  Room.prototype._hostOnBye = function (d) {
+    var uid = String(d.uid || '');
+    var p = this._player(uid);
+    if (!p || p.uid === this.uid) return;
+    if (this.phase === 'lobby') {
+      this.players = this.players.filter(function (x) { return x.uid !== uid; });
+      this._clampWin();
+    } else {
+      p.online = false;
+    }
+    this._broadcastState(true);
+    this.emit('left', { uid: uid, name: p.name });
+  };
+
+  Room.prototype._onState = function (st, sid) {
+    if (!st || typeof st !== 'object') return;
+    if (this.hostSid && st.hostSid && st.hostSid !== this.hostSid && st.hostSid !== sid) {
+      /* 내가 알고 있는 방장과 다른 방장 — 무시 */
+      return;
+    }
+    this.hostSid = st.hostSid || this.hostSid || sid;
+    this.lastStateAt = now();
+    this.hostGoneAt = 0;
+    var changed = false;
+    if (this.status !== 'connected') { this.setStatus('connected'); changed = true; }
+    this.players = (st.players || []).slice(0).sort(function (a, b) { return a.seat - b.seat; });
+    if (st.config) this.config = st.config;
+    if (st.phase) this.phase = st.phase;
+    if (st.round != null) this.round = st.round;
+    this.hostName = st.hostName || this.hostName;
+    var meBefore = this.byMe;
+    var myUid = this.uid;
+    this.byMe = this.players.some(function (p) { return p && p.uid === myUid; });
+    if (st.game && (!this.game || st.game.roundId !== this.game.roundId)) {
+      this.game = st.game;
+      this.emit('game', this.game);
+    } else if (st.game) {
+      this.game = st.game;
+    }
+    if (!st.game) this.game = null;
+    this.emit('state', st);
+    if (this.byMe && !meBefore && this.joinTimer) { clearInterval(this.joinTimer); this.joinTimer = null; }
+  };
+
+  /* ── 타이머: 방장 끊김 감시 ─────────────────────────── */
+  Room.prototype._startTick = function () {
+    var self = this;
+    if (this.tickTimer) return;
+    this.tickTimer = setInterval(function () {
+      if (!self.bus) return;
+      if (self.role === 'guest') {
+        var live = false, t = now();
+        for (var sid in self.seen) {
+          if (sid === self.bus.sid) continue;
+          if (t - self.seen[sid].at < DEAD_MS && self.seen[sid].kind === 'h') live = true;
+        }
+        if (!live && self.status === 'connected' && t - self.lastStateAt > DEAD_MS) {
+          self.hostGoneAt = t;
+          self.setStatus('waiting', '방장과 연결이 끊겼습니다 · 다시 찾는 중…');
+          self.bus.reconnect();
+        } else if (live && self.hostGoneAt) {
+          self.hostGoneAt = 0;
+          self.setStatus('connected');
+        }
+      }
+    }, 1500);
+  };
+
+  /* ── 공개 동작 ──────────────────────────────────────── */
+  Room.prototype.setName = function (name) {
+    this.name = String(name || '').slice(0, 10) || this.name;
+    if (this.role === 'host') {
+      var p = this._player(this.uid);
+      if (p) p.name = this.name;
+      if (this.bus) this.bus.name = this.name;
+      this._broadcastState(true);
+    } else if (this.bus) {
+      this.bus.name = this.name;
+      this.bus.send({ t: 'name', uid: this.uid, name: this.name });
+      this.bus.beacon();
+    }
+    return this.name;
+  };
+
+  Room.prototype.pick = function (seat) {
+    if (!this.bus) return false;
+    if (this.role === 'host') { this._hostOnPick({ uid: this.uid, seat: seat }); return true; }
+    this.bus.send({ t: 'pick', uid: this.uid, seat: clamp(seat, 0, SEATS - 1) });
+    return true;
+  };
+
+  Room.prototype.setConfig = function (cfg) {
+    if (this.role !== 'host') return false;
+    cfg = cfg || {};
+    if (cfg.winCount != null) this.config.winCount = clamp(cfg.winCount, 1, Math.max(1, this.players.length - 1));
+    if (cfg.winText != null) this.config.winText = String(cfg.winText).slice(0, 24) || this.config.winText;
+    if (cfg.loseText != null) this.config.loseText = String(cfg.loseText).slice(0, 24) || this.config.loseText;
+    if (cfg.emptyText != null) this.config.emptyText = String(cfg.emptyText).slice(0, 12) || this.config.emptyText;
+    if (cfg.presetId != null) this.config.presetId = String(cfg.presetId);
+    this._clampWin();
+    this._broadcastState(true);
+    return true;
+  };
+
+  Room.prototype.canStart = function () {
+    return this.role === 'host' && this.players.filter(function (p) { return p.online; }).length >= 2;
+  };
+
+  Room.prototype.startGame = function () {
+    if (this.role !== 'host') return null;
+    var onlinePlayers = this.players.filter(function (p) { return p.online; });
+    if (onlinePlayers.length < 2) return null;
+    this._clampWin();
+    var activeCols = onlinePlayers.map(function (p) { return p.seat; }).sort(function (a, b) { return a - b; });
+    this.round++;
+    var seed = ((Date.now() & 0x7fffffff) ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0;
+    var lead = 3200;                       // 3·2·1 카운트다운 + 여유
+    this.game = {
+      seed: seed,
+      roundId: this.round,
+      startAt: now() + lead,
+      activeCols: activeCols,
+      winCount: this.config.winCount,
+      winText: this.config.winText,
+      loseText: this.config.loseText,
+      emptyText: this.config.emptyText,
+      seats: onlinePlayers.map(function (p) { return { seat: p.seat, name: p.name, uid: p.uid }; })
+    };
+    this.phase = 'play';
+    this._broadcastState(true);
+    var self = this;
+    if (this.resultTimer) clearTimeout(this.resultTimer);
+    this.resultTimer = setTimeout(function () {
+      if (self.phase === 'play') { self.phase = 'result'; self._broadcastState(true); }
+    }, lead + HJ.ladder.ROWS * 220 + 1600);
+    return this.game;
+  };
+
+  /* 방장: 결과 화면에서 로비로 (설정을 다시 고르고 새 판) */
+  Room.prototype.toLobby = function () {
+    if (this.role !== 'host') return false;
+    this.phase = 'lobby';
+    this.game = null;
+    if (this.resultTimer) { clearTimeout(this.resultTimer); this.resultTimer = null; }
+    this._broadcastState(true);
+    return true;
+  };
+
+  /* 남은 대기 시간(ms) — 손님은 시계 오프셋을 반영 */
+  Room.prototype.waitMs = function () {
+    if (!this.game || !this.game.startAt) return 0;
+    return this.game.startAt - (now() - this.offset);
+  };
+
+  Room.prototype.leave = function () {
+    this.byMe = true;
+    if (this.bus) {
+      try { this.bus.send({ t: 'bye', uid: this.uid }); } catch (e) {}
+    }
+    var self = this;
+    setTimeout(function () { self.close(); }, 80);
+  };
+
+  Room.prototype.close = function () {
+    if (this.stateTimer) { clearInterval(this.stateTimer); this.stateTimer = null; }
+    if (this.joinTimer) { clearInterval(this.joinTimer); this.joinTimer = null; }
+    if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null; }
+    if (this.pingTimer) { clearInterval(this.pingTimer); this.pingTimer = null; }
+    if (this.resultTimer) { clearTimeout(this.resultTimer); this.resultTimer = null; }
+    if (this.bus) { try { this.bus.close(); } catch (e) {} this.bus = null; }
+    this.setStatus('closed');
+  };
+
+  Room.prototype.snapshot = function () { return this._snapshot(); };
+
+  HJ.online = {
+    SEATS: SEATS,
+    Room: function (opts) { return new Room(opts); }
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* ===== 한판 사다리 · sfx: WebAudio 효과음 + 진동 (외부 파일 없음) ===== */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+  var ctx = null, muted = false;
+
+  function ac() {
+    if (muted) return null;
+    try {
+      if (!ctx) {
+        var C = root.AudioContext || root.webkitAudioContext;
+        if (!C) return null;
+        ctx = new C();
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    } catch (e) { return null; }
+  }
+
+  function tone(freq, dur, type, vol, when, slideTo) {
+    var a = ac();
+    if (!a) return;
+    var t0 = a.currentTime + (when || 0);
+    var o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t0);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(40, slideTo), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol == null ? 0.16 : vol, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+
+  function noise(dur, vol) {
+    var a = ac();
+    if (!a) return;
+    var n = Math.floor(a.sampleRate * dur);
+    var buf = a.createBuffer(1, n, a.sampleRate), ch = buf.getChannelData(0);
+    for (var i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.6);
+    var src = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 1800; f.Q.value = 0.8;
+    g.gain.value = vol == null ? 0.07 : vol;
+    src.buffer = buf; src.connect(f); f.connect(g); g.connect(a.destination);
+    src.start();
+  }
+
+  function buzz(ms) {
+    try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+  }
+
+  var SFX = {
+    setMuted: function (v) { muted = !!v; },
+    isMuted: function () { return muted; },
+    tick: function () { tone(880, 0.06, 'triangle', 0.07); },
+    beep: function (n) { tone(520 + (n || 0) * 120, 0.16, 'triangle', 0.12); },
+    go: function () { tone(760, 0.12, 'square', 0.1, 0, 1200); },
+    step: function () { noise(0.05, 0.05); },
+    arrive: function (win) {
+      if (win) { tone(784, 0.12, 'triangle', 0.16); tone(1046, 0.16, 'triangle', 0.15, 0.09); tone(1318, 0.22, 'triangle', 0.14, 0.19); }
+      else { tone(330, 0.14, 'sine', 0.1); }
+    },
+    curtain: function () { noise(0.32, 0.06); },
+    win: function () {
+      var seq = [523, 659, 784, 1046];
+      for (var i = 0; i < seq.length; i++) tone(seq[i], 0.32, 'triangle', 0.14, i * 0.11);
+      tone(1568, 0.5, 'sine', 0.08, 0.42);
+      buzz([0, 40, 60, 40]);
+    },
+    join: function () { tone(660, 0.08, 'sine', 0.09); tone(880, 0.1, 'sine', 0.08, 0.07); },
+    leave: function () { tone(400, 0.12, 'sine', 0.08, 0, 260); },
+    error: function () { tone(220, 0.16, 'sawtooth', 0.07); }
+  };
+
+  HJ.sfx = SFX;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* ===== 한판 사다리 · app: 화면 · 로비 · 사다리 애니메이션 · 결과 발표 ===== */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ;
+  var L = HJ.ladder;
+  var $ = function (id) { return document.getElementById(id); };
+  var LS_NAME = 'ld_name', SS_UID = 'ld_uid';
+  var COLS = L.COLS, ROWS = L.ROWS;
+
+  function seatName(i) { return (i + 1) + '번'; }
+  function clamp(v, lo, hi) { v = Math.round(Number(v) || 0); return v < lo ? lo : (v > hi ? hi : v); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function store(key, v) { try { if (v === undefined) return localStorage.getItem(key) || ''; localStorage.setItem(key, v); } catch (e) {} return ''; }
+  function sstore(key, v) { try { if (v === undefined) return sessionStorage.getItem(key) || ''; sessionStorage.setItem(key, v); } catch (e) {} return ''; }
+
+  var App = {
+    screen: 'home',
+    mode: 'online',
+    one: {
+      players: [{ name: '1번', seat: 0 }, { name: '2번', seat: 1 }, { name: '3번', seat: 2 }],
+      winCount: 1,
+      winText: '☕ 커피 쏘기',
+      loseText: '😌 통과',
+      emptyText: '공석',
+      presetId: 'coffee'
+    },
+    room: null,
+    roomRole: 'host',
+    game: null,
+    src: null,
+    joinWatch: null,
+    switching: false,
+    kicked: false
+  };
+
+  /* ═════════════ 화면 전환 ═════════════ */
+  function go(scr) {
+    App.screen = scr;
+    ['home', 'room', 'play'].forEach(function (s) {
+      $('scr-' + s).classList.toggle('hidden', s !== scr);
+    });
+    try { window.scrollTo(0, 0); } catch (e) {}
+    if (scr !== 'play') Renderer.stop();
+    var meta = { home: '한판 사다리', room: '로비', play: '사다리' };
+    document.title = meta[scr] === '한판 사다리' ? '한판 사다리 — 6인 온라인 사다리타기' : '한판 사다리 · ' + meta[scr];
+  }
+
+  function chooseMode(m) {
+    App.mode = (m === 'one') ? 'one' : 'online';
+    var tabs = $('modeTabs').children;
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('on', tabs[i].getAttribute('data-m') === App.mode);
+    $('panelOnline').classList.toggle('hidden', App.mode !== 'online');
+    $('panelOne').classList.toggle('hidden', App.mode !== 'one');
+  }
+
+  var toastT = null;
+  function toast(msg, ms) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { t.classList.add('hidden'); }, ms || 2200);
+  }
+
+  /* ═════════════ 홈: 온라인 ═════════════ */
+  function initHome() {
+    var nm = store(LS_NAME);
+    if (nm) $('inName').value = nm;
+    var q = /[?&]r=([A-Za-z0-9]{1,8})/.exec(location.search);
+    if (q) {
+      var code = HJ.net.normalize(q[1]);
+      if (code) {
+        $('inCode').value = code;
+        $('homeHint').innerHTML = '초대받은 방 <b>' + esc(code) + '</b> — 이름을 넣고 <b>참가</b>를 누르세요.';
+        setTimeout(function () { try { $('inName').focus(); } catch (e) {} }, 400);
+      }
+    }
+    try {
+      var nm2 = /[?&]test=bc/.test(location.search);
+      if (nm2) $('homeHint').textContent += ' (탭 모드)';
+    } catch (e) {}
+  }
+
+  function myName() {
+    var v = ($('inName').value || '').trim().slice(0, 8);
+    if (v) store(LS_NAME, v);
+    return v || '친구';
+  }
+
+  function roomUid(code) {
+    var key = SS_UID + '_' + code;
+    var u = sstore(key);
+    if (!u) { u = HJ.net.uid(); sstore(key, u); }
+    return u;
+  }
+
+  function createRoom() {
+    var name = myName();
+    var code = HJ.net.newCode();
+    openRoom({ role: 'host', code: code, name: name, uid: roomUid(code) });
+  }
+
+  function joinRoom(codeRaw) {
+    var code = HJ.net.normalize(codeRaw);
+    if (code.length !== 4) { toast('방 코드 4자리를 넣어 주세요'); HJ.sfx.error(); return; }
+    openRoom({ role: 'guest', code: code, name: myName(), uid: roomUid(code) });
+  }
+
+  function openRoom(o) {
+    closeRoom(true);
+    App.roomRole = o.role;
+    App.kicked = false;
+    var forceBc = /[?&]test=bc/.test(location.search);
+    var room = HJ.online.Room({ role: o.role, code: o.code, name: o.name, uid: o.uid, forceBc: forceBc });
+    App.room = room;
+
+    room.on('state', function (st) { onRoomState(st); });
+    room.on('status', function (s) { onRoomStatus(s); });
+    room.on('game', function (g) { /* 상태 콜백에서 화면 전환 */ });
+    room.on('full', function (d) {
+      if (d && d.why === 'full') { App.kicked = true; toast('방이 가득 찼습니다 (최대 6명)'); }
+    });
+    room.on('joined', function (p) { if (App.screen === 'room') HJ.sfx.join(); });
+    room.on('left', function () { if (App.screen === 'room') HJ.sfx.leave(); });
+
+    go('room');
+    $('roomCode').textContent = room.code;
+    $('roomTitle').textContent = o.role === 'host' ? '방 만들기' : '방 참가';
+    $('roomSub').textContent = '연결하는 중…';
+    $('roomPill').textContent = '연결 중';
+    $('roomPill').className = 'pill wait';
+    if (o.role === 'guest') startJoinWatch(room.code);
+
+    room.open().then(function (ok) {
+      if (!ok) {
+        toast('연결하지 못했습니다. 잠시 뒤 다시 시도해 주세요.');
+        if (App.room === room) { closeRoom(); go('home'); }
+        return;
+      }
+      try { history.replaceState(null, '', location.pathname + '?r=' + room.code); } catch (e) {}
+      if (o.role === 'guest') {
+        $('roomSub').textContent = '방 ' + room.code + ' · 방장을 찾는 중…';
+      } else {
+        $('roomSub').textContent = '친구를 기다리는 중';
+      }
+    });
+  }
+
+  function startJoinWatch(code) {
+    clearTimeout(App.joinWatch);
+    App.joinWatch = setTimeout(function () {
+      var r = App.room;
+      if (!r || r.byMe || App.screen !== 'room') return;
+      if (r.status === 'connected') return;
+      $('roomHint').innerHTML = '방 <b>' + esc(code) + '</b> 을(를) 찾고 있습니다. 방장이 화면을 열어 두었는지, 코드가 맞는지 확인해 주세요.';
+    }, 9000);
+  }
+
+  function closeRoom(silent) {
+    clearTimeout(App.joinWatch);
+    if (App.room) {
+      try { if (!silent) App.room.leave(); else App.room.close(); } catch (e) {}
+      App.room = null;
+    }
+    Renderer.stop();
+    App.game = null;
+  }
+
+  /* ═════════════ 로비 상태 반영 ═════════════ */
+  function onRoomStatus(s) {
+    var pill = $('roomPill');
+    if (!pill) return;
+    var m = { connecting: ['연결 중', 'wait'], waiting: ['대기', 'wait'], connected: ['연결됨', 'ok'], closed: ['종료', 'off'], error: ['오류', 'off'] };
+    var v = m[s.status] || ['대기', 'wait'];
+    pill.textContent = v[0];
+    pill.className = 'pill ' + v[1];
+    if (App.screen === 'room' && App.room && App.roomRole === 'guest' && s.status === 'connected') {
+      $('roomSub').textContent = '방 ' + App.room.code + ' · 입장';
+    }
+    if (s.note && App.screen === 'room') $('roomHint').textContent = s.note;
+  }
+
+  function onRoomState(st) {
+    if (App.screen !== 'room' && App.screen !== 'play') return;
+    var room = App.room;
+    if (!room) return;
+    if (st.phase === 'play' && st.game) {
+      if (App.screen === 'room') startPlay(st.game, 'online');
+      else if (App.src === 'online' && App.game && App.game.roundId !== st.game.roundId) startPlay(st.game, 'online');
+      return;
+    }
+    if (st.phase === 'lobby') {
+      if (App.screen === 'play' && App.src === 'online') backToLobby();
+      if (App.screen === 'room') renderLobby(st);
+      return;
+    }
+    if (st.phase === 'result') {
+      /* 결과 화면은 각자 애니메이션 끝에 이미 열린다. 재접속이면 즉시 결과로. */
+      if (App.screen === 'room' && st.game) startPlay(st.game, 'online');
+      return;
+    }
+  }
+
+  function renderLobby(st) {
+    var room = App.room;
+    if (!room) return;
+    $('roomCode').textContent = room.code;
+    var hostId = st.hostSid;
+    var mine = room.role === 'host' ? room.uid : room.uid;
+    var players = st.players || [];
+
+    /* 자리 */
+    var used = {};
+    for (var i = 0; i < players.length; i++) used[players[i].seat] = players[i];
+    var grid = $('roomSeats');
+    grid.innerHTML = '';
+    for (var s = 0; s < COLS; s++) {
+      var p = used[s];
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'seat' + (p ? ' filled' : ' empty') + (p && p.uid === room.uid ? ' me' : '') + (p && !p.online ? ' off' : '');
+      b.setAttribute('data-seat', String(s));
+      b.innerHTML = '<span class="sno">' + (s + 1) + '</span>' +
+        '<span class="sname">' + (p ? esc(p.name) : '공석') + '</span>' +
+        '<span class="sdot"></span>';
+      if (!p) b.setAttribute('aria-label', (s + 1) + '번 빈자리로 옮기기');
+      grid.appendChild(b);
+    }
+
+    /* 방장 설정 */
+    var isHost = room.role === 'host';
+    $('hostPanel').classList.toggle('hidden', !isHost);
+    $('guestNote').classList.toggle('hidden', isHost);
+    if (isHost) {
+      var online = players.filter(function (x) { return x.online; }).length;
+      var maxWin = Math.max(1, online - 1);
+      var winBox = $('roomWin');
+      winBox.innerHTML = '';
+      for (var w = 1; w <= Math.min(5, maxWin); w++) {
+        var wb = document.createElement('button');
+        wb.type = 'button';
+        wb.textContent = w + '명';
+        wb.className = (st.config.winCount === w) ? 'on' : '';
+        wb.setAttribute('data-w', String(w));
+        winBox.appendChild(wb);
+      }
+      buildPresets($('roomPresets'), st.config, function (cfg) { room.setConfig(cfg); });
+      if (document.activeElement !== $('roomWinText')) $('roomWinText').value = st.config.winText;
+      if (document.activeElement !== $('roomLoseText')) $('roomLoseText').value = st.config.loseText;
+    }
+
+    var can = isHost && players.filter(function (x) { return x.online; }).length >= 2;
+    $('btnRoomStart').disabled = !can;
+    $('btnRoomStart').classList.toggle('hidden', !isHost);
+    $('roomSub').textContent = players.length + '명 입장 · ' + (COLS - players.length) + '칸 공석';
+    $('roomHint').textContent = isHost
+      ? (can ? '빈 자리를 눌러 내 자리를 옮길 수 있어요. 시작하면 모든 폰에 같은 사다리가 그려집니다.' : '2명 이상 모이면 시작할 수 있어요. 초대 링크를 보내 보세요.')
+      : '방장이 시작하면 모두 같은 사다리를 함께 내려갑니다.';
+  }
+
+  function buildPresets(box, cfg, onPick) {
+    if (!box) return;
+    box.innerHTML = '';
+    L.PRESETS.forEach(function (pr) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + ((cfg.presetId === pr.id) ? ' on' : '');
+      b.textContent = pr.label;
+      b.onclick = function () { onPick({ presetId: pr.id, winText: pr.win || cfg.winText, loseText: pr.lose || cfg.loseText }); };
+      box.appendChild(b);
+    });
+  }
+
+  /* ═════════════ 한 폰으로 타기 ═════════════ */
+  function initOne() {
+    var tabs = $('oneCount');
+    for (var n = 2; n <= 6; n++) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = n + '명';
+      b.setAttribute('data-n', String(n));
+      b.onclick = function () { setOneCount(+this.getAttribute('data-n')); };
+      tabs.appendChild(b);
+    }
+    var win = $('oneWin');
+    for (var w = 1; w <= 3; w++) {
+      var wb = document.createElement('button');
+      wb.type = 'button'; wb.textContent = w + '명';
+      wb.setAttribute('data-w', String(w));
+      wb.onclick = function () { App.one.winCount = +this.getAttribute('data-w'); renderOne(); };
+      win.appendChild(wb);
+    }
+    renderOne();
+  }
+
+  function setOneCount(n) {
+    n = clamp(n, 2, 6);
+    var ps = App.one.players;
+    if (n > ps.length) {
+      var used = {};
+      ps.forEach(function (p) { used[p.seat] = 1; });
+      var idx = ps.length + 1;
+      while (ps.length < n) {
+        var seat = -1;
+        for (var s = 0; s < COLS; s++) if (!used[s]) { seat = s; break; }
+        used[seat] = 1;
+        ps.push({ name: idx + '번', seat: seat });
+        idx++;
+      }
+    } else if (n < ps.length) {
+      ps.length = n;
+    }
+    App.one.winCount = Math.min(App.one.winCount, Math.max(1, n - 1));
+    renderOne();
+  }
+
+  function renderOne() {
+    var o = App.one;
+    var cnt = $('oneCount').children;
+    for (var i = 0; i < cnt.length; i++) cnt[i].classList.toggle('on', +cnt[i].getAttribute('data-n') === o.players.length);
+    var win = $('oneWin').children;
+    for (var j = 0; j < win.length; j++) {
+      var w = +win[j].getAttribute('data-w');
+      win[j].classList.toggle('on', w === o.winCount);
+      win[j].style.display = (w <= Math.max(1, o.players.length - 1)) ? '' : 'none';
+    }
+    /* 이름 */
+    var names = $('oneNames');
+    names.innerHTML = '';
+    o.players.forEach(function (p, idx) {
+      var row = document.createElement('div');
+      row.className = 'namerow';
+      var tag = document.createElement('span');
+      tag.className = 'tagseatsm';
+      tag.textContent = (p.seat + 1) + '번';
+      var inp = document.createElement('input');
+      inp.className = 'inp nm';
+      inp.maxLength = 8;
+      inp.value = p.name;
+      inp.setAttribute('aria-label', (idx + 1) + '번 참가자 이름');
+      inp.oninput = function () { p.name = (this.value || '').slice(0, 8) || ((idx + 1) + '번'); };
+      row.appendChild(tag); row.appendChild(inp);
+      names.appendChild(row);
+    });
+    /* 자리 */
+    var used = {};
+    o.players.forEach(function (p) { used[p.seat] = p; });
+    var sg = $('oneSeats');
+    sg.innerHTML = '';
+    for (var s = 0; s < COLS; s++) {
+      var c = document.createElement('div');
+      var p = used[s];
+      c.className = 'mseat' + (p ? ' filled' : ' empty');
+      c.innerHTML = '<b>' + (s + 1) + '</b><span>' + (p ? esc(p.name) : '공석') + '</span>';
+      sg.appendChild(c);
+    }
+    if (document.activeElement !== $('oneWinText')) $('oneWinText').value = o.winText;
+    if (document.activeElement !== $('oneLoseText')) $('oneLoseText').value = o.loseText;
+    buildPresets($('onePresets'), o, function (cfg) {
+      o.presetId = cfg.presetId;
+      o.winText = cfg.winText || o.winText;
+      o.loseText = cfg.loseText || o.loseText;
+      renderOne();
+    });
+  }
+
+  function shuffleSeats() {
+    var ps = App.one.players;
+    var seats = [];
+    for (var s = 0; s < COLS; s++) seats.push(s);
+    seats = L.shuffle(Math.random, seats);
+    ps.forEach(function (p, i) { p.seat = seats[i]; });
+    ps.sort(function (a, b) { return a.seat - b.seat; });
+    App.one.players = ps;
+    renderOne();
+    HJ.sfx.tick();
+  }
+
+  function startOne() {
+    var o = App.one;
+    o.winText = ($('oneWinText').value || '').trim().slice(0, 24) || '🎯 당첨';
+    o.loseText = ($('oneLoseText').value || '').trim().slice(0, 24) || '😌 통과';
+    if (o.players.length < 2) { toast('2명 이상이어야 합니다'); return; }
+    var names = {};
+    o.players.forEach(function (p) { names[p.seat] = p.name; });
+    var seed = ((Date.now() & 0x7fffffff) ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0;
+    startPlay({
+      seed: seed, roundId: seed, startAt: Date.now() + 2200,
+      activeCols: o.players.map(function (p) { return p.seat; }).sort(function (a, b) { return a - b; }),
+      winCount: Math.min(o.winCount, Math.max(1, o.players.length - 1)),
+      winText: o.winText, loseText: o.loseText, emptyText: '공석',
+      names: names
+    }, 'one');
+  }
+
+  /* ═════════════ 플레이 ═════════════ */
+  function startPlay(data, src) {
+    var names = {};
+    if (data.seats) data.seats.forEach(function (s) { names[s.seat] = s.name; });
+    if (data.names) for (var k in data.names) names[k] = data.names[k];
+    if (!data.names && !data.seats && App.room) {
+      App.room.players.forEach(function (p) { names[p.seat] = p.name; });
+    }
+    var g = L.generate({
+      seed: data.seed, rows: ROWS, cols: COLS,
+      activeCols: data.activeCols, winCount: data.winCount,
+      winText: data.winText, loseText: data.loseText, emptyText: data.emptyText || '공석',
+      names: names
+    });
+    g.roundId = data.roundId;
+    g.startAt = data.startAt;
+    g.names = names;
+    App.game = g;
+    App.src = src;
+
+    go('play');
+    $('playTitle').textContent = '사다리 ' + g.activeCols.length + '명';
+    $('playSub').textContent = src === 'online'
+      ? ('방 ' + (App.room ? App.room.code : '') + ' · 공석 ' + (COLS - g.activeCols.length) + '칸')
+      : ('한 폰 · 공석 ' + (COLS - g.activeCols.length) + '칸');
+
+    buildPlaySeats(g);
+    buildResults(g);
+
+    /* 시작 시각: 온라인이면 방장 시계 기준(sync) */
+    var offset = (src === 'online' && App.room) ? App.room.offset : 0;
+    var t0 = (data.startAt || Date.now()) - offset;
+    Renderer.load(g);
+    Renderer.begin(t0);
+    $('resultBar').classList.add('hidden');
+    $('btnAgain').style.display = (src === 'one' || App.roomRole === 'host') ? '' : 'none';
+    $('btnAgain').textContent = src === 'one' ? '다시 타기' : '다시 하기';
+    $('btnLeave').textContent = src === 'one' ? '처음으로' : '방 나가기';
+  }
+
+  function buildPlaySeats(g) {
+    var box = $('playSeats');
+    box.innerHTML = '';
+    for (var c = 0; c < COLS; c++) {
+      var p = null;
+      for (var i = 0; i < g.participants.length; i++) if (g.participants[i].col === c) p = g.participants[i];
+      var d = document.createElement('div');
+      d.className = 'pseat' + (p ? '' : ' empty');
+      d.setAttribute('data-col', String(c));
+      d.innerHTML = '<span class="pn">' + (c + 1) + '</span>' +
+        '<span class="pt">' + (p ? esc(p.name) : '공석') + '</span>';
+      if (p) {
+        d.onclick = function () {
+          var col = +this.getAttribute('data-col');
+          Renderer.solo(col);
+          HJ.sfx.tick();
+        };
+      }
+      box.appendChild(d);
+    }
+  }
+
+  function buildResults(g) {
+    var box = $('playResults');
+    box.innerHTML = '';
+    for (var c = 0; c < COLS; c++) {
+      var r = g.results[c];
+      var d = document.createElement('div');
+      d.className = 'rcard' + (r.type === 'empty' ? ' empty on' : '') + (r.type === 'win' ? ' win' : '');
+      d.setAttribute('data-col', String(c));
+      d.innerHTML = '<span class="q">?</span><span class="rv">' + esc(r.text) + '</span>';
+      box.appendChild(d);
+    }
+  }
+
+  function revealSeat(i, p) {
+    var col = p.end;
+    var card = document.querySelector('.rcard[data-col="' + col + '"]');
+    if (card) card.classList.add('on');
+    var chip = document.querySelector('.pseat[data-col="' + p.col + '"]');
+    if (chip) chip.classList.add(p.type === 'win' ? 'win' : 'lose');
+  }
+
+  function showResultBar(g) {
+    var winners = g.participants.filter(function (p) { return p.type === 'win'; });
+    var losers = g.participants.filter(function (p) { return p.type !== 'win'; });
+    function label(p) { return p.name === seatName(p.col) ? p.name : (p.name + ' (' + seatName(p.col) + ')'); }
+    var head, sub;
+    if (winners.length === 1) {
+      head = '🎉 ' + g.winText + ' → ' + label(winners[0]);
+      sub = losers.map(function (p) { return p.name; }).join(' · ') + ' 님은 통과';
+    } else {
+      head = '🎉 ' + g.winText + ' → ' + winners.map(label).join(', ');
+      sub = winners.length + '명 당첨 · ' + losers.length + '명 통과';
+    }
+    if (COLS - g.activeCols.length > 0) sub += ' · 공석 ' + (COLS - g.activeCols.length) + '칸은 결과 없음';
+    $('resultHead').textContent = head;
+    $('resultSub').textContent = sub;
+    $('resultBar').classList.remove('hidden');
+    if (Renderer.refit) Renderer.refit();
+    HJ.sfx.win();
+  }
+
+  function again() {
+    if (App.src === 'one') { startOne(); return; }
+    if (!App.room || App.roomRole !== 'host') return;
+    if (!App.room.canStart()) { toast('참여자가 2명 이상이어야 합니다'); return; }
+    App.room.startGame();
+  }
+
+  function leaveGame() {
+    if (App.src === 'online') {
+      closeRoom();
+      go('home');
+    } else {
+      Renderer.stop();
+      App.game = null;
+      go('home');
+    }
+  }
+
+  function backToLobby() {
+    if (App.switching) return;
+    App.switching = true;
+    Renderer.stop();
+    App.game = null;
+    $('resultBar').classList.add('hidden');
+    go('room');
+    if (App.room) {
+      if (App.roomRole === 'host') App.room.toLobby();
+      renderLobby(App.room.snapshot());
+    }
+    App.switching = false;
+  }
+
+  /* ═════════════ 사다리 렌더러 ═════════════ */
+  var Renderer = (function () {
+    var cv = null, cx = null, W = 0, H = 0, dpr = 1;
+    var G = null;
+    var raf = 0;
+    var startPerf = 0, dur = 1800, stagger = 100, arrived = {}, done = false, solo = -1, soloStart = 0;
+    var lastCount = -1, beeped = -1, tickAt = 0;
+
+    function init() {
+      cv = $('ladder');
+      cx = cv.getContext('2d');
+      window.addEventListener('resize', function () { if (G) resize(); });
+      window.addEventListener('orientationchange', function () { setTimeout(function () { if (G) resize(); }, 220); });
+    }
+
+    function resize() {
+      if (!cv) return;
+      var box = cv.parentElement.getBoundingClientRect();
+      var w = Math.max(240, Math.floor(box.width));
+      var h = Math.max(220, Math.floor(box.height));
+      dpr = Math.min(3, window.devicePixelRatio || 1);
+      W = w; H = h;
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+      cv.style.width = w + 'px';
+      cv.style.height = h + 'px';
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (G) draw(performance.now());
+    }
+
+    function load(g) {
+      G = g;
+      arrived = {}; done = false; solo = -1; lastCount = -1; beeped = -1;
+      dur = 1250 + g.rows * 52;
+      stagger = Math.min(140, 620 / Math.max(1, g.participants.length - 1));
+      resize();
+      draw(performance.now());
+    }
+
+    function begin(t0Local) {
+      var nowMs = Date.now();
+      startPerf = performance.now() + (t0Local - nowMs);
+      /* 이미 끝난 판(재접속)이면 결과 상태로 바로 */
+      if (t0Local + dur + 600 < nowMs) {
+        startPerf = performance.now() - (dur + 1400);
+      }
+      arrived = {}; done = false; solo = -1;
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      G = null;
+    }
+
+    function colX(c) { return (c + 0.5) * (W / COLS); }
+    function rowY(r) { return 22 + (H - 44) * (r / G.rows); }
+
+    function posAt(p, f) {
+      /* f: 0..1 along the path (rows+1 points) */
+      var n = G.rows;
+      var idx = Math.max(0, Math.min(n, f * n));
+      var i0 = Math.floor(idx), i1 = Math.min(n, i0 + 1), k = idx - i0;
+      var c0 = p.path[i0], c1 = p.path[i1];
+      return { x: colX(c0) + (colX(c1) - colX(c0)) * k, y: rowY(i0) + (rowY(i1) - rowY(i0)) * k };
+    }
+
+    function progressOf(p, i, elapsed) {
+      var d = i * stagger;
+      return Math.max(0, Math.min(1, (elapsed - d) / dur));
+    }
+
+    function loop() {
+      raf = requestAnimationFrame(loop);
+      if (!G || App.screen !== 'play') return;
+      var nowP = performance.now();
+      var elapsed = nowP - startPerf;
+      var g = G;
+
+      /* 카운트다운 */
+      var remain = -elapsed;
+      if (remain > 0) {
+        var n = Math.ceil(remain / 1000);
+        var cd = $('countdown');
+        cd.classList.remove('hidden');
+        if (n !== lastCount) { lastCount = n; cd.textContent = n > 0 ? String(n) : ''; cd.classList.remove('pop'); void cd.offsetWidth; cd.classList.add('pop'); HJ.sfx.beep(4 - n); }
+      } else {
+        var cd2 = $('countdown');
+        if (lastCount !== 0) { lastCount = 0; cd2.textContent = 'GO'; cd2.classList.remove('pop'); void cd2.offsetWidth; cd2.classList.add('pop'); HJ.sfx.go(); setTimeout(function () { cd2.classList.add('hidden'); }, 420); }
+      }
+
+      /* 도착 처리 */
+      var tAll = 0;
+      for (var i = 0; i < g.participants.length; i++) {
+        var p = g.participants[i];
+        var pr = progressOf(p, i, elapsed);
+        tAll = Math.max(tAll, i * stagger + dur);
+        if (pr >= 1 && !arrived[p.col]) {
+          arrived[p.col] = 1;
+          revealSeat(i, p);
+          HJ.sfx.arrive(p.type === 'win');
+          try { if (navigator.vibrate) navigator.vibrate(p.type === 'win' ? 60 : 18); } catch (e) {}
+        }
+      }
+
+      /* 내려가는 소리 */
+      if (elapsed > 0 && elapsed < tAll + 200 && nowP - tickAt > 130) { tickAt = nowP; HJ.sfx.step(); }
+
+      /* 결과 발표 */
+      if (!done && elapsed > tAll + 420) {
+        done = true;
+        showResultBar(g);
+      }
+
+      draw(nowP);
+    }
+
+    function roundRect(x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      cx.beginPath();
+      cx.moveTo(x + r, y);
+      cx.arcTo(x + w, y, x + w, y + h, r);
+      cx.arcTo(x + w, y + h, x, y + h, r);
+      cx.arcTo(x, y + h, x, y, r);
+      cx.arcTo(x, y, x + w, y, r);
+      cx.closePath();
+    }
+
+    function draw(nowP) {
+      if (!G || !cx) return;
+      var g = G, elapsed = nowP - startPerf;
+      cx.clearRect(0, 0, W, H);
+
+      /* 배경 */
+      var bg = cx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, 'rgba(18,26,44,0.55)');
+      bg.addColorStop(1, 'rgba(10,15,26,0.85)');
+      cx.fillStyle = bg;
+      roundRect(0, 0, W, H, 18);
+      cx.fill();
+
+      /* 세로줄 */
+      cx.lineCap = 'round';
+      for (var c = 0; c < COLS; c++) {
+        var empty = g.activeCols.indexOf(c) < 0;
+        cx.strokeStyle = empty ? 'rgba(120,140,180,0.16)' : 'rgba(150,175,220,0.42)';
+        cx.lineWidth = 3;
+        cx.beginPath();
+        cx.moveTo(colX(c), rowY(0) - 8);
+        cx.lineTo(colX(c), rowY(g.rows) + 8);
+        cx.stroke();
+      }
+
+      /* 가로줄 */
+      for (var i = 0; i < g.rungs.length; i++) {
+        var r = g.rungs[i];
+        var y = rowY(r.r), x1 = colX(r.c), x2 = colX(r.c + 1);
+        cx.strokeStyle = 'rgba(140,165,210,0.5)';
+        cx.lineWidth = 4;
+        cx.beginPath(); cx.moveTo(x1, y); cx.lineTo(x2, y); cx.stroke();
+        cx.strokeStyle = 'rgba(255,255,255,0.10)';
+        cx.lineWidth = 1.5;
+        cx.beginPath(); cx.moveTo(x1 + 3, y - 1.5); cx.lineTo(x2 - 3, y - 1.5); cx.stroke();
+      }
+
+      /* 경로 빛 */
+      var soloP = null;
+      for (var k = 0; k < g.participants.length; k++) {
+        var p = g.participants[k], pr = progressOf(p, k, elapsed);
+        if (solo >= 0) {
+          if (p.col === solo) {
+            soloP = p;
+            pr = Math.max(pr, Math.min(1, (nowP - soloStart) / (dur * 0.9)));
+          } else pr = 0;
+        }
+        if (pr <= 0) continue;
+        var isWin = p.type === 'win';
+        var col1 = isWin ? 'rgba(255,203,77,0.95)' : 'rgba(90,209,255,0.9)';
+        var col2 = isWin ? 'rgba(255,140,90,0.25)' : 'rgba(90,209,255,0.12)';
+        cx.save();
+        cx.shadowColor = isWin ? 'rgba(255,203,77,0.85)' : 'rgba(90,209,255,0.8)';
+        cx.shadowBlur = 16;
+        cx.strokeStyle = col1;
+        cx.lineWidth = 5;
+        cx.lineJoin = 'round';
+        cx.beginPath();
+        var first = true;
+        var steps = Math.max(2, Math.ceil(pr * g.rows * 8));
+        for (var s = 0; s <= steps; s++) {
+          var f = pr * (s / steps);
+          var pt = posAt(p, f);
+          if (first) { cx.moveTo(pt.x, pt.y); first = false; }
+          else cx.lineTo(pt.x, pt.y);
+        }
+        cx.stroke();
+        cx.restore();
+
+        /* 머리 점 */
+        var hp = posAt(p, pr);
+        var rg = cx.createRadialGradient(hp.x, hp.y, 0, hp.x, hp.y, 15);
+        rg.addColorStop(0, isWin ? 'rgba(255,236,180,1)' : 'rgba(200,245,255,1)');
+        rg.addColorStop(0.45, isWin ? 'rgba(255,203,77,0.85)' : 'rgba(90,209,255,0.8)');
+        rg.addColorStop(1, col2);
+        cx.fillStyle = rg;
+        cx.beginPath(); cx.arc(hp.x, hp.y, 15, 0, Math.PI * 2); cx.fill();
+
+        /* 도착 표시 */
+        if (pr >= 1) {
+          cx.save();
+          cx.strokeStyle = isWin ? 'rgba(255,203,77,0.9)' : 'rgba(120,210,255,0.7)';
+          cx.lineWidth = 2.5;
+          cx.beginPath(); cx.arc(hp.x, hp.y, 10 + 10 * (1 - Math.min(1, ((elapsed - k * stagger - dur) / 500))), 0, Math.PI * 2); cx.stroke();
+          cx.restore();
+        }
+      }
+
+      /* 가림막 커튼 — 시작 직후 걷힌다 */
+      var veilA = elapsed < 0 ? 1 : Math.max(0, 1 - elapsed / 520);
+      if (veilA > 0.01) {
+        var y0 = rowY(1.4), y1 = rowY(g.rows - 1.6);
+        cx.save();
+        cx.globalAlpha = veilA;
+        var vg = cx.createLinearGradient(0, y0, 0, y1);
+        vg.addColorStop(0, 'rgba(12,18,32,0.55)');
+        vg.addColorStop(0.5, 'rgba(10,15,28,0.92)');
+        vg.addColorStop(1, 'rgba(12,18,32,0.55)');
+        cx.fillStyle = vg;
+        roundRect(6, y0, W - 12, y1 - y0, 16);
+        cx.fill();
+        cx.strokeStyle = 'rgba(120,150,200,0.20)';
+        cx.lineWidth = 1;
+        for (var dy = 0; dy < (y1 - y0); dy += 14) {
+          cx.beginPath(); cx.moveTo(8, y0 + dy); cx.lineTo(W - 8, y0 + dy); cx.stroke();
+        }
+        cx.fillStyle = 'rgba(140,170,220,0.5)';
+        cx.font = '700 ' + Math.round(Math.min(20, W / 18)) + 'px "Noto Sans KR", sans-serif';
+        cx.textAlign = 'center';
+        cx.fillText('?  ?  ?', W / 2, (y0 + y1) / 2 + 6);
+        cx.restore();
+      }
+    }
+
+    function soloTrace(col) {
+      if (!G) return;
+      solo = col;
+      soloStart = performance.now();
+      /* 잠시 뒤 전체로 복귀 */
+      setTimeout(function () { if (solo === col) solo = -1; }, Math.min(2600, dur * 1.1 + 900));
+    }
+
+    return {
+      init: init, load: load, begin: begin, stop: stop,
+      solo: soloTrace,
+      refit: function () { if (G) resize(); },
+      info: function () { return { W: W, H: H, dur: dur }; }
+    };
+  })();
+
+  /* ═════════════ 테스트 훅 ═════════════ */
+  function installTestHooks() {
+    window.__ldTest = {
+      screen: function () { return App.screen; },
+      mode: function () { return App.mode; },
+      game: function () { return App.game ? JSON.parse(JSON.stringify({
+        seed: App.game.seed, endOf: App.game.endOf, results: App.game.results,
+        winners: App.game.winners, activeCols: App.game.activeCols, winCount: App.game.winCount,
+        winText: App.game.winText, loseText: App.game.loseText, emptyText: App.game.emptyText,
+        rungs: App.game.rungs, roundId: App.game.roundId, startAt: App.game.startAt,
+        participants: App.game.participants.map(function (p) { return { col: p.col, name: p.name, end: p.end, type: p.type, text: p.text }; })
+      })) : null; },
+      resultVisible: function () { return !$('resultBar').classList.contains('hidden'); },
+      resultText: function () { return $('resultHead').textContent + ' / ' + $('resultSub').textContent; },
+      room: function () { return App.room ? JSON.parse(JSON.stringify(App.room.snapshot())) : null; },
+      roomRole: function () { return App.roomRole; },
+      roomCode: function () { return App.room ? App.room.code : ''; },
+      roomMode: function () { return App.room && App.room.bus ? App.room.bus.mode : ''; },
+      status: function () { return App.room ? App.room.status : ''; },
+      offset: function () { return App.room ? App.room.offset : 0; },
+      seats: function () { return Array.prototype.map.call(document.querySelectorAll('#roomSeats .seat'), function (b) { return b.textContent.trim(); }); },
+      playSeatsText: function () { return Array.prototype.map.call(document.querySelectorAll('#playSeats .pseat'), function (b) { return b.textContent.trim(); }); },
+      cardsOn: function () {
+        return Array.prototype.map.call(document.querySelectorAll('#playResults .rcard'), function (c) {
+          if (!c.classList.contains('on')) return '';
+          var rv = c.querySelector('.rv');
+          return rv ? rv.textContent.trim() : '';
+        });
+      },
+      oneState: function () { return JSON.parse(JSON.stringify(App.one)); },
+      setOneCount: setOneCount,
+      shuffleSeats: shuffleSeats,
+      startOne: startOne,
+      again: again,
+      leaveGame: leaveGame,
+      lobby: backToLobby,
+      chooseMode: chooseMode,
+      createRoom: createRoom,
+      joinRoom: joinRoom,
+      setConfig: function (c) { if (App.room) App.room.setConfig(c); },
+      pick: function (s) { if (App.room) App.room.pick(s); }
+    };
+  }
+
+  /* ═════════════ 이벤트 연결 ═════════════ */
+  function bind() {
+    var tabs = $('modeTabs').children;
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].onclick = function () { chooseMode(this.getAttribute('data-m')); HJ.sfx.tick(); };
+    }
+    $('btnCreate').onclick = createRoom;
+    $('btnJoin').onclick = function () { joinRoom($('inCode').value); };
+    $('inCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') joinRoom(this.value); });
+    $('inName').addEventListener('change', function () { store(LS_NAME, this.value.trim().slice(0, 8)); });
+    $('inCode').addEventListener('input', function () { this.value = HJ.net.normalize(this.value); });
+    $('btnShuffleSeats').onclick = shuffleSeats;
+    $('btnOneStart').onclick = startOne;
+    $('oneWinText').addEventListener('change', function () { App.one.winText = this.value.trim() || '🎯 당첨'; });
+    $('oneLoseText').addEventListener('change', function () { App.one.loseText = this.value.trim() || '😌 통과'; });
+
+    $('btnRoomBack').onclick = function () { closeRoom(); go('home'); };
+    $('btnCopyLink').onclick = function () {
+      if (!App.room) return;
+      var link = HJ.net.roomLink(App.room.code);
+      copyText(link);
+    };
+    $('roomSeats').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.seat') : null;
+      if (!b || !App.room) return;
+      var seat = +b.getAttribute('data-seat');
+      var mine = App.room.players.filter(function (p) { return p.uid === App.room.uid; })[0];
+      if (mine && mine.seat === seat) return;
+      if (b.classList.contains('filled')) return;
+      App.room.pick(seat);
+      HJ.sfx.tick();
+    });
+    $('roomWin').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button[data-w]') : null;
+      if (!b || !App.room) return;
+      App.room.setConfig({ winCount: +b.getAttribute('data-w') });
+    });
+    $('roomWinText').addEventListener('change', function () { if (App.room) App.room.setConfig({ winText: this.value.trim(), presetId: 'custom' }); });
+    $('roomLoseText').addEventListener('change', function () { if (App.room) App.room.setConfig({ loseText: this.value.trim() }); });
+    $('btnRoomStart').onclick = function () {
+      if (!App.room || App.roomRole !== 'host') return;
+      var g = App.room.startGame();
+      if (!g) { toast('2명 이상 모여야 시작할 수 있어요'); HJ.sfx.error(); }
+    };
+
+    $('btnPlayBack').onclick = function () {
+      if (App.src === 'online') {
+        if (App.roomRole === 'host') { backToLobby(); }
+        else { closeRoom(); go('home'); }
+      } else {
+        leaveGame();
+      }
+    };
+    $('btnAgain').onclick = again;
+    $('btnLeave').onclick = function () {
+      if (App.src === 'online' && App.roomRole === 'host' && App.room) { backToLobby(); }
+      else leaveGame();
+    };
+    $('btnFull').onclick = function () { toggleFull(); };
+
+    /* 꾹 누르기 메뉴·확대 차단 */
+    document.addEventListener('contextmenu', function (e) {
+      if (e.target.closest && e.target.closest('input')) return;
+      e.preventDefault();
+    }, { passive: false });
+    ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (ev) {
+      document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
+    });
+    /* 첫 터치에서 오디오 활성화 */
+    var once = function () { HJ.sfx.tick(); document.removeEventListener('pointerdown', once); };
+    document.addEventListener('pointerdown', once);
+  }
+
+  function copyText(txt) {
+    var done = function (ok) { toast(ok ? '초대 링크를 복사했습니다' : txt, ok ? 2000 : 5000); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { done(true); }, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(ok);
+    } catch (e) { done(false); }
+  }
+
+  function toggleFull() {
+    var el = document.documentElement;
+    try {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
+      }
+    } catch (e) { toast('전체화면을 켤 수 없습니다'); }
+  }
+
+  /* ═════════════ 시작 ═════════════ */
+  function boot() {
+    Renderer.init();
+    initHome();
+    initOne();
+    bind();
+    installTestHooks();
+    chooseMode('online');
+    go('home');
+    /* 초대 링크로 들어오면 이름 입력에 바로 포커스 */
+    if (/[?&]r=/.test(location.search)) {
+      setTimeout(function () { try { $('inName').focus(); } catch (e) {} }, 500);
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+</body>
+</html>
