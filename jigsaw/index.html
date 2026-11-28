@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
 <title>한판 직소 — 그림 퍼즐</title>
-<meta name="description" content="해변의 미소녀·강아지·고양이·코스모스 그림 10장을 조각으로 맞추는 한 손 퍼즐. 진짜 직소(클래식)와 스피드 스왑 두 모드, 자석 스냅·그룹 병합·확대·이어하기·갤러리 수집.">
+<meta name="description" content="해변의 미소녀·강아지·고양이·코스모스 그림 10장을 조각으로 맞추는 한 손 퍼즐. 진짜 직소(클래식)와 스피드 스왑 두 모드, 지인과 방 코드로 겨루는 온라인 1:1 대전, 자석 스냅·그룹 병합·확대·이어하기·갤러리 수집.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
 <style>
 /* ===================== 한판 직소 — 화면 스타일 ===================== */
@@ -408,6 +408,164 @@ h1.title em{
   *{animation-duration:.01ms !important; transition-duration:.01ms !important}
 }
 
+/* =====================================================================
+   3단계 — 온라인 1:1 대전
+   ===================================================================== */
+.head-btns{display:flex; gap:6px}
+.oltabs{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:4px; margin:2px 0 4px;
+  border-radius:14px; background:rgba(255,255,255,.05); border:1px solid var(--line);
+}
+.oltabs button{padding:10px 4px; border-radius:11px; font-size:12.5px; font-weight:800; color:var(--dim2)}
+.oltabs button.on{
+  background:linear-gradient(135deg,rgba(94,224,208,.24),rgba(177,140,255,.22));
+  color:#eafcff; border:1px solid rgba(94,224,208,.42);
+}
+.sect-head .ghost.on{
+  background:linear-gradient(135deg,rgba(94,224,208,.22),rgba(177,140,255,.2));
+  border-color:rgba(94,224,208,.46); color:#eafcff;
+}
+.olrec{
+  display:flex; align-items:center; gap:8px; margin-top:8px;
+  padding:8px 12px; border-radius:12px; font-size:11.5px; font-weight:800; color:var(--dim);
+  background:rgba(94,224,208,.07); border:1px solid rgba(94,224,208,.22);
+}
+.olrec span{color:var(--dim2)}
+.olrec b{margin-left:auto; color:var(--aqua); font-size:12.5px}
+
+/* ---- 로비 ---- */
+#scr-online{padding-top:calc(6px + var(--safe-t)); overflow-y:auto; padding-bottom:calc(18px + var(--safe-b))}
+.netpill{
+  flex:0 0 auto; padding:5px 10px; border-radius:999px; font-size:10.5px; font-weight:900; letter-spacing:.02em;
+  background:rgba(255,255,255,.06); border:1px solid var(--line2); color:var(--dim);
+  white-space:nowrap;
+}
+.netpill.ok{background:rgba(74,222,128,.16); border-color:rgba(74,222,128,.45); color:#a7f3c8}
+.netpill.wait{background:rgba(255,203,77,.14); border-color:rgba(255,203,77,.4); color:var(--gold)}
+.netpill.bad{background:rgba(255,143,107,.16); border-color:rgba(255,143,107,.45); color:#ffbfa8}
+.olbody{display:flex; flex-direction:column; gap:10px; padding-bottom:8px}
+.olcard{
+  padding:14px; border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+  border:1px solid var(--line);
+}
+.ol-lab{display:block; font-size:11px; font-weight:900; letter-spacing:.08em; color:var(--dim2); margin-bottom:6px}
+.ol-input{
+  width:100%; padding:12px 13px; border-radius:12px; font-size:15px; font-weight:800; color:var(--ink);
+  background:rgba(4,8,16,.55); border:1px solid var(--line2); margin-bottom:10px;
+  -webkit-user-select:text; user-select:text;
+}
+.ol-input:focus{outline:none; border-color:rgba(94,224,208,.6); box-shadow:0 0 0 3px rgba(94,224,208,.12)}
+.ol-input.code{letter-spacing:.42em; text-align:center; font-size:22px; text-transform:uppercase; font-weight:900}
+.btn.wide{width:100%; text-align:center}
+.btn[disabled]{opacity:.45; box-shadow:none}
+.ol-hint{margin:8px 0 0; font-size:11.5px; color:var(--dim2); line-height:1.5; text-align:center}
+.ol-tip{margin:2px 2px 0; font-size:11.5px; color:var(--dim2); line-height:1.65; text-align:center}
+.ol-tip b{color:var(--aqua)}
+.ol-roomhead{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+.ol-roomhead small{display:block; font-size:10px; font-weight:900; letter-spacing:.12em; color:var(--dim2)}
+.ol-roomhead b{display:block; font-size:26px; font-weight:900; letter-spacing:.22em; color:var(--gold); line-height:1.2}
+.ol-copy{
+  margin-left:auto; padding:8px 12px; border-radius:11px; font-size:11.5px; font-weight:900;
+  background:rgba(255,255,255,.07); border:1px solid var(--line2); color:var(--dim);
+}
+.ol-peer{
+  display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:12px;
+  background:rgba(255,255,255,.04); border:1px solid var(--line); font-size:12px; font-weight:800; color:var(--dim);
+}
+.ol-peer .dot{width:8px; height:8px; border-radius:50%; background:var(--gold); flex:0 0 auto; animation:blink 1.3s ease-in-out infinite}
+.ol-peer.on{color:#c8ffe9}
+.ol-peer.on .dot{background:var(--ok); animation:none}
+@keyframes blink{0%,100%{opacity:.35} 50%{opacity:1}}
+.ol-pick{margin:12px 0 4px}
+.ol-pickhead{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+.ol-pickhead b{font-size:12px; font-weight:900; letter-spacing:.02em}
+.ol-pickhead span{font-size:10.5px; color:var(--dim2); font-weight:800}
+.ol-arts{display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; touch-action:pan-x}
+.ol-arts::-webkit-scrollbar{display:none}
+.oart{
+  position:relative; flex:0 0 auto; width:54px; height:54px; border-radius:11px; overflow:hidden;
+  border:1.5px solid var(--line); padding:0; background:#0a1220;
+}
+.oart img{width:100%; height:100%; object-fit:cover; display:block; opacity:.72}
+.oart span{
+  position:absolute; left:3px; bottom:2px; font-size:9px; font-weight:900; color:#dfe9ff;
+  text-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+.oart.on{border-color:var(--gold); box-shadow:0 0 0 2px rgba(255,203,77,.22)}
+.oart.on img{opacity:1}
+.oart[disabled]{opacity:.62}
+.ol-ranks{margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:4px; background:rgba(255,255,255,.04)}
+.ol-ranks button{padding:8px 2px; font-size:11px; font-weight:800; border-radius:9px; color:var(--dim2)}
+.ol-ranks button.on{background:rgba(94,224,208,.2); color:#dffcff}
+
+/* ---- 대전 중 진행 바 ---- */
+.olbar{
+  display:flex; align-items:center; gap:8px; height:44px; flex:0 0 auto; margin-bottom:6px;
+  padding:5px 8px; border-radius:13px;
+  background:linear-gradient(180deg,rgba(94,224,208,.10),rgba(255,255,255,.02));
+  border:1px solid rgba(94,224,208,.24);
+}
+.olp{flex:1 1 0; min-width:0; display:flex; align-items:center; gap:6px}
+.olp .onm{
+  font-size:10.5px; font-weight:900; color:var(--dim); max-width:58px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:0 0 auto;
+}
+.olp.me .onm{color:var(--aqua)}
+.olp.op .onm{color:var(--coral)}
+.olp .ob{flex:1 1 auto; min-width:22px; height:7px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden}
+.olp .ob i{display:block; height:100%; width:0%; border-radius:99px; transition:width .18s ease}
+.olp.me .ob i{background:linear-gradient(90deg,var(--aqua),#7fd7ff)}
+.olp.op .ob i{background:linear-gradient(90deg,var(--coral),var(--gold))}
+.olp b{font-size:10px; font-weight:900; color:var(--dim); font-variant-numeric:tabular-nums; flex:0 0 auto; min-width:30px; text-align:right}
+.olp.done b{color:var(--ok)}
+.olthumb{
+  flex:0 0 auto; width:34px; height:34px; padding:0; border-radius:9px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.22); background:#0a1220;
+}
+.olthumb canvas{display:block; width:100%; height:100%}
+.olbig{
+  position:absolute !important; top:10px; right:10px; z-index:9; width:186px;
+  border-radius:14px; overflow:hidden; background:rgba(6,11,22,.92);
+  border:1px solid rgba(255,255,255,.2); box-shadow:0 14px 40px rgba(0,0,0,.55);
+  backdrop-filter:blur(6px);
+}
+.olbig-head{display:flex; align-items:center; justify-content:space-between; padding:6px 8px}
+.olbig-head b{font-size:10.5px; font-weight:900; color:var(--coral); letter-spacing:.04em}
+.olbig-head button{font-size:12px; color:var(--dim); padding:0 2px}
+.olbig canvas{display:block; width:186px; height:186px}
+.olbig-foot{padding:5px 8px; font-size:10px; font-weight:800; color:var(--dim); text-align:center}
+.olbanner{
+  position:fixed; left:50%; top:calc(12px + var(--safe-t)); transform:translateX(-50%) translateY(-8px);
+  z-index:85; padding:9px 15px; border-radius:999px; font-size:12px; font-weight:900;
+  background:rgba(255,143,107,.94); color:#2a1200; opacity:0; pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease; max-width:92vw; text-align:center;
+}
+.olbanner.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+/* ---- 결과 ---- */
+.result .olbig-label{font-size:26px; letter-spacing:-.02em}
+.result.olres.win .olbig-label{color:var(--gold); text-shadow:0 0 26px rgba(255,203,77,.45)}
+.result.olres.lose .olbig-label{color:#9fb0cc}
+.result.olres.draw .olbig-label{color:var(--aqua)}
+.olres-sub{margin:6px 0 0; font-size:12px; color:var(--dim); line-height:1.55}
+.olres-sub span{color:var(--dim2); font-size:11.5px}
+.olconfirm{
+  width:100%; max-width:340px; padding:20px 18px 16px; border-radius:20px; text-align:center;
+  background:linear-gradient(180deg,#15203a,#0b1322); border:1px solid var(--line2);
+  box-shadow:0 30px 70px rgba(0,0,0,.6);
+}
+.olconfirm b{font-size:16px; font-weight:900}
+.olconfirm p{margin:8px 0 0; font-size:12.5px; color:var(--dim); line-height:1.6}
+.olconfirm p b{font-size:12.5px; color:var(--coral)}
+.olconfirm .acts{display:flex; gap:8px; margin-top:16px}
+.olconfirm .acts .btn{flex:1}
+@media (max-height:700px){
+  .olbar{height:38px}
+  .olthumb{width:28px; height:28px}
+  .olbig{width:156px}
+  .olbig canvas{width:156px; height:156px}
+}
+
 </style>
 </head>
 <body>
@@ -424,6 +582,7 @@ h1.title em{
         <div class="stat"><b id="statClear">0<small>/10</small></b><span>완성한 그림</span></div>
         <div class="stat"><b id="statBest">0<small>개</small></b><span>3별 그림</span></div>
       </div>
+      <div class="olrec" id="statOnline"><span>🌐 온라인 전적</span><b id="olRecTxt">0승 0패</b></div>
       <button class="resume hidden" id="resumeCard">
         <span class="r-txt"><b id="resumeTitle">이어서 하기</b><small id="resumeSub"></small></span>
         <span class="go">이어하기 →</span>
@@ -432,7 +591,10 @@ h1.title em{
 
     <div class="sect-head">
       <h2>그림 10장</h2>
-      <button class="ghost" id="btnGallery">🖼️ 갤러리</button>
+      <div class="head-btns">
+        <button class="ghost on" id="btnOnline">🌐 온라인 1:1</button>
+        <button class="ghost" id="btnGallery">🖼️ 갤러리</button>
+      </div>
     </div>
     <div class="stage-grid" id="stageGrid"></div>
     <div class="foot">
@@ -451,6 +613,22 @@ h1.title em{
         <div class="cell"><b id="hudMoves">0</b><span>이동</span></div>
       </div>
     </div>
+    <!-- 온라인 1:1 진행 바 -->
+    <div class="olbar hidden" id="olBar">
+      <div class="olp me">
+        <span class="onm" id="olMeName">나</span>
+        <div class="ob"><i id="olMeFill"></i></div>
+        <b id="olMeCnt">0/0</b>
+      </div>
+      <div class="olp op">
+        <span class="onm" id="olOpName">상대</span>
+        <div class="ob"><i id="olOpFill"></i></div>
+        <b id="olOpCnt">0/0</b>
+      </div>
+      <button class="olthumb" id="olThumb" aria-label="상대 판 크게 보기">
+        <canvas id="olMini" width="144" height="144"></canvas>
+      </button>
+    </div>
     <div class="board-wrap" id="boardWrap">
       <canvas id="board" aria-label="퍼즐 판"></canvas>
       <div class="zoombar hidden" id="zoombar">
@@ -461,6 +639,11 @@ h1.title em{
       </div>
       <button class="alignbtn hidden" id="btnAlign">🧲 가운데로 정렬</button>
       <div class="board-badge hidden" id="boardBadge">원본 미리보기</div>
+      <div class="olbig hidden" id="olBig">
+        <div class="olbig-head"><b>상대 판</b><button id="olBigClose" aria-label="닫기">✕</button></div>
+        <canvas id="olBigCv" width="360" height="360"></canvas>
+        <div class="olbig-foot"><span id="olBigCnt">0조각 맞춤</span></div>
+      </div>
       <div class="pause-ov hidden" id="pauseOv">
         <b>일시정지</b>
         <div class="row">
@@ -499,6 +682,52 @@ h1.title em{
     </div>
   </section>
 
+  <!-- ================= 온라인 1:1 ================= -->
+  <section id="scr-online" class="screen hidden">
+    <div class="topbar">
+      <button class="iconbtn" id="btnOlBack" aria-label="뒤로">‹</button>
+      <div class="topctr"><b>🌐 온라인 1:1</b><small id="olSub">방 코드로 친구와 같은 그림 겨루기</small></div>
+      <div class="netpill" id="olPill">대기</div>
+    </div>
+    <div class="olbody">
+      <div class="oltabs" id="olTabs">
+        <button type="button" data-t="create" class="on">방 만들기</button>
+        <button type="button" data-t="join">코드로 참가</button>
+      </div>
+
+      <div class="olcard" id="olCardCreate">
+        <label class="ol-lab" for="olName">내 이름</label>
+        <input id="olName" class="ol-input" maxlength="8" placeholder="친구" autocomplete="off" spellcheck="false">
+        <button class="btn primary wide" id="btnCreate">방 만들기</button>
+        <p class="ol-hint">방을 만들면 4자리 코드와 초대 링크가 생깁니다.</p>
+      </div>
+
+      <div class="olcard hidden" id="olCardJoin">
+        <label class="ol-lab" for="olCode">방 코드</label>
+        <input id="olCode" class="ol-input code" maxlength="6" placeholder="ABCD" autocomplete="off" spellcheck="false" autocapitalize="characters">
+        <button class="btn primary wide" id="btnJoin">참가하기</button>
+        <p class="ol-hint">친구에게 받은 4자리 코드를 넣으세요.</p>
+      </div>
+
+      <div class="olcard hidden" id="olCardRoom">
+        <div class="ol-roomhead">
+          <div><small>방 코드</small><b id="olRoomCode">····</b></div>
+          <button class="ol-copy" id="btnCopy">링크 복사</button>
+        </div>
+        <div class="ol-peer" id="olPeer"><i class="dot"></i><span id="olPeerTxt">상대를 기다리는 중…</span></div>
+        <div class="ol-pick" id="olPick">
+          <div class="ol-pickhead"><b>그림 · 난이도</b><span id="olPickSub">방장이 고릅니다</span></div>
+          <div class="ol-arts" id="olArts"></div>
+          <div class="seg ol-ranks" id="olRanks"></div>
+        </div>
+        <button class="btn warm wide" id="btnOlStart" disabled>대전 시작</button>
+        <p class="ol-hint" id="olRoomHint">상대가 들어오면 시작할 수 있어요.</p>
+      </div>
+
+      <p class="ol-tip">두 사람이 <b>같은 그림</b>을 동시에 시작해 먼저 완성하는 쪽이 이깁니다. 내가 맞춘 조각은 상대 화면에도 바로 보입니다.</p>
+    </div>
+  </section>
+
   <!-- ================= 갤러리 ================= -->
   <section id="scr-gallery" class="screen hidden">
     <div class="topbar">
@@ -509,6 +738,7 @@ h1.title em{
   </section>
 
   <div id="overlayRoot"></div>
+  <div class="olbanner" id="olBanner"></div>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -983,7 +1213,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 (function (root) {
   'use strict';
   var HJ = root.HJ;
-  var K = { settings: 'hj.settings', progress: 'hj.progress', save: 'hj.save', csave: 'hj.csave', v: 1 };
+  var K = { settings: 'hj.settings', progress: 'hj.progress', save: 'hj.save', csave: 'hj.csave', online: 'hj.online', v: 1 };
   var mem = {};       // localStorage를 못 쓰는 환경(사생활 보호 모드)용 폴백
 
   function read(key) {
@@ -1000,6 +1230,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   var Store = HJ.Store = {
     settings: { v: K.v, muted: false, mode: 'classic', guide: 0.25 },
     progress: { v: K.v, best: {}, cleared: {} },
+    online: { v: K.v, w: 0, l: 0, d: 0, hist: [] },
 
     load: function () {
       var s = null, p = null;
@@ -1014,6 +1245,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       try { p = JSON.parse(read(K.progress) || 'null'); } catch (e) { p = null; }
       if (p && typeof p === 'object' && p.v === K.v && p.best && p.cleared) {
         this.progress = { v: K.v, best: p.best, cleared: p.cleared };
+      }
+      var o = null;
+      try { o = JSON.parse(read(K.online) || 'null'); } catch (e) { o = null; }
+      if (o && typeof o === 'object' && o.v === K.v) {
+        this.online = { v: K.v, w: o.w | 0, l: o.l | 0, d: o.d | 0, hist: Array.isArray(o.hist) ? o.hist.slice(0, 30) : [] };
       }
     },
 
@@ -1090,6 +1326,25 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var c = 0, k;
       for (k in this.progress.cleared) if (Object.prototype.hasOwnProperty.call(this.progress.cleared, k) && this.progress.cleared[k] > 0) c++;
       return c;
+    },
+
+    /* ---------------- 온라인 전적 ---------------- */
+    onlineRecord: function (res) {
+      if (!res || (res.who !== 'me' && res.who !== 'peer' && res.who !== 'draw')) return this.online;
+      var o = this.online;
+      var out = res.who === 'me' ? 'w' : (res.who === 'peer' ? 'l' : 'd');
+      if (out === 'w') o.w++; else if (out === 'l') o.l++; else o.d++;
+      o.hist.unshift({ t: Date.now(), st: res.stage | 0, rk: res.rank || '', r: out,
+        my: res.myTime | 0, op: res.peerTime | 0, myN: res.myN | 0, opN: res.peerN | 0 });
+      if (o.hist.length > 30) o.hist.length = 30;
+      write(K.online, JSON.stringify(o));
+      return o;
+    },
+    onlineRecordText: function () {
+      var o = this.online;
+      var s = o.w + '승 ' + o.l + '패';
+      if (o.d) s += ' ' + o.d + '무';
+      return s;
     },
 
     /* 이어하기 — 스왑 */
@@ -2775,6 +3030,1290 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
 </script>
 <script>
+/* ===== 한판 직소 · net: 방 코드 · MQTT over WebSocket 중계 · BroadcastChannel =====
+   한판 맞고 2단계에서 검증한 구조를 그대로 옮겼다 (jigsaw/v1/ 네임스페이스).
+
+   · 1순위: WSS 중계(MQTT over WebSocket) — 두 기기가 각자 중계 서버에 붙어 메시지를 주고받는다.
+            443 포트 브로커를 먼저 쓰므로 5G·회사망·카톡 인앱 브라우저에서도 막히지 않는다.
+   · 2순위: BroadcastChannel — 같은 브라우저 두 탭(테스트 · 폴백). ?test=bc
+    외부 라이브러리를 쓰지 않고 필요한 MQTT 패킷만 직접 만든다.
+*/
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+
+  var NET = {
+    version: 1,
+    topicBase: 'jigsaw/v1/',                 // jigsaw/v1/{ROOM_CODE}
+    bcPrefix: 'jigsaw-v1-',
+    alphabet: 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',   // 0·O·1·I 제외 32자
+    codeLen: 4,
+    graceMs: 20000,         // 끊김 재연결 유예 (직소는 조각 하나가 길어 넉넉히)
+    pingMs: 2500,
+    relay: {
+      brokers: [
+        { name: 'TBMQ', url: 'wss://demo.tbmq.io/mqtt', user: 'demo' },      // 443
+        { name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt' },
+        { name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt' },
+        { name: 'Mosquitto', url: 'wss://test.mosquitto.org:8081/mqtt' }
+      ],
+      connectMs: 7000,
+      joinMs: 30000,          // 게스트가 방장 신호를 기다리는 시간 (한 번 열면 계속 기다린다)
+      joinEveryMs: 600,
+      helloMs: 600,           // 인사(hello) 재전송 주기 — 방장 응답이 올 때까지
+      beatMs: 2000,
+      deadMs: 18000,
+      keepaliveS: 45,
+      only: null              // 테스트용: 특정 브로커만 (인덱스)
+    }
+  };
+
+  /* 테스트용 유예 시간 단축 (?grace=3 → 3초). 배포본에서는 아무도 쓰지 않는다. */
+  try {
+    var gm = /[?&]grace=(\d+)/.exec(location.search);
+    if (gm) NET.graceMs = Math.min(60000, Math.max(800, +gm[1]));
+    var dm = /[?&]dead=(\d+)/.exec(location.search);
+    if (dm) NET.relay.deadMs = Math.min(60000, Math.max(1000, +dm[1]));
+  } catch (e) { }
+
+  /* ── 방 코드 ─────────────────────────────────────────── */
+  function netNewCode() {
+    var s = '', buf = null;
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        buf = new Uint32Array(NET.codeLen);
+        window.crypto.getRandomValues(buf);
+      }
+    } catch (e) { buf = null; }
+    for (var i = 0; i < NET.codeLen; i++) {
+      var v = buf ? buf[i] : Math.floor(Math.random() * 4294967296);
+      s += NET.alphabet.charAt(v % NET.alphabet.length);
+    }
+    return s;
+  }
+
+  function netNormalizeCode(v) {
+    if (!v) return '';
+    var up = String(v).toUpperCase(), out = '';
+    for (var i = 0; i < up.length && out.length < NET.codeLen; i++) {
+      var c = up.charAt(i);
+      if (NET.alphabet.indexOf(c) >= 0) out += c;
+    }
+    return out;
+  }
+
+  function netRoomLink(code, asHost) {
+    var base = location.href.split('#')[0].split('?')[0];
+    return base + '?r=' + code + (asHost ? '&host=1' : '');
+  }
+
+  function netUid() {
+    var s = '', chars = 'abcdefghijklmnopqrstuvwxyz0123456789', buf = null;
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        buf = new Uint32Array(10);
+        window.crypto.getRandomValues(buf);
+      }
+    } catch (e) { buf = null; }
+    for (var i = 0; i < 10; i++) {
+      var v = buf ? buf[i] : Math.floor(Math.random() * 4294967296);
+      s += chars.charAt(v % chars.length);
+    }
+    return s;
+  }
+
+  function netErr(type, cause) {
+    var e = new Error(String(type));
+    e.type = type;
+    if (cause) e.cause = cause;
+    return e;
+  }
+
+  /* ═════════════════════════════════════════════════════════
+     전송 계층 1 — WSS 중계 (MQTT 3.1.1 over WebSocket)
+     ═════════════════════════════════════════════════════════ */
+  var NET_TXT = (typeof TextDecoder === 'function') ? new TextDecoder('utf-8') : null;
+
+  function netBytes(s) {
+    var enc = (typeof TextEncoder === 'function') ? new TextEncoder() : null;
+    var arr = enc ? enc.encode(s) : (function () {
+      var out = [], esc = unescape(encodeURIComponent(s));
+      for (var i = 0; i < esc.length; i++) out.push(esc.charCodeAt(i));
+      return out;
+    })();
+    return Array.prototype.slice.call(arr);
+  }
+
+  function netMqttStr(s) {
+    var b = netBytes(s);
+    return [b.length >> 8, b.length & 0xff].concat(b);
+  }
+
+  function netMqttLen(n) {
+    var out = [];
+    do {
+      var d = n % 128;
+      n = Math.floor(n / 128);
+      if (n > 0) d |= 0x80;
+      out.push(d);
+    } while (n > 0);
+    return out;
+  }
+
+  function netMqttPacket(type, flags, body) {
+    var rl = netMqttLen(body.length);
+    var out = new Uint8Array(1 + rl.length + body.length);
+    out[0] = (type << 4) | (flags & 0x0f);
+    out.set(rl, 1);
+    out.set(body, 1 + rl.length);
+    return out;
+  }
+
+  function MqttWs(opt) {
+    this.url = opt.url;
+    this.clientId = opt.clientId;
+    this.username = opt.username || '';
+    this.onPacket = opt.onPacket || function () {};
+    this.onClose = opt.onClose || function () {};
+    this.ws = null;
+    this.buf = new Uint8Array(0);
+    this.ready = false;
+    this.wasReady = false;
+    this._dead = false;
+    this.pid = 1;
+    this.waiters = {};
+    this.kaTimer = null;
+    this._connack = null;
+  }
+
+  MqttWs.prototype.connect = function (ms) {
+    var self = this;
+    var limit = ms || NET.relay.connectMs;
+    return new Promise(function (resolve, reject) {
+      var settled = false, timer = null;
+      var fin = function (fn, v) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        fn(v);
+      };
+      timer = setTimeout(function () {
+        fin(reject, netErr('relay-timeout'));
+        self.close();
+      }, limit);
+      var ws;
+      try { ws = new WebSocket(self.url, 'mqtt'); }
+      catch (e) { fin(reject, netErr('relay-blocked', e)); return; }
+      self.ws = ws;
+      try { ws.binaryType = 'arraybuffer'; } catch (e) {}
+      self._connack = function (code) {
+        if (code === 0) {
+          self.ready = true;
+          self.wasReady = true;
+          fin(resolve, true);
+          self._startKeepalive();
+        } else {
+          fin(reject, netErr('relay-refused'));
+          self.close();
+        }
+      };
+      ws.onopen = function () {
+        try { ws.send(self._connectPacket()); }
+        catch (e) { fin(reject, netErr('relay-send', e)); }
+      };
+      ws.onmessage = function (ev) { self._feed(ev.data); };
+      ws.onerror = function () { fin(reject, netErr('relay-error')); };
+      ws.onclose = function () {
+        fin(reject, netErr('relay-closed'));
+        self._down();
+      };
+    });
+  };
+
+  MqttWs.prototype._connectPacket = function () {
+    var flags = 0x02 | (this.username ? 0x80 : 0);   // clean session (+ username)
+    var body = [0, 4, 77, 81, 84, 84, 4, flags]
+      .concat([(NET.relay.keepaliveS >> 8) & 0xff, NET.relay.keepaliveS & 0xff])
+      .concat(netMqttStr(this.clientId));
+    if (this.username) Array.prototype.push.apply(body, netMqttStr(this.username));
+    return netMqttPacket(1, 0, body);
+  };
+
+  MqttWs.prototype.subscribe = function (topic) {
+    var self = this;
+    return new Promise(function (resolve, reject) {
+      if (!self.ready || !self.ws) { reject(netErr('relay-not-ready')); return; }
+      var id = self.pid++;
+      if (self.pid > 60000) self.pid = 1;
+      self.waiters[id] = { resolve: resolve, reject: reject };
+      var body = [id >> 8, id & 0xff].concat(netMqttStr(topic)).concat([0]);
+      try { self.ws.send(netMqttPacket(8, 2, body)); }
+      catch (e) { delete self.waiters[id]; reject(netErr('relay-send', e)); return; }
+      setTimeout(function () {
+        if (!self.waiters[id]) return;
+        delete self.waiters[id];
+        reject(netErr('relay-suback'));
+      }, 6000);
+    });
+  };
+
+  MqttWs.prototype.publish = function (topic, text) {
+    if (!this.ready || !this.ws || this.ws.readyState !== 1) return false;
+    var body = netMqttStr(topic).concat(netBytes(text));
+    try { this.ws.send(netMqttPacket(3, 0, body)); return true; }
+    catch (e) { return false; }
+  };
+
+  MqttWs.prototype._startKeepalive = function () {
+    var self = this;
+    this._stopKeepalive();
+    this.kaTimer = setInterval(function () {
+      if (!self.ready || !self.ws || self.ws.readyState !== 1) return;
+      try { self.ws.send(new Uint8Array([0xc0, 0x00])); } catch (e) {}
+    }, 20000);
+  };
+
+  MqttWs.prototype._stopKeepalive = function () {
+    if (this.kaTimer) { clearInterval(this.kaTimer); this.kaTimer = null; }
+  };
+
+  MqttWs.prototype._feed = function (data) {
+    var chunk;
+    if (data && typeof data === 'string') chunk = netBytes(data);
+    else if (data && data.byteLength != null) chunk = new Uint8Array(data);
+    else return;
+    if (this.buf.length) {
+      var merged = new Uint8Array(this.buf.length + chunk.length);
+      merged.set(this.buf, 0);
+      merged.set(chunk, this.buf.length);
+      this.buf = merged;
+    } else {
+      this.buf = chunk;
+    }
+    var off = 0;
+    while (this.buf.length - off >= 2) {
+      var mult = 1, len = 0, i = off + 1, ok = false;
+      for (var k = 0; k < 4 && i < this.buf.length; k++) {
+        var d = this.buf[i++];
+        len += (d & 0x7f) * mult;
+        mult *= 128;
+        if ((d & 0x80) === 0) { ok = true; break; }
+      }
+      if (!ok || this.buf.length < i + len) break;
+      var type = this.buf[off] >> 4;
+      var body = this.buf.subarray(i, i + len);
+      off = i + len;
+      this._packet(type, body);
+    }
+    if (off > 0) this.buf = this.buf.slice(off);
+  };
+
+  MqttWs.prototype._packet = function (type, body) {
+    if (type === 2) {                                  // CONNACK
+      var code = body.length > 1 ? body[1] : 255;
+      var f = this._connack;
+      this._connack = null;
+      if (f) f(code);
+      return;
+    }
+    if (type === 9) {                                  // SUBACK
+      var id = (body[0] << 8) | body[1];
+      var w = this.waiters[id];
+      if (!w) return;
+      delete this.waiters[id];
+      if (body[2] === 0x80) w.reject(netErr('relay-subfail'));
+      else w.resolve(true);
+      return;
+    }
+    if (type === 3) {                                  // PUBLISH (QoS 0)
+      if (body.length < 2) return;
+      var tl = (body[0] << 8) | body[1];
+      if (body.length < 2 + tl) return;
+      var topic = '', text = '';
+      try {
+        topic = NET_TXT ? NET_TXT.decode(body.subarray(2, 2 + tl))
+          : decodeURIComponent(escape(String.fromCharCode.apply(null, body.subarray(2, 2 + tl))));
+      } catch (e) { topic = ''; }
+      try {
+        text = NET_TXT ? NET_TXT.decode(body.subarray(2 + tl))
+          : decodeURIComponent(escape(String.fromCharCode.apply(null, body.subarray(2 + tl))));
+      } catch (e) { text = ''; }
+      if (text) this.onPacket(topic, text);
+    }
+  };
+
+  MqttWs.prototype._down = function () {
+    var was = this.wasReady;
+    this.ready = false;
+    this._stopKeepalive();
+    for (var k in this.waiters) {
+      try { this.waiters[k].reject(netErr('relay-closed')); } catch (e) {}
+    }
+    this.waiters = {};
+    if (was && !this._dead) this.onClose();
+  };
+
+  MqttWs.prototype.close = function () {
+    this._dead = true;
+    this.ready = false;
+    this._stopKeepalive();
+    try { if (this.ws) this.ws.close(); } catch (e) {}
+    this.ws = null;
+  };
+
+  function RelayLink(room) {
+    this.room = room;
+    this.code = room.code;
+    this.topic = NET.topicBase + room.code;
+    this.sid = 'm' + netUid();
+    this.clients = [];
+    this.connected = false;
+    this.main = -1;
+    this.peerSeen = {};
+    this.lastPeer = 0;
+    this.seq = 0;                   // 내가 보낸 데이터 번호(중복 제거용)
+    this.seenQ = {};                // 이미 받은 (보낸이:번호) — 여러 중계로 같은 메시지가 와도 한 번만
+    this.qCount = 0;
+    this._visBound = false;
+    this._dead = false;
+    this._busy = false;
+    this._ok = null;
+    this._err = null;
+    this.beatTimer = null;
+    this.watchTimer = null;
+    this.joinTimer = null;
+    this.joinStopTimer = null;
+  }
+
+  RelayLink.prototype.open = function () {
+    var self = this, room = this.room;
+    return this._connectAll().then(function (any) {
+      if (!any) throw netErr('relay-unreachable');
+      self._startBeat();
+      self._startWatch();
+      self._bindVisibility();
+      self._beat();
+      if (room.role === 'host') {
+        room.onLinkWaiting();
+        return true;
+      }
+      return self._waitHost().then(function () { return true; });
+    });
+  };
+
+  RelayLink.prototype._idxs = function () {
+    var out = [];
+    for (var i = 0; i < NET.relay.brokers.length; i++) {
+      if (NET.relay.only == null || NET.relay.only === i) out.push(i);
+    }
+    return out;
+  };
+
+  RelayLink.prototype._connectAll = function () {
+    var self = this, idxs = this._idxs();
+    if (!idxs.length) return Promise.resolve(false);
+    return new Promise(function (resolve) {
+      var left = idxs.length, done = false;
+      var finish = function (v) { if (!done) { done = true; resolve(v); } };
+      idxs.forEach(function (i) {
+        self._connectOne(i).then(function () { finish(true); }, function () {})
+          .then(function () { if (--left === 0) finish(false); });
+      });
+    });
+  };
+
+  RelayLink.prototype._connectOne = function (i) {
+    var self = this, b = NET.relay.brokers[i], cur = this.clients[i];
+    if (cur && cur.ready) return Promise.resolve(true);
+    var mq = new MqttWs({
+      url: b.url,
+      username: b.user || '',
+      clientId: 'jg2' + this.sid + i,
+      onPacket: function (topic, text) { self._onPacket(i, text); },
+      onClose: function () { self._onClientDown(i); }
+    });
+    this.clients[i] = { mq: mq, ready: false };
+    return mq.connect(NET.relay.connectMs).then(function () {
+      return mq.subscribe(self.topic);
+    }).then(function () {
+      if (self.clients[i]) self.clients[i].ready = true;
+      self._beatOne(i);
+      return true;
+    }, function (e) {
+      if (self.clients[i]) self.clients[i].ready = false;
+      try { mq.close(); } catch (err) {}
+      throw e;
+    });
+  };
+
+  RelayLink.prototype._presence = function () {
+    return JSON.stringify({
+      s: this.sid,
+      k: this.room.role === 'host' ? 'h' : 'j',
+      n: String(this.room.name || '').slice(0, 10)
+    });
+  };
+
+  RelayLink.prototype._beatOne = function (i) {
+    var c = this.clients[i];
+    if (c && c.ready) c.mq.publish(this.topic, this._presence());
+  };
+
+  RelayLink.prototype._beat = function () {
+    for (var i = 0; i < this.clients.length; i++) this._beatOne(i);
+  };
+
+  RelayLink.prototype._startBeat = function () {
+    var self = this;
+    if (this.beatTimer) return;
+    this.beatTimer = setInterval(function () { if (!self._dead) self._beat(); }, NET.relay.beatMs);
+  };
+
+  RelayLink.prototype._onPacket = function (i, text) {
+    var m = null;
+    try { m = JSON.parse(text); } catch (e) { return; }
+    if (!m || typeof m !== 'object') return;
+    if (m.s === this.sid) return;                    // 내가 보낸 메시지
+    if (m.k === 'h' || m.k === 'j') {
+      var was = this.connected;
+      this._peerHere(i);
+      if (!was) this._beatOne(i);                    // 상대가 나를 봤다는 신호에 바로 응답
+      this._setConnected();
+      return;
+    }
+    if (!m.d || typeof m.d !== 'object') return;
+    /* 같은 메시지를 여러 브로커로 보냈으므로 번호로 중복만 걸러 낸다(순서는 건드리지 않는다) */
+    if (typeof m.q === 'number') {
+      var key = m.s + ':' + m.q;
+      if (this.seenQ[key]) return;
+      this.seenQ[key] = 1;
+      if (++this.qCount > 400) { this.seenQ = {}; this.qCount = 0; }
+    }
+    if (!this.lastPeer) this._peerHere(i);           // 데이터가 왔다는 것 자체가 생존 신호
+    this.room.onLinkData(m.d);
+  };
+
+  RelayLink.prototype._peerHere = function (i) {
+    this.peerSeen[i] = Date.now();
+    this.lastPeer = Date.now();
+    var c = this.clients[this.main];
+    if (this.main < 0 || !c || !c.ready || i < this.main) this._pickMain();
+  };
+
+  RelayLink.prototype._pickMain = function () {
+    var best = -1;
+    for (var i = 0; i < this.clients.length; i++) {
+      var c = this.clients[i];
+      if (c && c.ready && this.peerSeen[i]) { best = i; break; }
+    }
+    this.main = best;
+  };
+
+  RelayLink.prototype._firstReady = function (skip) {
+    for (var i = 0; i < this.clients.length; i++) {
+      if (i === skip) continue;
+      if (this.clients[i] && this.clients[i].ready) return i;
+    }
+    return -1;
+  };
+
+  RelayLink.prototype._setConnected = function () {
+    if (this._dead || this.connected) return;
+    this.connected = true;
+    var ok = this._ok;
+    this._ok = null; this._err = null;
+    this._stopJoin();
+    if (ok) ok(true);
+    this.room.onLinkOpen();
+  };
+
+  RelayLink.prototype._waitHost = function () {
+    var self = this;
+    return new Promise(function (resolve, reject) {
+      if (self.connected) { resolve(true); return; }
+      self._ok = resolve;
+      self._err = reject;
+      self._joinOnce();
+      self.joinTimer = setInterval(function () { self._joinOnce(); }, NET.relay.joinEveryMs);
+      self.joinStopTimer = setTimeout(function () {
+        if (self.connected) return;
+        self._stopJoin();
+        var rej = self._err;
+        self._ok = null; self._err = null;
+        if (rej) rej(netErr('room-not-found'));
+        self.close();
+      }, NET.relay.joinMs);
+    });
+  };
+
+  RelayLink.prototype._joinOnce = function () {
+    for (var i = 0; i < this.clients.length; i++) this._beatOne(i);
+  };
+
+  RelayLink.prototype._stopJoin = function () {
+    if (this.joinTimer) { clearInterval(this.joinTimer); this.joinTimer = null; }
+    if (this.joinStopTimer) { clearTimeout(this.joinStopTimer); this.joinStopTimer = null; }
+  };
+
+  /* 앱을 다시 켰을 때 바로 존재를 알린다 — 배경 탭에서는 타이머가 느려진다 */
+  RelayLink.prototype._bindVisibility = function () {
+    if (this._visBound || typeof document === 'undefined') return;
+    this._visBound = true;
+    var self = this;
+    document.addEventListener('visibilitychange', function () {
+      if (self._dead || document.hidden) return;
+      self._beat();
+      if (!self.connected && self.room.role === 'guest') self._joinOnce();
+    });
+  };
+
+  RelayLink.prototype._startWatch = function () {
+    var self = this;
+    if (this.watchTimer) return;
+    this.watchTimer = setInterval(function () {
+      if (self._dead) return;
+      // 배경 탭에서는 타이머가 느려지므로 끊김 판정을 미룬다
+      if (typeof document !== 'undefined' && document.hidden) {
+        self.lastPeer = Date.now();
+        return;
+      }
+      var ready = 0;
+      for (var i = 0; i < self.clients.length; i++) if (self.clients[i] && self.clients[i].ready) ready++;
+      if (!ready) self._recover();
+      var now = Date.now(), aged = false;
+      for (var k in self.peerSeen) {
+        if (now - self.peerSeen[k] > NET.relay.deadMs) { delete self.peerSeen[k]; aged = true; }
+      }
+      if (aged) self._pickMain();
+      if (self.connected && Date.now() - self.lastPeer > NET.relay.deadMs) {
+        self.connected = false;
+        self.room.onLinkClose();
+      }
+    }, 1000);
+  };
+
+  RelayLink.prototype._recover = function () {
+    if (this._busy || this._dead) return;
+    var self = this;
+    this._busy = true;
+    this._connectAll().then(function (any) {
+      self._busy = false;
+      if (!any || self._dead) return;
+      self._beat();
+    }, function () { self._busy = false; });
+  };
+
+  RelayLink.prototype._onClientDown = function (i) {
+    var c = this.clients[i];
+    if (c) c.ready = false;
+    delete this.peerSeen[i];
+    if (this.main === i) { this.main = -1; this._pickMain(); }
+  };
+
+  RelayLink.prototype.reconnect = function () {
+    if (this._dead) return false;
+    var ready = 0;
+    for (var i = 0; i < this.clients.length; i++) if (this.clients[i] && this.clients[i].ready) ready++;
+    if (ready) { this._beat(); return true; }
+    this._recover();
+    return true;
+  };
+
+  RelayLink.prototype.send = function (obj) {
+    if (this._dead) return false;
+    /* 붙어 있는 브로커 모두에 같은 번호로 보낸다 — 한 곳이 조용히 끊겨도
+       상대는 다른 곳에서 받는다. 받는 쪽은 번호로 중복을 버린다. */
+    var text = JSON.stringify({ s: this.sid, q: ++this.seq, d: obj });
+    var sent = 0;
+    for (var i = 0; i < this.clients.length; i++) {
+      var c = this.clients[i];
+      if (c && c.ready && c.mq.publish(this.topic, text)) sent++;
+    }
+    return sent > 0;
+  };
+
+  RelayLink.prototype.close = function () {
+    this._dead = true;
+    this._stopJoin();
+    if (this.beatTimer) { clearInterval(this.beatTimer); this.beatTimer = null; }
+    if (this.watchTimer) { clearInterval(this.watchTimer); this.watchTimer = null; }
+    for (var i = 0; i < this.clients.length; i++) {
+      var c = this.clients[i];
+      if (c && c.mq) { try { c.mq.close(); } catch (e) {} }
+    }
+    this.clients = [];
+    this.connected = false;
+  };
+
+  /* ═════════════════════════════════════════════════════════
+     전송 계층 2 — BroadcastChannel (같은 브라우저 탭끼리 · ?test=bc)
+     ═════════════════════════════════════════════════════════ */
+  function BcLink(room) {
+    this.room = room;
+    this.sid = 'b' + netUid();      // 방장·손님을 가르는 식별자 (중계 없이도 두 방장을 정리하려면 필요)
+    this.ch = null;
+    this.connected = false;
+    this.joinTimer = null;
+    this.tries = 0;
+    this._dead = false;
+    this._pendingResolve = null;
+  }
+
+  BcLink.prototype.open = function () {
+    var self = this, room = this.room;
+    return new Promise(function (resolve, reject) {
+      if (typeof window.BroadcastChannel !== 'function') { reject(netErr('no-bc')); return; }
+      var ch;
+      try { ch = new BroadcastChannel(NET.bcPrefix + room.code); }
+      catch (e) { reject(netErr('no-bc', e)); return; }
+      self.ch = ch;
+      ch.onmessage = function (ev) {
+        var d = ev.data;
+        if (!d || typeof d !== 'object') return;
+        if (d.t === '__join') {
+          if (room.role === 'host') {
+            if (!self.connected) {
+              self.connected = true;
+              try { ch.postMessage({ t: '__welcome' }); } catch (e) {}
+              room.onLinkOpen();
+            } else {
+              try { ch.postMessage({ t: '__welcome' }); } catch (e) {}
+            }
+          }
+          return;
+        }
+        if (d.t === '__welcome') {
+          if (room.role === 'guest' && !self.connected) {
+            self.connected = true;
+            clearInterval(self.joinTimer);
+            self.joinTimer = null;
+            if (self._pendingResolve) { var f = self._pendingResolve; self._pendingResolve = null; f(true); }
+            room.onLinkOpen();
+          }
+          return;
+        }
+        room.onLinkData(d);
+      };
+      if (room.role === 'host') {
+        room.onLinkWaiting();
+        resolve(true);
+        return;
+      }
+      self._pendingResolve = resolve;
+      var ping = function () {
+        if (self.connected || self._dead) return;
+        self.tries++;
+        try { ch.postMessage({ t: '__join' }); } catch (e) {}
+        if (self.tries > 25) {
+          clearInterval(self.joinTimer);
+          self.joinTimer = null;
+          var f = self._pendingResolve;
+          self._pendingResolve = null;
+          if (f) reject(netErr('no-host'));
+        }
+      };
+      ping();
+      self.joinTimer = setInterval(ping, 400);
+    });
+  };
+
+  BcLink.prototype.send = function (obj) {
+    if (!this.ch || this._dead) return false;
+    try { this.ch.postMessage(obj); return true; } catch (e) { return false; }
+  };
+
+  BcLink.prototype.reconnect = function () { return false; };
+
+  BcLink.prototype.close = function () {
+    this._dead = true;
+    clearInterval(this.joinTimer);
+    try { if (this.ch) this.ch.close(); } catch (e) {}
+    this.connected = false;
+  };
+
+  /* ═════════════════════════════════════════════════════════
+     방 — 연결 상태 · 프로토콜 라우팅 · 핑
+     ═════════════════════════════════════════════════════════ */
+  function NetRoom(opts) {
+    opts = opts || {};
+    this.role = (opts.role === 'guest') ? 'guest' : 'host';
+    this.code = netNormalizeCode(opts.code) || netNewCode();
+    this.name = String(opts.name || '플레이어').slice(0, 10);
+    this.forceBc = !!opts.forceBc;
+    this.mode = null;              // 'relay' | 'bc'
+    this.status = 'idle';          // idle|connecting|waiting|connected|closed|error
+    this.peerName = '';
+    this.connected = false;
+    this.latency = 0;
+    this.inMatch = false;
+    this.link = null;
+    this.handlers = {};
+    this.log = [];
+    this.pingTimer = null;
+    this.graceTimer = null;
+    this.reconnectTimer = null;
+    this.graceLeft = 0;
+    this.lastErr = null;
+    this.bye = false;
+    this.peerHeard = false;        // 상대의 인사·데이터를 받았는지
+    this.helloTimer = null;
+  }
+
+  NetRoom.prototype.on = function (type, fn) { if (typeof fn === 'function') this.handlers[type] = fn; return this; };
+  NetRoom.prototype.emit = function (type, data) {
+    var f = this.handlers[type];
+    if (!f) return;
+    try { f(data || {}); } catch (e) { if (window.console) console.error('[net] handler', type, e); }
+  };
+  NetRoom.prototype.setStatus = function (s, note) {
+    this.status = s;
+    this.emit('status', { status: s, note: note || '' });
+  };
+
+  NetRoom.prototype.open = function () {
+    var self = this;
+    this.setStatus('connecting');
+    if (!this.forceBc) {
+      this.link = new RelayLink(this);
+      this.mode = 'relay';
+      return this.link.open().then(function () { return true; }, function (e) {
+        self.lastErr = e;
+        try { if (self.link) self.link.close(); } catch (err) {}
+        self.link = null;
+        self.mode = null;
+        if (e && e.type === 'room-not-found') { self.setStatus('error', 'room-not-found'); return false; }
+        return self._openBc();
+      });
+    }
+    return this._openBc();
+  };
+
+  NetRoom.prototype._openBc = function () {
+    var self = this;
+    this.link = new BcLink(this);
+    this.mode = 'bc';
+    return this.link.open().then(function () { return true; }, function (e) {
+      self.lastErr = e;
+      self.link = null;
+      self.setStatus('error');
+      return false;
+    });
+  };
+
+  NetRoom.prototype.onLinkWaiting = function () {
+    if (this.status !== 'connected') this.setStatus('waiting');
+  };
+
+  NetRoom.prototype.onLinkOpen = function () {
+    this.connected = true;
+    this.setStatus('connected');
+    this.startPing();
+    this.stopGrace();
+    this.peerHeard = false;
+    this.send('hello', { name: this.name, ver: NET.version });
+    this.startHello();
+    this.emit('connected', { mode: this.mode });
+  };
+
+  /* 상대가 응답할 때까지 인사를 되푼다 — hello/start 한 번이 유실되면
+     양쪽 다 '연결됨'인 채로 서로 기다리기만 해서 두 번 초대해야 했다. */
+  NetRoom.prototype.startHello = function () {
+    var self = this;
+    this.stopHello();
+    var n = 0;
+    this.helloTimer = setInterval(function () {
+      if (!self.connected || self.peerHeard) { self.stopHello(); return; }
+      if (++n > 90) { self.stopHello(); return; }
+      self.send('hello', { name: self.name, ver: NET.version });
+    }, NET.relay.helloMs);
+  };
+
+  NetRoom.prototype.stopHello = function () {
+    if (this.helloTimer) { clearInterval(this.helloTimer); this.helloTimer = null; }
+  };
+
+  NetRoom.prototype.onLinkClose = function () {
+    if (this.bye) return;
+    this.connected = false;
+    this.latency = 0;
+    this.stopPing();
+    this.stopHello();
+    this.peerHeard = false;
+    this.setStatus('closed');
+    this.emit('disconnected', {});
+    if (this.inMatch) this.beginGrace();
+    else this.emit('peerLeft', {});
+  };
+
+  NetRoom.prototype.onLinkData = function (d) {
+    if (!d || typeof d !== 'object' || typeof d.t !== 'string') return;
+    var t = d.t;
+    if (t === '__join' || t === '__welcome') return;
+    if (t === 'ping') { this.send('pong', { ts: d.ts }); return; }
+    if (t === 'pong') {
+      var r = Date.now() - (d.ts || 0);
+      if (r >= 0 && r < 60000) this.latency = r;
+      return;
+    }
+    this.peerHeard = true;
+    this.stopHello();
+    if (t === 'hello') {
+      this.peerName = String(d.name || '상대').slice(0, 10);
+      this.emit('hello', { name: this.peerName });
+      return;
+    }
+    if (t === 'bye') { this.bye = true; this.emit('bye', {}); return; }
+    this.log.push(d);
+    if (this.log.length > 80) this.log.shift();
+    this.emit(t, d);
+  };
+
+  NetRoom.prototype.send = function (t, d) {
+    if (!this.link) return false;
+    var msg = Object.assign({ t: t }, d || {});
+    return this.link.send(msg);
+  };
+
+  NetRoom.prototype.startPing = function () {
+    var self = this;
+    this.stopPing();
+    this.pingTimer = setInterval(function () {
+      if (self.connected) self.send('ping', { ts: Date.now() });
+    }, NET.pingMs);
+  };
+  NetRoom.prototype.stopPing = function () {
+    if (this.pingTimer) { clearInterval(this.pingTimer); this.pingTimer = null; }
+  };
+
+  NetRoom.prototype.beginGrace = function () {
+    if (this.graceTimer) return;
+    var self = this;
+    this.graceLeft = Math.round(NET.graceMs / 1000);
+    this.emit('grace', { left: this.graceLeft });
+    this.graceTimer = setInterval(function () {
+      self.graceLeft--;
+      if (self.graceLeft > 0) { self.emit('grace', { left: self.graceLeft }); return; }
+      self.stopGrace();
+      self.emit('graceEnd', {});
+    }, 1000);
+    if (this.link && this.link.reconnect) {
+      var n = 0;
+      this.reconnectTimer = setInterval(function () {
+        if (self.connected || n++ >= 8) {
+          clearInterval(self.reconnectTimer);
+          self.reconnectTimer = null;
+          return;
+        }
+        try { self.link.reconnect(); } catch (e) {}
+      }, 1800);
+    }
+  };
+  NetRoom.prototype.stopGrace = function () {
+    if (this.graceTimer) { clearInterval(this.graceTimer); this.graceTimer = null; }
+    if (this.reconnectTimer) { clearInterval(this.reconnectTimer); this.reconnectTimer = null; }
+  };
+
+  NetRoom.prototype.byeNow = function () {
+    this.bye = true;
+    this.stopGrace();
+    this.stopPing();
+    this.send('bye', {});
+    var self = this;
+    setTimeout(function () { self.close(); }, 60);
+  };
+
+  NetRoom.prototype.close = function () {
+    this.stopGrace();
+    this.stopPing();
+    this.stopHello();
+    try { if (this.link) this.link.close(); } catch (e) {}
+    this.link = null;
+    this.connected = false;
+    this.setStatus('closed');
+  };
+
+  HJ.net = {
+    NET: NET,
+    newCode: netNewCode,
+    normalize: netNormalizeCode,
+    roomLink: netRoomLink,
+    uid: netUid,
+    Room: function (opts) { return new NetRoom(opts); },
+    MqttWs: MqttWs
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* =====================================================================
+   한판 직소 — 온라인 1:1 대전 프로토콜 (online_proto.js)
+   DOM·소켓에 전혀 의존하지 않는 순수 상태 기계. 화면(online.js)과
+   퍼즈 하네스(tests/fuzz_online.js)가 같은 코드를 쓴다.
+
+   방식 — 스피드 대전(방식 ①):
+     두 사람이 같은 그림·같은 난이도·같은 시드로 각자 판을 시작해
+     먼저 완성하는 쪽이 이긴다. 판정은 각자 로컬 직소 엔진이 하고,
+     서로에게는 '스냅된 조각 ID'와 '진행률'만 보낸다(남의 판을 조작하지 않는다).
+
+   권위:
+     · 방장(host)이 승패를 확정해 res 로 알린다. 손님(guest)은 그 판정을 따른다.
+     · 방장 판정이 오래 안 오면(유실·양쪽 끊김) 손님은 자기 시야로 마무리한다.
+     · 네트워크는 지연·중복·역순·유실을 전제로 짠다:
+         - 스냅 집합은 합집합이라 중복·역순에 강하고 절대 줄지 않는다.
+         - 진행률은 max() 로만 갱신한다.
+         - 이미 낸 판정(result)은 다시 바꾸지 않는다(손님이 방장 판정을 받으면 예외).
+   ===================================================================== */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+  var OP = HJ.OProto = {};
+
+  var DRAW_MS = OP.DRAW_MS = 350;       // 방장 기준 이 안에 둘 다 완성하면 무승부
+  var RANKS = OP.RANKS = ['easy', 'normal', 'hard', 'master'];
+  var STAGES = OP.STAGES = 10;
+
+  function blank() {
+    return { snaps: {}, n: 0, jp: 0, tray: 0, moves: 0, hints: 0, finished: false, time: 0, finAt: 0 };
+  }
+
+  function Match(opt) {
+    opt = opt || {};
+    this.role = opt.role === 'guest' ? 'guest' : 'host';
+    this.name = String(opt.name || '').slice(0, 8);
+    this.now = opt.now || function () { return Date.now(); };
+    this.phase = 'lobby';            // lobby | live | done
+    this.round = 0;
+    this.cfg = null;                 // { stage, rank, seed, round }
+    this.me = blank();
+    this.peer = blank();
+    this.peer.here = false;
+    this.result = null;              // { raw:'h'|'g'|'d', who:'me'|'peer'|'draw', reason, myTime, peerTime, myN, peerN }
+    this.pending = null;             // 손님: 방장 판정을 기다리는 임시 확정 { raw, reason, ms }
+    this.left = false;
+    this.outbox = [];
+    this.handlers = {};
+  }
+
+  Match.prototype.on = function (type, fn) {
+    if (typeof fn === 'function') this.handlers[type] = fn;
+    return this;
+  };
+  Match.prototype.emit = function (type, data) {
+    var f = this.handlers[type];
+    if (!f) return;
+    try { f(data || {}); } catch (e) { if (root.console) console.error('[oproto] handler', type, e); }
+  };
+
+  /* ---------------- 보낼 메시지 ---------------- */
+  Match.prototype._out = function (t, d) {
+    var m = { t: t }, k;
+    if (d) for (k in d) if (Object.prototype.hasOwnProperty.call(d, k)) m[k] = d[k];
+    this.outbox.push(m);
+    return m;
+  };
+  Match.prototype.takeOut = function () {
+    var o = this.outbox;
+    this.outbox = [];
+    return o;
+  };
+  Match.prototype.flush = function (send) {
+    var o = this.takeOut(), i;
+    for (i = 0; i < o.length; i++) {
+      try { send(o[i]); } catch (e) { /* 소켓 오류는 무시 — 재접속 sync 가 복구한다 */ }
+    }
+    return o.length;
+  };
+
+  /* ---------------- 라운드 ---------------- */
+  Match.prototype.resetRound = function (cfg) {
+    var here = this.peer.here;
+    this.cfg = cfg;
+    this.round = cfg.round;
+    this.phase = 'live';
+    this.me = blank();
+    this.peer = blank();
+    this.peer.here = here;
+    this.result = null;
+    this.pending = null;
+    this.left = false;
+    this.outbox = [];
+  };
+
+  /* 방장: 새 라운드 시작 → cfg 를 outbox 에 넣는다 */
+  Match.prototype.hostStart = function (opt) {
+    opt = opt || {};
+    var stage = Math.max(1, Math.min(STAGES, opt.stage | 0 || 1));
+    var rank = RANKS.indexOf(opt.rank) >= 0 ? opt.rank : RANKS[0];
+    var seed = (opt.seed >>> 0) || (Math.floor(Math.random() * 0x7fffffff) | 0) || 7;
+    var cfg = { stage: stage, rank: rank, seed: seed, round: this.round + 1 };
+    this.resetRound(cfg);
+    this.needCfg = true;
+    this.cfgTries = 0;
+    this._out('cfg', { stage: stage, rank: rank, seed: seed, round: cfg.round });
+    this.emit('start', { cfg: cfg });
+    return cfg;
+  };
+
+  /* 손님: 방장의 cfg 수락. 이미 지난 라운드·중복·잘못된 값은 버린다. */
+  Match.prototype.onCfg = function (m) {
+    if (!m || typeof m !== 'object') return null;
+    if (this.role !== 'guest') return null;
+    var rd = m.round | 0;
+    if (rd <= this.round) return null;                    // 중복·역순
+    if (!(m.stage >= 1 && m.stage <= STAGES)) return null;
+    if (RANKS.indexOf(m.rank) < 0) return null;
+    var cfg = { stage: m.stage | 0, rank: m.rank, seed: (m.seed >>> 0) || 7, round: rd };
+    this.resetRound(cfg);
+    this._out('ready', { rd: rd });          // 방장은 이걸 받아 cfg 재전송을 멈춘다
+    this.emit('start', { cfg: cfg });
+    return cfg;
+  };
+
+  Match.prototype.onReady = function (m) {
+    if (!m || typeof m !== 'object') return false;
+    if ((m.rd | 0) === this.round) this.needCfg = false;
+    return true;
+  };
+
+  /* ---------------- 스냅 · 진행률 ---------------- */
+  Match.prototype._merge = function (target, ids, jp, n, mv) {
+    var changed = 0, i, id;
+    if (Array.isArray(ids)) {
+      for (i = 0; i < ids.length && i < 256; i++) {
+        id = ids[i];
+        if (typeof id !== 'number' || !isFinite(id) || id % 1 || id < 0 || id > 4095) continue;
+        if (!target.snaps[id]) { target.snaps[id] = 1; changed++; }
+      }
+    }
+    target.n = (target.n | 0) + changed;
+    if (n != null) target.n = Math.max(target.n, n | 0);
+    target.jp = Math.max(target.jp | 0, jp | 0);
+    if (mv != null) target.moves = Math.max(target.moves | 0, mv | 0);
+    return changed;
+  };
+
+  Match.prototype.localSnap = function (ids, info) {
+    if (this.phase !== 'live') return null;
+    var before = this.me.n;
+    this._merge(this.me, ids, info && info.jp, 0, info && info.moves);
+    if (info && info.tray != null) this.me.tray = info.tray | 0;
+    if (this.me.n === before && !(info && info.jp != null)) return null;
+    return this._out('snap', { ids: (ids || []).slice(0, 96), jp: this.me.jp, n: this.me.n, mv: this.me.moves });
+  };
+
+  Match.prototype.onSnap = function (m) {
+    if (!m || this.phase !== 'live') return false;
+    var changed = this._merge(this.peer, m.ids, m.jp, m.n, m.mv);
+    if (changed) this.emit('peerSnap', { ids: m.ids || [], n: this.peer.n, jp: this.peer.jp });
+    return changed > 0;
+  };
+
+  Match.prototype.localProg = function () {
+    // 방장은 진행 하트비트에 판정(res)도 함께 실어 보낸다 —
+    // 유실된 판정도 몇 초 안에 저절로 복구된다(지연·유실 전제 설계).
+    if (this.result && this.role === 'host' && this.result.msg) {
+      this.outbox.push(this.result.msg);
+    }
+    // 손님이 시작 신호를 놓쳤으면 다시 보낸다(최대 20번 ≈ 22초)
+    if (this.role === 'host' && this.needCfg && this.cfg && (this.cfgTries | 0) < 20) {
+      this.cfgTries = (this.cfgTries | 0) + 1;
+      this._out('cfg', { stage: this.cfg.stage, rank: this.cfg.rank, seed: this.cfg.seed, round: this.cfg.round });
+    }
+    return this._out('prog', { jp: this.me.jp, n: this.me.n, tr: this.me.tray, mv: this.me.moves, el: this.me.time });
+  };
+
+  /* 화면의 경과 시간 — 결과창에 진 쪽 시간도 남기기 위해 */
+  Match.prototype.setElapsed = function (ms) {
+    if (this.me.finished) return false;
+    if (!(ms >= 0)) return false;
+    this.me.time = Math.max(this.me.time, ms | 0);
+    return true;
+  };
+  Match.prototype.onProg = function (m) {
+    if (!m || this.phase !== 'live') return false;
+    this.peer.jp = Math.max(this.peer.jp, m.jp | 0);
+    this.peer.n = Math.max(this.peer.n, m.n | 0);
+    this.peer.tray = m.tr | 0;
+    if (m.mv != null) this.peer.moves = Math.max(this.peer.moves, m.mv | 0);
+    if (m.el != null && !this.peer.finished) this.peer.time = Math.max(this.peer.time, m.el | 0);
+    return true;
+  };
+
+  /* ---------------- 완성 · 판정 ---------------- */
+  Match.prototype.localFinish = function (rec) {
+    if (this.phase !== 'live' || this.me.finished) return null;
+    rec = rec || {};
+    this.me.finished = true;
+    this.me.time = Math.max(0, rec.time | 0);
+    this.me.moves = Math.max(this.me.moves, rec.moves | 0);
+    this.me.hints = Math.max(0, rec.hints | 0);
+    this.me.finAt = this.now();
+    this._out('fin', { el: this.me.time, mv: this.me.moves, hi: this.me.hints, n: this.me.n });
+    if (this.role === 'host') {
+      this._decide();
+    } else {
+      // 방장 판정을 잠시 기다린다. 그 사이 상대 'fin' 이 먼저 와 있었으면 패배 후보.
+      this.pending = { raw: this.peer.finished ? 'h' : 'g', reason: 'finish', ms: 3000 };
+    }
+    return this.me.finished;
+  };
+
+  Match.prototype.onFin = function (m) {
+    if (!m || this.phase !== 'live') return false;
+    if (!this.peer.finished) {
+      this.peer.finished = true;
+      this.peer.time = Math.max(0, m.el | 0);
+      this.peer.moves = Math.max(this.peer.moves, m.mv | 0);
+      this.peer.hints = Math.max(0, m.hi | 0);
+      this.peer.n = Math.max(this.peer.n, m.n | 0);
+      this.peer.finAt = this.now();
+    }
+    if (this.role === 'host') this._decide();
+    return true;
+  };
+
+  /* 방장만: 둘 다 완성했으면 승패 확정.
+     한쪽만 완성했다면 DRAW_MS 만큼 기다렸다가(상대가 거의 동시에 끝낼 수 있다) 확정한다. */
+  Match.prototype._decide = function () {
+    if (this.role !== 'host' || this.result) return null;
+    if (!this.me.finished && !this.peer.finished) return null;
+    if (this.me.finished && this.peer.finished) {
+      var d = this.me.finAt - this.peer.finAt;
+      if (Math.abs(d) <= DRAW_MS) return this._setResult('d', 'draw');
+      return this._setResult(d < 0 ? 'h' : 'g', 'finish');
+    }
+    if (!this.pending) {
+      this.pending = { raw: this.me.finished ? 'h' : 'g', reason: 'finish', ms: DRAW_MS };
+    }
+    return null;
+  };
+
+  /* 상대가 나갔다(bye) 또는 유예 시간이 끝났다 */
+  Match.prototype.peerLeft = function (reason) {
+    if (this.result) return null;
+    this.left = true;
+    this.peer.here = false;
+    if (this.phase !== 'live') return null;
+    var win = this.peer.finished ? 'peer' : 'me';
+    if (this.role === 'host') return this._setResult(win === 'me' ? 'h' : 'g', reason || 'left');
+    // 손님: 방장 판정을 먼저 기다리고, 안 오면 스스로 마무리
+    this.pending = { raw: win === 'me' ? 'g' : 'h', reason: reason || 'left', ms: 1500 };
+    return null;
+  };
+
+  Match.prototype._setResult = function (raw, reason) {
+    if (this.result) return null;
+    if (raw !== 'h' && raw !== 'g' && raw !== 'd') raw = 'd';
+    var who = raw === 'd' ? 'draw' : ((this.role === 'host') === (raw === 'h') ? 'me' : 'peer');
+    this.result = {
+      raw: raw, who: who, reason: reason || 'finish',
+      myTime: this.me.time, peerTime: this.peer.time,
+      myN: this.me.n, peerN: this.peer.n, myJP: this.me.jp, peerJP: this.peer.jp,
+      at: this.now()
+    };
+    this.phase = 'done';
+    this.pending = null;
+    this.emit('result', this.result);
+    if (this.role === 'host') {
+      this._out('res', { w: raw, r: this.result.reason, rd: this.round, a: [this.me.time, this.me.n], b: [this.peer.time, this.peer.n] });
+      this.result.msg = this.outbox[this.outbox.length - 1];
+    }
+    return this.result;
+  };
+
+  Match.prototype.onRes = function (m) {
+    if (!m || typeof m !== 'object') return false;
+    if (m.w !== 'h' && m.w !== 'g' && m.w !== 'd') return false;
+    if (m.rd != null && (m.rd | 0) !== this.round) return false;   // 다른 라운드 판정(역순 도착)
+    if (Array.isArray(m.a)) { this.peer.time = Math.max(this.peer.time, m.a[0] | 0); this.peer.n = Math.max(this.peer.n, m.a[1] | 0); }
+    // 내 진행 수(me.n)는 내 스냅 집합이 유일한 진실 — 방장 시야로 덮어쓰지 않는다.
+    if (this.role === 'host') return false;             // 방장 판정이 권위
+    if (this.result && this.result.raw === m.w) return false;
+    this.result = null;
+    this._setResult(m.w, m.r || 'finish');
+    return true;
+  };
+
+  /* 재접속: 내 상태를 통째로 다시 알린다(유실 복구) */
+  Match.prototype.localSync = function () {
+    var ids = [], k;
+    for (k in this.me.snaps) if (Object.prototype.hasOwnProperty.call(this.me.snaps, k)) ids.push(+k);
+    return this._out('sync', { ids: ids, jp: this.me.jp, n: this.me.n, tr: this.me.tray,
+      mv: this.me.moves, fin: this.me.finished, el: this.me.time, rd: this.round });
+  };
+  Match.prototype.onSync = function (m) {
+    if (!m || typeof m !== 'object' || (m.rd | 0) !== this.round) return false;
+    var changed = this._merge(this.peer, m.ids, m.jp, m.n, m.mv);
+    if (m.tr != null) this.peer.tray = m.tr | 0;
+    if (m.fin && !this.peer.finished) {
+      this.peer.finished = true;
+      this.peer.time = Math.max(0, m.el | 0);
+      this.peer.finAt = this.now();
+      if (this.role === 'host') this._decide();
+    }
+    if (changed) this.emit('peerSnap', { ids: m.ids || [], n: this.peer.n, jp: this.peer.jp });
+    return true;
+  };
+
+  Match.prototype.peerCome = function () { this.peer.here = true; this.left = false; };
+
+  /* 재접속한 상대가 판을 놓쳤을 때 방장이 시작 신호를 다시 보낸다 */
+  Match.prototype.resendCfg = function () {
+    if (this.role !== 'host' || !this.cfg) return false;
+    this.needCfg = true;
+    this.cfgTries = 0;
+    this._out('cfg', { stage: this.cfg.stage, rank: this.cfg.rank, seed: this.cfg.seed, round: this.cfg.round });
+    return true;
+  };
+
+  /* 남은 대기 시간(손님 임시 확정) — UI 루프가 dt(ms)로 부른다 */
+  Match.prototype.tick = function (dt) {
+    if (!this.pending) return null;
+    this.pending.ms -= (dt > 0 ? dt : 0);
+    if (this.pending.ms > 0) return null;
+    var p = this.pending;
+    this.pending = null;
+    if (this.result) return null;
+    return this._setResult(p.raw, p.reason);
+  };
+
+  /* ---------------- 메시지 라우팅 (net 이벤트 → 프로토콜) ---------------- */
+  Match.prototype.handle = function (t, m) {
+    switch (t) {
+      case 'cfg': this.onCfg(m); return true;
+      case 'snap': this.onSnap(m); return true;
+      case 'prog': this.onProg(m); return true;
+      case 'ready': this.onReady(m); return true;
+      case 'fin': this.onFin(m); return true;
+      case 'sync': this.onSync(m); return true;
+      case 'res': this.onRes(m); return true;
+      default: return false;
+    }
+  };
+
+  /* 승/패/무 표기 */
+  OP.label = function (who, reason) {
+    if (who === 'draw') return '무승부';
+    var w = who === 'me';
+    if (reason === 'left') return w ? '승리 · 상대 기권' : '패배 · 기권';
+    return w ? '승리' : '패배';
+  };
+  OP.reasonText = function (res) {
+    if (!res) return '';
+    if (res.reason === 'draw') return '둘 다 거의 동시에 완성했어요';
+    if (res.reason === 'left') return '상대가 대전에서 나갔어요';
+    if (res.reason === 'lost') return '연결이 끊겨 무승부로 마무리했어요';
+    return '먼저 완성한 쪽이 이겼어요';
+  };
+
+  OP.create = function (opt) { return new Match(opt); };
+  OP.Match = Match;
+  OP.blank = blank;
+
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
 /* ===================== 한판 직소 — 화면·입력·저장 흐름 ===================== */
 (function (root) {
   'use strict';
@@ -2826,7 +4365,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     return '<span class="stars">' + s + '</span>';
   }
   function showScreen(name) {
-    ['home', 'play', 'gallery'].forEach(function (s) {
+    ['home', 'play', 'gallery', 'online'].forEach(function (s) {
       var el = $('#scr-' + s);
       if (el) el.classList.toggle('hidden', s !== name);
     });
@@ -2871,6 +4410,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     $('#statStars').innerHTML = total + '<small>/' + (STAGES.length * 8) + '</small>';
     $('#statClear').innerHTML = cleared + '<small>/' + STAGES.length + '</small>';
     $('#statBest').innerHTML = three + '<small>개</small>';
+    var orec = $('#olRecTxt');
+    if (orec) orec.textContent = Store.onlineRecordText
+      ? Store.onlineRecordText()
+      : '0승 0패';
 
     var saved = Store.resume();
     var card = $('#resumeCard');
@@ -3399,6 +4942,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       else startPlay(r.g.stage, r.g.n, r.g);
     });
     $('#btnGallery').addEventListener('click', function () { buildGallery(); showScreen('gallery'); });
+    if ($('#btnOnline')) $('#btnOnline').addEventListener('click', function () {
+      SFX.unlock(); SFX.tap();
+      if (HJ.Online) HJ.Online.openLobby();
+    });
     $('#btnGalBack').addEventListener('click', function () { showScreen('home'); buildHome(); });
     $('#galGrid').addEventListener('click', function (e) {
       var b = e.target.closest('.gal');
@@ -3406,6 +4953,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     });
 
     $('#btnBack').addEventListener('click', function () {
+      if (HJ.Online && HJ.Online.inMatch()) { HJ.Online.confirmLeave(); return; }
       if (!C) C = HJ.Classic;
       if (C && C.active) {
         C.save(); C.stop();
@@ -3471,6 +5019,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
     // 뒤로가기 가드
     root.addEventListener('popstate', function () {
+      if (HJ.Online && HJ.Online.inMatch()) { HJ.Online.confirmLeave(); return; }
       if (ui.screen === 'play') {
         if (C && C.active) { C.save(); C.stop(); showScreen('home'); buildHome(); return; }
         if (G && !G.finished) { pauseGame(); Store.saveGame(G); }
@@ -3480,6 +5029,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
     doc.addEventListener('visibilitychange', function () {
       if (doc.hidden) {
+        if (HJ.Online && HJ.Online.inMatch()) return;        // 온라인은 서로 겨루므로 멈추지 않는다
         if (C && C.active) {
           var S2 = C.state();
           if (S2 && !S2.finished) { S2.paused = true; C.save(); }
@@ -3590,12 +5140,29 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       mode: function () { return mode; },
       resume: function () { return Store.resume(); },
       saveArt: function (stage) { saveArt(stage || 1); },
-      bestClassic: function (stage, rank) { return Store.bestOfClassic(stage, rank); }
+      bestClassic: function (stage, rank) { return Store.bestOfClassic(stage, rank); },
+      online: function () { return HJ.Online ? HJ.Online.testState() : null; },
+      onlineRecord: function () { return Store.online; }
     };
     if (HJ.Classic && HJ.Classic.hook) root.__hjC = HJ.Classic.hook();
   }
 
   /* ---------------- 부팅 ---------------- */
+  HJ.App = {
+    showScreen: showScreen,
+    showHome: function () { showScreen('home'); buildHome(); },
+    buildHome: buildHome,
+    toast: toast,
+    haptic: haptic,
+    overlay: overlay,
+    closeOverlay: closeOverlay,
+    stageById: stageById,
+    stages: function () { return STAGES; },
+    saveArt: saveArt,
+    screen: function () { return ui.screen; },
+    sfx: SFX
+  };
+
   function boot() {
     Store.load();
     C = HJ.Classic;
@@ -3647,6 +5214,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   var items = {}, resultOpen = false, ghost = null;
   var BOX_ALL = { x0: -400, y0: -400, x1: 1400, y1: 1400 };
 
+  /* ---- 온라인 대전 훅 (online.js 가 채운다) ----
+     ONLINE 이면 이어하기 저장·별점 기록을 하지 않고, 스냅된 조각을 상대에게 알린다. */
+  var ONLINE = false, hooks = null, snapSeen = {}, snapAt = 0, lastTickAt = 0;
+
   var $ = function (s) { return doc.querySelector(s); };
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
@@ -3684,12 +5255,19 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   /* ---------------- 시작 / 종료 ---------------- */
   C.setup = function (a) { api = a; bind(); };
 
-  C.start = function (stage, rankKey, resumeState) {
+  C.setHooks = function (h) { hooks = h || null; };
+  C.isOnline = function () { return ONLINE; };
+
+  /* opts: { seed, online } — 온라인은 양쪽이 같은 시드를 쓴다 */
+  C.start = function (stage, rankKey, resumeState, opts) {
+    opts = opts || {};
     var st = api.stageById(stage);
+    ONLINE = !!opts.online;
+    snapSeen = {}; snapAt = 0; lastTickAt = 0;
     cur = { stage: stage, rank: rankKey };
     S = resumeState || J.create({
       stage: stage, rank: rankKey,
-      seed: ((Date.now() & 0x7fffffff) ^ (stage * 7919) ^ (HJ.hashSeed(rankKey))) >>> 0 || 1
+      seed: opts.seed || (((Date.now() & 0x7fffffff) ^ (stage * 7919) ^ (HJ.hashSeed(rankKey))) >>> 0 || 1)
     });
     S.paused = false;
     C.active = true;
@@ -3746,6 +5324,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   C.stop = function () {
     C.active = false;
+    ONLINE = false;
+    snapSeen = {};
     S = null;
     $('#classicTray').classList.add('hidden');
     $('#zoombar').classList.add('hidden');
@@ -3933,6 +5513,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (q) afterAction(res, q.x + S.pw / 2, q.y + S.ph / 2);
     renderTray(false);
     draw(); updateHud(); save(true);
+    emitSnaps();
   }
 
   /* ---------------- 드래그: 보드 그룹 ---------------- */
@@ -4042,6 +5623,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (q && res.ok) afterAction(res, q.x + S.pw / 2, q.y + S.ph / 2);
     else if (!res.ok && cancelled) { /* 취소: 이미 클램프된 위치 유지 */ }
     draw(); updateHud(); save(true);
+    emitSnaps();
     if (res.ok && res.finished) onComplete();
   };
 
@@ -4059,9 +5641,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         });
       }
       if (res.merged) SFX.merge ? SFX.merge() : null;
+      emitSnaps();
       if (res.finished || (S && S.finished)) onComplete();
     } else {
       SFX.tap();
+      emitSnaps();
       if (S && S.finished) onComplete();
     }
   }
@@ -4077,6 +5661,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     $('#btnHint').classList.add('hinted');
     setTimeout(function () { $('#btnHint').classList.remove('hinted'); }, 2600);
     renderTray(false); draw(); updateHud(); save(true);
+    emitSnaps();
     if (r.finished || S.finished) onComplete();
     else api.toast(r.pid != null ? '힌트: 한 조각을 제자리에 붙였어요' : '가운데로 정렬했어요');
   };
@@ -4097,6 +5682,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (!r.ok) return;
     SFX.correct(); api.haptic([10, 20, 10]);
     draw(); updateHud(); save(true);
+    emitSnaps();
     if (r.finished || S.finished) onComplete();
   };
 
@@ -4146,21 +5732,46 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   /* ---------------- 저장 ---------------- */
   function save(force) {
+    if (ONLINE) return;                 // 온라인 판은 이어하기 저장 대상이 아니다
     if (!S || S.finished) return;
     Store.saveJigsaw(S);
     U.lastSave = U.now;
     void force;
   }
-  C.save = function () { if (S && !S.finished) Store.saveJigsaw(S); };
+  C.save = function () { if (!ONLINE && S && !S.finished) Store.saveJigsaw(S); };
+
+  /* ---------------- 온라인: 스냅 브로드캐스트 ---------------- */
+  function emitSnaps() {
+    if (!ONLINE || !S || !hooks || !hooks.snap) return;
+    var out = [], i, n = S.pieces.length;
+    for (i = 0; i < n; i++) {
+      if (snapSeen[i]) continue;
+      if (J.isExact(S, i)) { snapSeen[i] = 1; out.push(i); }
+    }
+    if (out.length) hooks.snap(out, { jp: J.joinedPairs(S), tray: S.tray.length, moves: S.moves });
+  }
+  C.liveInfo = function () {
+    if (!S) return null;
+    var n = 0, i;
+    for (i = 0; i < S.pieces.length; i++) if (snapSeen[i] || J.isExact(S, i)) n++;
+    return { n: n, jp: J.joinedPairs(S), tray: S.tray.length, moves: S.moves,
+             elapsed: Math.round(S.elapsed), finished: !!S.finished };
+  };
 
   /* ---------------- 완성 ---------------- */
   function onComplete() {
     if (!S || !S.finished || resultOpen) return;
     resultOpen = true;
     U.doneAt = now();
+    emitSnaps();
     SFX.complete(); api.haptic([18, 40, 18, 40, 24]);
     var stars = J.stars(S);
     var rec = { stars: stars, moves: S.moves, time: Math.round(S.elapsed), hints: S.hints };
+    if (ONLINE) {
+      draw();
+      if (hooks && hooks.finish) hooks.finish(rec);
+      return;                               // 별점·갤러리·이어하기와 분리
+    }
     var res = Store.submitClassic(cur.stage, cur.rank, rec);
     Store.clearJigsaw();
     draw();
@@ -4227,7 +5838,16 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (U.shake && t - U.shake.t0 > 240) U.shake = null;
     draw();
     if (t - U.lastHud > 110) { updateHud(); U.lastHud = t; }
-    if (!S.finished && t - U.lastSave > 1500) { Store.saveJigsaw(S); U.lastSave = t; }
+    if (!ONLINE && !S.finished && t - U.lastSave > 1500) { Store.saveJigsaw(S); U.lastSave = t; }
+    if (ONLINE) {
+      // 액션 경로를 하나라도 놓쳐도 0.25초 안에 따라잡는 안전망
+      if (t - snapAt > 250) { snapAt = t; emitSnaps(); }
+      if (hooks && hooks.tick) {
+        var dt2 = lastTickAt ? Math.min(500, t - lastTickAt) : 0;
+        lastTickAt = t;
+        hooks.tick(dt2, C.liveInfo());
+      }
+    }
   };
 
   /* ---------------- 바인딩 ---------------- */
@@ -4294,6 +5914,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       filter: function () { return U.filter; },
       trayIds: function () { return S ? S.tray.slice() : null; },
       groups: function () { return S ? J.groupIds(S) : []; },
+      snapStep: function (n) {  // 테스트: 트레이 앞 n개를 제자리에 놓고 즉시 알린다(온라인)
+        if (!S) return 0;
+        var tray = S.tray.slice(0, Math.max(0, n | 0)), k, p, cnt = 0;
+        for (k = 0; k < tray.length; k++) {
+          p = S.pieces[tray[k]];
+          J.applyAction(S, { type: 'take', pid: tray[k], x: p.c * S.pw, y: p.r * S.ph, tol: 0.0001, box: safeBox() });
+          cnt++;
+        }
+        renderTray(false); draw(); updateHud(); emitSnaps();
+        return cnt;
+      },
       solve: function () {     // 테스트: 남은 조각을 전부 제자리에 (스냅 연쇄)
         if (!S) return false;
         var tray = S.tray.slice();
@@ -4303,12 +5934,783 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
           if (S.finished) break;
         }
         if (!S.finished) J.applyAction(S, { type: 'align' });
-        renderTray(false); draw(); updateHud();
+        renderTray(false); draw(); updateHud(); emitSnaps();
         if (S.finished) onComplete();
         return S.finished;
       }
     };
   };
+
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
+/* =====================================================================
+   한판 직소 — 온라인 1:1 대전 화면 (online.js)
+   net.js(중계) + online_proto.js(판정) + classic.js(내 판) 위에 얹는 UI.
+
+   · 방 만들기(4자리 코드) → 코드/초대 링크로 입장 → 두 사람이 같은 그림·같은
+     난이도·같은 시드로 동시에 시작 → 먼저 완성하는 쪽 승리.
+   · 내가 스냅한 조각은 상대에게 즉시 보내고(상대 미니 판에 바로 나타난다),
+     상대가 스냅한 조각도 내 미니 판에 바로 나타난다.
+   · 온라인 판은 이어하기·별점·갤러리 저장 대상이 아니다(전적만 따로).
+   ===================================================================== */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ, Store = HJ.Store, OP = HJ.OProto, J = HJ.Jigsaw;
+  var doc = root.document;
+  var $ = function (s) { return doc.querySelector(s); };
+
+  var OL = HJ.Online = {
+    room: null, M: null, role: null, code: '', mode: 'create',
+    stage: 1, rank: 'easy', name: '', started: false, busy: false,
+    connected: false, peerName: '', peerHere: false, inited: false,
+    graceLeft: 0, againWait: false, hostWantsAgain: false,
+    resultShown: false, lastProg: 0, lastBar: 0, artImg: null, artStage: 0,
+    big: false, forceBc: false, leftByMe: false
+  };
+
+  function toast(m, ms) { if (HJ.App) HJ.App.toast(m, ms); }
+  function sfx() { return root.SFX; }
+  function haptic(p) { if (HJ.App) HJ.App.haptic(p); }
+  function isTest() { return location.search.indexOf('test=1') >= 0; }
+
+  function totalPieces(cfg) {
+    var rk = J.rankByKey(cfg && cfg.rank);
+    return rk ? rk.c * rk.r : 12;
+  }
+  function name() {
+    if (!OL.name) {
+      var v = '';
+      try { v = localStorage.getItem('hj.nick') || ''; } catch (e) { }
+      OL.name = String(v || '').slice(0, 8);
+    }
+    return OL.name || '나';
+  }
+  function saveName(n) {
+    OL.name = String(n || '').slice(0, 8);
+    try { localStorage.setItem('hj.nick', OL.name); } catch (e) { }
+  }
+
+  /* ---------------- 로비 열기 ---------------- */
+  OL.openLobby = function (tab) {
+    if (!OL.inited) return;
+    if (OL.room && OL.room.connected && OL.M && OL.M.phase === 'live') { return; }
+    HJ.App.showScreen('online');
+    OL.mode = tab === 'join' ? 'join' : 'create';
+    syncTabs();
+    var nEl = $('#olName');
+    if (nEl) nEl.value = name();
+    renderLobby();
+    if (OL.mode === 'join') setTimeout(function () { focusEl($('#olCode')); }, 90);
+  };
+
+  function focusEl(el) { if (el) { try { el.focus({ preventScroll: true }); } catch (e) { } } }
+
+  function syncTabs() {
+    var t = $('#olTabs');
+    if (!t) return;
+    [].forEach.call(t.querySelectorAll('button'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-t') === OL.mode);
+    });
+  }
+
+  function setPill(cls, txt) {
+    var p = $('#olPill');
+    if (!p) return;
+    p.className = 'netpill ' + cls;
+    p.textContent = txt;
+  }
+
+  /* 로비 화면 상태(카드 전환) */
+  function renderLobby() {
+    var inRoom = !!(OL.room && OL.code);
+    $('#olCardCreate').classList.toggle('hidden', inRoom || OL.mode === 'join');
+    $('#olCardJoin').classList.toggle('hidden', inRoom || OL.mode !== 'join');
+    $('#olCardRoom').classList.toggle('hidden', !inRoom);
+    if (!inRoom) {
+      $('#olSub').textContent = '방 코드로 친구와 같은 그림 겨루기';
+      setPill('idle', '대기');
+      return;
+    }
+    $('#olRoomCode').textContent = OL.code;
+    var peerTxt = $('#olPeerTxt');
+    if (OL.peerHere) {
+      peerTxt.textContent = (OL.peerName || '상대') + ' 님이 함께하고 있어요';
+      $('#olPeer').classList.add('on');
+    } else {
+      peerTxt.textContent = '상대를 기다리는 중… (방 코드 ' + OL.code + ')';
+      $('#olPeer').classList.remove('on');
+    }
+    var host = OL.role === 'host';
+    $('#olPickSub').textContent = host ? '방장이 고릅니다' : '방장이 고른 설정';
+    renderArts();
+    renderRanks();
+    var canStart = host && OL.peerHere && OL.connected;
+    var sb = $('#btnOlStart');
+    sb.disabled = !canStart;
+    sb.textContent = host ? (OL.peerHere ? '대전 시작' : '상대를 기다리는 중') : '방장이 시작하기를 기다리는 중';
+    sb.classList.toggle('hidden', !host);
+    $('#olRoomHint').textContent = host
+      ? (OL.peerHere ? '시작을 누르면 두 사람이 같은 그림으로 동시에 시작합니다.' : '상대가 들어오면 시작할 수 있어요.')
+      : '방장이 시작하면 자동으로 판이 열립니다.';
+    setPill(OL.connected ? 'ok' : 'wait', OL.connected ? (OL.peerHere ? '함께하는 중' : '연결됨') : '연결 중…');
+  }
+
+  function renderArts() {
+    var box = $('#olArts');
+    if (!box || !HJ.App) return;
+    var host = OL.role === 'host', html = '', i, st;
+    var stages = HJ.App.stages();
+    for (i = 0; i < stages.length; i++) {
+      st = stages[i];
+      html += '<button type="button" class="oart' + (OL.stage === st.id ? ' on' : '') + '" data-st="' + st.id + '"' +
+        (host ? '' : ' disabled') + '><img src="' + (root.THUMB[st.id] || root.ART[st.id]) + '" alt="' + st.title + '" draggable="false"><span>' + (st.id < 10 ? '0' : '') + st.id + '</span></button>';
+    }
+    box.innerHTML = html;
+    var rk = J.rankByKey(OL.rank) || J.RANKS[0];
+    $('#olPickSub').textContent = (host ? '방장이 고릅니다 · ' : '') + rk.name + ' ' + rk.c + '×' + rk.r + ' · ' + rk.pieces + '조각';
+  }
+
+  function renderRanks() {
+    var box = $('#olRanks');
+    if (!box) return;
+    var host = OL.role === 'host', html = '', i, r;
+    for (i = 0; i < J.RANKS.length; i++) {
+      r = J.RANKS[i];
+      html += '<button type="button" class="' + (OL.rank === r.key ? 'on' : '') + '" data-rk="' + r.key + '"' +
+        (host ? '' : ' disabled') + '>' + r.name + ' ' + r.c + '×' + r.r + '</button>';
+    }
+    box.innerHTML = html;
+  }
+
+  /* ---------------- 방 열기 ---------------- */
+  function makeRoom(role, code) {
+    var room = HJ.net.Room({
+      role: role, code: code, name: (OL.name || '친구'),
+      forceBc: OL.forceBc
+    });
+    OL.room = room;
+    OL.role = role;
+    OL.code = code;
+    OL.leftByMe = false;
+    OL.peerHere = false;
+    OL.connected = false;
+    OL.resultShown = false;
+    OL.againWait = false;
+    OL.hostWantsAgain = false;
+
+    var M = OL.M = OP.create({ role: role, name: name() });
+    M.on('start', function (e) { beginRound(e.cfg); });
+    M.on('result', function () { checkResult(); });
+
+    bindRoom(room);
+    return room;
+  }
+
+  function bindRoom(room) {
+    function M() { return OL.M; }
+    function sendMsg(msg) { if (msg) room.send(msg.t, msg); }
+    function flush() { if (OL.M) OL.M.flush(sendMsg); }
+
+    room.on('status', function (e) {
+      if (!OL.room || OL.room !== room) return;
+      if (e.status === 'connecting') setPill('wait', '연결 중…');
+      else if (e.status === 'waiting') setPill('wait', '상대 기다림');
+      else if (e.status === 'error') {
+        setPill('bad', '실패');
+        if (e.note === 'room-not-found' || true) {
+          if (OL.M && OL.M.phase === 'live') return;
+          toast('방을 찾지 못했어요 · 코드를 확인해 주세요', 2600);
+          closeRoom(false);
+        }
+      }
+    });
+
+    room.on('connected', function () {
+      if (!OL.room || OL.room !== room) return;
+      OL.connected = true;
+      if (M().phase === 'live') {
+        M().peerCome();
+        M().localSync();
+        if (M().role === 'host') M().resendCfg();
+        flush();
+      }
+      renderLobby();
+    });
+
+    room.on('hello', function (e) {
+      if (!OL.room || OL.room !== room) return;
+      OL.peerName = String(e.name || '상대').slice(0, 8);
+      OL.peerHere = true;
+      M().peerCome();
+      if (M().phase === 'live') {
+        M().localSync();
+        if (M().role === 'host') M().resendCfg();
+        flush();
+      }
+      if (HJ.App.screen() === 'online') renderLobby();
+      updateNames();
+    });
+
+    room.on('disconnected', function () {
+      if (!OL.room || OL.room !== room) return;
+      OL.connected = false;
+      if (M().phase === 'live') {
+        setPill('wait', '재연결 중');
+        toast('연결이 흔들려요 · 잠시 기다려 주세요', 2000);
+      } else {
+        setPill('bad', '연결 끊김');
+        renderLobby();
+      }
+    });
+
+    room.on('grace', function (e) {
+      if (!OL.room || OL.room !== room) return;
+      OL.graceLeft = e.left | 0;
+      showBanner('상대 연결이 끊겼어요 · ' + OL.graceLeft + '초 뒤 기권 처리');
+    });
+    room.on('graceEnd', function () {
+      if (!OL.room || OL.room !== room) return;
+      hideBanner();
+      OL.peerHere = false;
+      M().peerLeft('left');
+      flush();
+      checkResult();
+      if (M().phase === 'live' && M().role === 'guest') {
+        // 방장 판정을 못 받는 상황 — 손님 혼자 마무리
+        M().pending = null;
+        M()._setResult('g', 'left');
+        flush();
+      }
+    });
+    room.on('peerLeft', function () {
+      if (!OL.room || OL.room !== room) return;
+      OL.peerHere = false;
+      if (M().phase === 'live') { M().peerLeft('left'); flush(); checkResult(); }
+      else { toast('상대가 방에서 나갔어요', 2200); renderLobby(); }
+    });
+    room.on('bye', function () {
+      if (!OL.room || OL.room !== room) return;
+      OL.peerHere = false;
+      if (M().phase === 'live') { M().peerLeft('left'); flush(); checkResult(); }
+      else { toast('상대가 방에서 나갔어요', 2200); renderLobby(); }
+    });
+
+    ['cfg', 'snap', 'prog', 'fin', 'sync', 'res'].forEach(function (t) {
+      room.on(t, function (d) {
+        if (!OL.room || OL.room !== room) return;
+        M().handle(t, d);
+        flush();
+        checkResult();
+        if (t === 'snap' || t === 'sync' || t === 'prog') { drawMini(); updateBars(); }
+      });
+    });
+
+    room.on('again', function () {
+      if (!OL.room || OL.room !== room) return;
+      if (M().phase !== 'done') return;
+      if (OL.role === 'host') {
+        hostStart();                  // 손님이 다시 대전을 원한다 → 바로 새 판
+      } else {
+        OL.hostWantsAgain = true;
+        renderResult(true);           // 방장이 기다린다 → 안내만
+      }
+    });
+
+    room.on('banner', function () { /* reserved */ });
+  }
+
+  /* ---------------- 방 만들기 / 참가 ---------------- */
+  OL.createRoom = function () {
+    if (OL.busy) return;
+    var nEl = $('#olName');
+    if (nEl) saveName(nEl.value.trim());
+    OL.busy = true;
+    var code = HJ.net.newCode();
+    var room = makeRoom('host', code);
+    renderLobby();
+    setPill('wait', '연결 중…');
+    room.open().then(function (ok) {
+      OL.busy = false;
+      if (!ok) { toast('중계 서버에 연결하지 못했어요 · 잠시 뒤 다시', 2600); closeRoom(false); return; }
+      OL.connected = true;
+      afterOpen(room);
+      renderLobby();
+    }, function () {
+      OL.busy = false;
+      toast('중계 서버에 연결하지 못했어요 · 잠시 뒤 다시', 2600);
+      closeRoom(false);
+    });
+  };
+
+  /* 중계가 막혀 같은 브라우저 탭끼리만 이어지는 폴백이면 분명히 알린다 */
+  function afterOpen(room) {
+    if (room.mode === 'bc' && !OL.forceBc) {
+      setPill('bad', '중계 실패');
+      toast('중계 서버에 못 붙어 같은 브라우저에서만 대전됩니다', 3200);
+    }
+  }
+
+  OL.joinRoom = function (raw) {
+    if (OL.busy) return;
+    var code = HJ.net.normalize(raw || ($('#olCode') ? $('#olCode').value : ''));
+    if (code.length !== HJ.net.NET.codeLen) {
+      toast('방 코드 ' + HJ.net.NET.codeLen + '자리를 넣어 주세요');
+      return;
+    }
+    var nEl = $('#olName');
+    if (nEl) saveName(nEl.value.trim());
+    OL.busy = true;
+    var room = makeRoom('guest', code);
+    renderLobby();
+    setPill('wait', '방 찾는 중…');
+    room.open().then(function (ok) {
+      OL.busy = false;
+      if (!ok) { toast('방을 찾지 못했어요 · 코드를 확인해 주세요', 2600); closeRoom(false); return; }
+      OL.connected = true;
+      afterOpen(room);
+      renderLobby();
+    }, function () {
+      OL.busy = false;
+      toast('방을 찾지 못했어요 · 코드를 확인해 주세요', 2600);
+      closeRoom(false);
+    });
+  };
+
+  /* ---------------- 대전 시작 ---------------- */
+  function hostStart() {
+    if (!OL.M || OL.M.role !== 'host') return;
+    var seed = Math.floor(Math.random() * 0x7fffffff) | 0;
+    OL.M.hostStart({ stage: OL.stage, rank: OL.rank, seed: seed });
+    flush();
+  }
+
+  function flush() { if (OL.M && OL.room) OL.M.flush(function (m) { OL.room.send(m.t, m); }); }
+
+  OL.startMatch = function () {
+    if (!OL.M || OL.M.role !== 'host' || !OL.peerHere) return;
+    sfx().unlock(); sfx().tap();
+    hostStart();
+  };
+
+  function beginRound(cfg) {
+    if (!cfg) return;
+    OL.started = true;
+    OL.resultShown = false;
+    OL.graceLeft = 0;
+    OL.againWait = false;
+    OL.hostWantsAgain = false;
+    hideBanner();
+    closeRoomOverlay();
+    if (OL.room) OL.room.inMatch = true;
+
+    var C = HJ.Classic;
+    C.setHooks({
+      snap: function (ids, info) {
+        OL.M.localSnap(ids, info);
+        flush();
+        drawMini(); updateBars();
+      },
+      finish: function (rec) {
+        OL.M.localFinish(rec);
+        flush();
+        checkResult();
+        drawMini(); updateBars();
+        if (!OL.M.result) {
+          showBanner('완성! 상대의 결과를 기다리는 중…');
+          setTimeout(function () { if (OL.M && !OL.M.result) { OL.M.tick(5000); flush(); checkResult(); } }, 3200);
+        }
+      },
+      tick: function (dt, info) {
+        if (!OL.M) return;
+        var decided = OL.M.tick(dt);
+        if (info && info.elapsed >= 0) OL.M.setElapsed(info.elapsed);
+        if (decided) { flush(); checkResult(); }
+        var now = Date.now();
+        if (now - OL.lastProg > 1100) {
+          OL.lastProg = now;
+          OL.M.localProg();
+          flush();
+        }
+        if (now - OL.lastBar > 260) { OL.lastBar = now; updateBars(); }
+      }
+    });
+    C.start(cfg.stage, cfg.rank, null, { online: true, seed: cfg.seed });
+
+    $('#olBar').classList.remove('hidden');
+    $('#olBig').classList.add('hidden');
+    OL.big = false;
+    loadArt(cfg.stage);
+    updateNames();
+    updateBars();
+    drawMini();
+  }
+
+  /* ---------------- 진행 표시 ---------------- */
+  function updateNames() {
+    if (!OL.M) return;
+    var me = $('#olMeName'), op = $('#olOpName');
+    if (me) me.textContent = name();
+    if (op) op.textContent = OL.peerName || '상대';
+  }
+
+  function updateBars() {
+    if (!OL.M || !OL.M.cfg) return;
+    var total = totalPieces(OL.M.cfg), me = OL.M.me, pe = OL.M.peer;
+    var pm = Math.min(100, Math.round((me.n / total) * 100));
+    var pp = Math.min(100, Math.round((pe.n / total) * 100));
+    var a = $('#olMeFill'), b = $('#olOpFill');
+    if (a) a.style.width = pm + '%';
+    if (b) b.style.width = pp + '%';
+    var c1 = $('#olMeCnt'), c2 = $('#olOpCnt');
+    if (c1) c1.textContent = me.n + '/' + total;
+    if (c2) c2.textContent = pe.n + '/' + total;
+    var big = $('#olBigCnt');
+    if (big) big.textContent = pe.n + '조각 맞춤 · ' + total + '조각 중';
+    var meBar = $('#olBar .olp.me'), opBar = $('#olBar .olp.op');
+    if (meBar) meBar.classList.toggle('done', me.finished);
+    if (opBar) opBar.classList.toggle('done', pe.finished);
+  }
+
+  function loadArt(stage) {
+    if (OL.artStage === stage && OL.artImg) { drawMini(); return; }
+    OL.artStage = stage;
+    var im = new Image();
+    im.decoding = 'async';
+    im.onload = function () { if (OL.artStage === stage) { OL.artImg = im; drawMini(); } };
+    im.onerror = function () { OL.artImg = null; };
+    im.src = root.ART[stage];
+    OL.artImg = imgReady(im) ? im : null;
+  }
+  function imgReady(im) { return !!(im && im.complete && im.naturalWidth); }
+
+  function drawMini() {
+    if (!OL.M || !OL.M.cfg) return;
+    var cv = $('#olMini'), big = $('#olBigCv');
+    if (cv) paintMini(cv.getContext('2d'), cv.width);
+    if (big && OL.big) paintMini(big.getContext('2d'), big.width);
+  }
+
+  function paintMini(ctx, size) {
+    var cfg = OL.M && OL.M.cfg;
+    if (!ctx || !cfg) return;
+    var rk = J.rankByKey(cfg.rank) || J.RANKS[0];
+    var cols = rk.c, rows = rk.r;
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = '#0a1220';
+    ctx.fillRect(0, 0, size, size);
+    var im = OL.artImg;
+    if (imgReady(im)) {
+      ctx.globalAlpha = 0.13;
+      ctx.drawImage(im, 0, 0, size, size);
+      ctx.globalAlpha = 1;
+      var iw = im.naturalWidth, ih = im.naturalHeight;
+      var pw = size / cols, ph = size / rows;
+      var snaps = (OL.M.peer && OL.M.peer.snaps) || {};
+      for (var k in snaps) {
+        if (!Object.prototype.hasOwnProperty.call(snaps, k)) continue;
+        var pid = +k;
+        if (!(pid >= 0 && pid < cols * rows)) continue;
+        var r = (pid / cols) | 0, c = pid % cols;
+        ctx.drawImage(im, (c * iw) / cols, (r * ih) / rows, iw / cols, ih / rows,
+          Math.floor(c * pw), Math.floor(r * ph), Math.ceil(pw) + 0.5, Math.ceil(ph) + 0.5);
+      }
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,.16)';
+    ctx.lineWidth = Math.max(1, size / 90);
+    ctx.strokeRect(0.5, 0.5, size - 1, size - 1);
+  }
+
+  /* ---------------- 결과 ---------------- */
+  function checkResult() {
+    if (!OL.M || !OL.M.result) return;
+    if (OL.room) OL.room.inMatch = false;
+    hideBanner();
+    if (!OL.resultShown) {
+      OL.resultShown = true;
+      var res = OL.M.result;
+      res.stage = OL.M.cfg ? OL.M.cfg.stage : 0;
+      res.rank = OL.M.cfg ? OL.M.cfg.rank : '';
+      Store.onlineRecord(res);
+      if (HJ.App.screen() === 'play') {
+        try { sfx().complete(); haptic([18, 40, 18, 40, 24]); } catch (e) { }
+      }
+      setTimeout(function () { renderResult(false); }, 420);
+    } else if (OL.M.phase === 'done' && !doc.querySelector('.olres') && !OL.againWait) {
+      renderResult(false);           // 결과창이 실수로 닫히면 다시 보여 준다
+    }
+    var t = $('#olRecTxt');
+    if (t) t.textContent = Store.onlineRecordText();
+  }
+
+  function renderResult(updateOnly) {
+    if (!OL.M || !OL.M.result) return;
+    var res = OL.M.result;
+    var label = OP.label(res.who, res.reason);
+    var cls = res.who === 'me' ? 'win' : (res.who === 'peer' ? 'lose' : 'draw');
+    var stName = '';
+    if (OL.M.cfg && HJ.App) stName = HJ.App.stageById(OL.M.cfg.stage).title;
+    var rk = OL.M.cfg ? (J.rankByKey(OL.M.cfg.rank) || J.RANKS[0]) : J.RANKS[0];
+    var total = totalPieces(OL.M.cfg);
+
+    var acts =
+      '<button class="btn primary" data-act="again" id="olAgain">' + (OL.againWait ? '상대를 기다리는 중…' : '같은 방 다시 대전') + '</button>' +
+      '<button class="btn" data-act="leave">방 나가기</button>';
+
+    if (updateOnly) {
+      var ag = $('#olAgain');
+      if (ag) {
+        ag.textContent = OL.hostWantsAgain ? '다시 대전 (방장이 기다려요)' : '상대를 기다리는 중…';
+        ag.disabled = !!OL.againWait;
+      }
+      return;
+    }
+
+    var html = '<div class="result olres ' + cls + '">' +
+      '<div class="art"><img src="' + (root.THUMB[OL.M.cfg.stage] || root.ART[OL.M.cfg.stage]) + '" alt=""></div>' +
+      '<div class="body">' +
+      '<div class="kicker">🌐 온라인 1:1 · ' + rk.name + ' ' + rk.c + '×' + rk.r + '</div>' +
+      '<h3 class="olbig-label">' + label + '</h3>' +
+      '<p class="olres-sub">' + stName + '<br><span>' + OP.reasonText(res) + '</span></p>' +
+      '<div class="nums">' +
+      '<div><b>' + HJ.formatTime(res.myTime) + '</b><span>내 시간 · ' + res.myN + '/' + total + '</span></div>' +
+      '<div><b>' + HJ.formatTime(res.peerTime) + '</b><span>상대 시간 · ' + res.peerN + '/' + total + '</span></div>' +
+      '</div>' +
+      '<p class="badges">🌐 온라인 전적 ' + Store.onlineRecordText() + '</p>' +
+      '<div class="acts">' + acts + '</div>' +
+      '</div></div>';
+
+    [].forEach.call(doc.querySelectorAll('.olres'), function (el) {
+      var ov = el.closest ? el.closest('.overlay') : null;
+      if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    });
+    var w = HJ.App.overlay(html, { center: true, dismiss: false });
+    w.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      var act = b.getAttribute('data-act');
+      if (act === 'again') OL.again();
+      else if (act === 'leave') OL.leave(true);
+    });
+  }
+
+  function closeRoomOverlay() { HJ.App.closeOverlay(); }
+
+  OL.again = function () {
+    if (!OL.M || OL.M.phase !== 'done' || !OL.room) return;
+    HJ.App.closeOverlay();
+    if (OL.role === 'host') {
+      hostStart();
+      toast('새 판을 시작합니다');
+    } else {
+      if (OL.hostWantsAgain) { OL.againWait = false; OL.room.send('again', {}); toast('방장이 곧 시작합니다'); return; }
+      OL.againWait = true;
+      OL.room.send('again', {});
+      toast('방장의 시작을 기다리는 중…', 2000);
+    }
+  };
+
+  /* ---------------- 나가기 ---------------- */
+  OL.inMatch = function () { return !!(OL.M && OL.M.phase === 'live' && OL.started); };
+
+  OL.confirmLeave = function () {
+    if (!OL.M) { OL.leave(true); return; }
+    if (OL.M.phase !== 'live') { OL.leave(true); return; }
+    var w = HJ.App.overlay('<div class="olconfirm"><b>대전에서 나갈까요?</b>' +
+      '<p>지금 나가면 <b>기권</b>으로 처리됩니다.</p>' +
+      '<div class="acts"><button class="btn" data-act="stay">계속하기</button>' +
+      '<button class="btn warm" data-act="go">나가기</button></div></div>', { center: true });
+    w.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      if (b.getAttribute('data-act') === 'go') OL.leave(true);
+      else HJ.App.closeOverlay();
+    });
+  };
+
+  OL.leave = function (withBye) {
+    HJ.App.closeOverlay();
+    var room = OL.room, C = HJ.Classic;
+    OL.leftByMe = true;
+    if (room) {
+      try { room.inMatch = false; } catch (e) { }
+      if (withBye) { try { room.byeNow(); } catch (e) { } }
+      setTimeout(function () { try { room.close(); } catch (e) { } }, 80);
+    }
+    OL.room = null; OL.M = null; OL.started = false; OL.resultShown = false;
+    OL.connected = false; OL.peerHere = false; OL.code = ''; OL.busy = false;
+    OL.againWait = false; OL.hostWantsAgain = false;
+    hideBanner();
+    $('#olBar').classList.add('hidden');
+    $('#olBig').classList.add('hidden');
+    if (C && C.active) C.stop();
+    renderLobby();
+    HJ.App.showHome();
+  };
+
+  function closeRoom(backHome) {
+    var room = OL.room;
+    if (room) { try { room.close(); } catch (e) { } }
+    OL.room = null; OL.M = null; OL.started = false; OL.code = '';
+    OL.connected = false; OL.peerHere = false; OL.busy = false;
+    renderLobby();
+    if (backHome) HJ.App.showHome();
+  }
+
+  /* ---------------- 안내 배너 ---------------- */
+  function showBanner(txt) {
+    var b = $('#olBanner');
+    if (!b) return;
+    b.textContent = txt;
+    b.classList.add('show');
+  }
+  function hideBanner() {
+    var b = $('#olBanner');
+    if (b) b.classList.remove('show');
+  }
+
+  /* ---------------- 초대 링크 ---------------- */
+  OL.link = function () { return HJ.net.roomLink(OL.code, false); };   // 초대는 항상 손님용
+  function copyLink() {
+    var link = OL.link();
+    var done = function () { toast('초대 링크를 복사했어요', 1800); };
+    if (root.navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(done, function () { fallbackCopy(link); });
+    } else fallbackCopy(link);
+  }
+  function fallbackCopy(txt) {
+    try {
+      var ta = doc.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      doc.body.appendChild(ta);
+      ta.select();
+      doc.execCommand('copy');
+      ta.remove();
+      toast('초대 링크를 복사했어요', 1800);
+    } catch (e) { toast('링크: ' + txt, 3200); }
+  }
+
+  /* ---------------- 바인딩 ---------------- */
+  OL.inited = bindAll();
+
+  function bindAll() {
+    if (!$('#scr-online')) return false;
+    OL.forceBc = /(\?|&)test=bc\b/.test(location.search);
+
+    $('#olTabs').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-t]');
+      if (!b) return;
+      if (OL.code) return;
+      sfx().tap();
+      OL.mode = b.getAttribute('data-t');
+      syncTabs();
+      renderLobby();
+      if (OL.mode === 'join') setTimeout(function () { focusEl($('#olCode')); }, 80);
+    });
+    $('#btnCreate').addEventListener('click', function () { sfx().unlock(); OL.createRoom(); });
+    $('#btnJoin').addEventListener('click', function () { sfx().unlock(); OL.joinRoom(); });
+    $('#olCode').addEventListener('input', function () {
+      var v = HJ.net.normalize(this.value);
+      if (this.value !== v) this.value = v;
+    });
+    $('#olCode').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') OL.joinRoom();
+    });
+    $('#btnCopy').addEventListener('click', function () { sfx().tap(); copyLink(); });
+    $('#btnOlStart').addEventListener('click', function () { OL.startMatch(); });
+    $('#btnOlBack').addEventListener('click', function () {
+      sfx().tap();
+      if (OL.M && OL.M.phase === 'live') { OL.confirmLeave(); return; }
+      if (OL.room) { OL.leave(true); return; }
+      HJ.App.showHome();
+    });
+    $('#olArts').addEventListener('click', function (e) {
+      var b = e.target.closest('.oart');
+      if (!b || OL.role !== 'host') return;
+      sfx().tap();
+      OL.stage = +b.getAttribute('data-st');
+      renderArts();
+    });
+    $('#olRanks').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-rk]');
+      if (!b || OL.role !== 'host') return;
+      sfx().tap();
+      OL.rank = b.getAttribute('data-rk');
+      renderRanks();
+      renderArts();
+    });
+    $('#olThumb').addEventListener('click', function () {
+      OL.big = !OL.big;
+      $('#olBig').classList.toggle('hidden', !OL.big);
+      sfx().tap();
+      drawMini();
+    });
+    $('#olBigClose').addEventListener('click', function () {
+      OL.big = false;
+      $('#olBig').classList.add('hidden');
+    });
+    doc.addEventListener('pointerdown', function () {
+      var b = $('#olBanner');
+      if (b && b.classList.contains('show') && OL.M && OL.M.result) hideBanner();
+    });
+
+    /* 초대 링크(?r=CODE)로 열면 참가 화면을 미리 채운다 */
+    var m = /[?&]r=([A-Za-z0-9]{2,8})/.exec(location.search);
+    if (m) {
+      var code = HJ.net.normalize(m[1]);
+      if (code.length === HJ.net.NET.codeLen) {
+        OL.mode = 'join';
+        setTimeout(function () {
+          OL.openLobby('join');
+          var el = $('#olCode');
+          if (el) el.value = code;
+          renderLobby();
+          OL.joinRoom(code);
+        }, 300);
+      }
+    }
+    return true;
+  }
+
+  /* ---------------- 테스트 훅 (?test=1) ---------------- */
+  OL.testState = function () {
+    var M = OL.M;
+    if (!M) return { room: !!OL.room, code: OL.code, role: OL.role, started: false };
+    var snaps = 0, k;
+    for (k in M.peer.snaps) if (Object.prototype.hasOwnProperty.call(M.peer.snaps, k)) snaps++;
+    var mine = 0;
+    for (k in M.me.snaps) if (Object.prototype.hasOwnProperty.call(M.me.snaps, k)) mine++;
+    return {
+      room: !!OL.room, code: OL.code, role: OL.role, connected: OL.connected,
+      peerHere: OL.peerHere, peerName: OL.peerName, phase: M.phase, round: M.round,
+      cfg: M.cfg ? { stage: M.cfg.stage, rank: M.cfg.rank, seed: M.cfg.seed } : null,
+      me: { n: M.me.n, snaps: mine, jp: M.me.jp, tray: M.me.tray, finished: M.me.finished, time: M.me.time },
+      peer: { n: M.peer.n, snaps: snaps, jp: M.peer.jp, finished: M.peer.finished, time: M.peer.time },
+      result: M.result ? { who: M.result.who, raw: M.result.raw, reason: M.result.reason } : null,
+      miniPainted: !!OL.artImg, banner: ($('#olBanner') || {}).textContent || '',
+      screen: HJ.App ? HJ.App.screen() : ''
+    };
+  };
+  if (isTest()) {
+    root.__hjOl = OL;
+    root.__hjOlApi = {
+      create: function () { return OL.createRoom(); },
+      join: function (c) { return OL.joinRoom(c); },
+      start: function () { return OL.startMatch(); },
+      again: function () { return OL.again(); },
+      leave: function () { return OL.leave(true); },
+      state: function () { return OL.testState(); },
+      setPick: function (st, rk) { OL.stage = st; OL.rank = rk; },
+      link: function () { return OL.link(); },
+      open: function (t) { return OL.openLobby(t); }
+    };
+  }
+
+  /* 로비로 돌아올 때 상태 갱신 */
+  var _show = HJ.App && HJ.App.showScreen;
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
