@@ -566,6 +566,81 @@ h1.title em{
   .olbig canvas{width:156px; height:156px}
 }
 
+/* =====================================================================
+   3단계 — 전체화면(꽉 채우기) 레이아웃 + 터치 조작 개선
+   ===================================================================== */
+/* 기본 플레이 화면도 여백을 줄여 보드를 더 크게 */
+#scr-play{padding-left:8px; padding-right:8px}
+#scr-play .board-wrap{padding:4px; margin-bottom:6px}
+#scr-play .topbar{gap:8px}
+
+/* 전체화면·꽉 채우기: 앱 폭 제한을 풀고 보드를 화면에 꽉 채운다 */
+html.fs #app{max-width:none; margin:0}
+html.fs .screen{padding-left:3px; padding-right:3px}
+html.fs #scr-play{padding-top:0}
+html.fs #scr-play .topbar{height:40px}
+html.fs #scr-play .board-wrap{padding:0; margin-bottom:3px; border:0; border-radius:6px}
+html.fs #scr-play .info{display:none}
+html.fs #scr-play .traywrap{margin-bottom:3px}
+html.fs #scr-play .tray-head{height:22px; margin-bottom:4px}
+html.fs #scr-play .tray{height:62px}
+html.fs #scr-play .tool{height:44px}
+html.fs #scr-play .tool .ico{font-size:16px}
+html.fs #scr-play .bottom{padding-bottom:calc(2px + var(--safe-b))}
+html.fs #scr-play .zoombar{top:6px; right:6px}
+html.fs #scr-play .olbar{height:38px; margin-bottom:3px}
+html.fs #scr-play .olthumb{width:28px; height:28px}
+html.fs #scr-gallery, html.fs #scr-home{padding-left:8px; padding-right:8px}
+@media (max-height:640px){
+  html.fs #scr-play .tray{height:52px}
+  html.fs #scr-play .tool{height:38px; font-size:10px}
+}
+
+/* 트레이 조각: 가로 스와이프는 스크롤, 세로로 끌면 조각 집기 */
+.tray .piece{touch-action:pan-x}
+#board{touch-action:none}
+
+/* 가로 화면 + 꽉 채우기: 트레이를 오른쪽 기둥으로 옮겨 보드를 최대한 크게 */
+@media (orientation: landscape){
+  html.fs #scr-play{
+    display:grid; grid-template-columns:1fr 168px; grid-template-rows:auto minmax(0,1fr);
+    grid-template-areas:"top top" "board side"; column-gap:4px; row-gap:2px;
+  }
+  html.fs #scr-play .topbar{grid-area:top}
+  html.fs #scr-play .board-wrap{grid-area:board; min-height:0}
+  html.fs #scr-play .bottom{grid-area:side; display:flex; flex-direction:column; min-height:0; padding-bottom:calc(2px + var(--safe-b))}
+  html.fs #scr-play .bottom .traywrap{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; margin-bottom:4px}
+  html.fs #scr-play .bottom .traywrap.hidden{display:none}
+  html.fs #scr-play .tray-head{flex:0 0 auto; flex-wrap:wrap; height:auto; gap:4px}
+  html.fs #scr-play .bottom .tray{
+    flex:1 1 auto; height:auto; min-height:0; flex-wrap:wrap; align-content:flex-start;
+    overflow-y:auto; overflow-x:hidden; touch-action:pan-y; gap:5px;
+  }
+  html.fs #scr-play .bottom .tray .piece{touch-action:pan-y}
+  html.fs #scr-play .bottom .toolbar{grid-template-columns:1fr 1fr; flex:0 0 auto}
+  html.fs #scr-play .bottom .tool{height:38px; font-size:10px}
+  html.fs #scr-play .bottom .tool .ico{font-size:15px}
+  html.fs #scr-play .bottom .info{display:none}
+}
+
+/* 가로 화면(높이 390 안팎): 시트가 화면을 넘지 않게 */
+@media (orientation: landscape) and (max-height:520px){
+  .overlay{align-items:center; padding:8px}
+  .overlay .sheet{
+    max-height:calc(100dvh - 16px); overflow-y:auto; border-radius:18px; border-bottom:1px solid var(--line2);
+  }
+  .sheet .grab{display:none}
+  .result{max-height:calc(100dvh - 16px)}
+  .result .art{height:96px}
+}
+
+/* 꽉 채우기에서는 보드 캔버스 바탕을 비워 뒤의 흐린 그림이 비치게 */
+html.fs #board{background:transparent; box-shadow:none}
+
+/* 꽉 채우기: 보드 둘레를 그림이 은은하게 비치는 배경으로 */
+html.fs #scr-play .board-wrap::before{filter:blur(18px) brightness(.8) saturate(1.2); opacity:.95}
+html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 42%, rgba(6,11,22,0) 0%, rgba(6,11,22,.42) 92%)}
+
 </style>
 </head>
 <body>
@@ -2624,7 +2699,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     R.canvas.style.width = R.cssW + 'px';
     R.canvas.style.height = R.cssH + 'px';
     R.ctx.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
-    R.fit = R.cssW / J.UNIT;
+    // 정사각 보드가 가로·세로 어느 쪽에도 꽉 차도록 짧은 변 기준으로 맞춘다
+    R.fit = Math.min(R.cssW, R.cssH) / J.UNIT;
     R.clampView();
     R.key = '';
   };
@@ -2696,8 +2772,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   R.pan = function (dx, dy) { R.view.tx += dx; R.view.ty += dy; R.clampView(); };
 
   /* 보드 좌표 → 조각 히트. Path2D 는 '현재 변환'을 따라가고 점은 캔버스 좌표로
-     해석되므로, 반드시 변환을 단위행렬로 되돌린 뒤 검사한다. */
-  R.hitTest = function (s, bx, by) {
+     해석되므로, 반드시 변환을 단위행렬로 되돌린 뒤 검사한다.
+     pad(보드 단위) > 0 이면 윤곽을 정확히 안 밟아도 가장 가까운 조각을 집는다 —
+     손가락 터치 반경을 넉넉히 주기 위한 것이다. */
+  R.hitTest = function (s, bx, by, pad) {
     var c = R.ctx;
     if (!c) return -1;
     var prev = null;
@@ -2712,6 +2790,23 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         gid = s.pieces[i].g;
         if (hit < 0 || gid > s.pieces[hit].g) hit = i;   // 나중에 놓은 그룹 우선
       }
+    }
+    if (hit < 0 && pad > 0) {
+      var best = -1, bestD = Infinity, bestG = -1;
+      for (i = 0; i < s.pieces.length; i++) {
+        if (!s.pieces[i].g) continue;
+        var q = J.piecePos(s, i);
+        if (!q) continue;
+        var dx = Math.max(q.x - bx, 0, bx - (q.x + s.pw));
+        var dy = Math.max(q.y - by, 0, by - (q.y + s.ph));
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d > pad) continue;
+        gid = s.pieces[i].g;
+        if (d < bestD - 0.5 || (Math.abs(d - bestD) <= 0.5 && gid > bestG)) {
+          best = i; bestD = d; bestG = gid;
+        }
+      }
+      hit = best;
     }
     if (prev && c.setTransform) c.setTransform(prev);
     else c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
@@ -4344,7 +4439,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   var ui = {
     screen: 'home', selected: -1, dragging: false, dragFrom: -1, dragPos: null, dropCell: -1,
     swap: null, hintPair: null, hintUntil: 0, preview: false, previewLocked: false,
-    flash: [], completeAt: 0, particles: [], wantFull: false, lastFullTry: 0
+    flash: [], completeAt: 0, particles: [], wantFull: false, lastFullTry: 0, immersive: false
   };
   var ptr = { down: false, id: null, startX: 0, startY: 0, x: 0, y: 0, cell: -1, moved: false };
   var imgCache = {}, imgOrder = [], IMG_CACHE_MAX = 3;
@@ -4583,7 +4678,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var wrap = $('#boardWrap');
     if (!wrap || !G) return;
     var w = wrap.clientWidth - 4, h = wrap.clientHeight - 6;
-    var size = Math.floor(Math.max(150, Math.min(w, h, 620)));
+    var cap = ui.immersive ? 4096 : 620;          // 꽉 채우기에서는 화면이 허락하는 만큼
+    var size = Math.floor(Math.max(150, Math.min(w, h, cap)));
     if (V.size !== size) V.resize(size);
     V.cell = size / V.n;
     drawOnce();
@@ -4745,23 +4841,49 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   function toggleFull() {
     var d = doc, el = d.documentElement;
-    ui.wantFull = !(d.fullscreenElement || d.webkitFullscreenElement);
-    ui.lastFullTry = 0;
-    if (ui.wantFull) {
-      var p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' })
-        : (el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null);
-      if (p && p.catch) p.catch(function () {
-        ui.wantFull = false;
-        toast('이 브라우저는 전체화면을 막았어요 · 홈 화면에 추가하면 앱처럼 열립니다', 2600);
-      });
-    } else {
-      if (d.exitFullscreen) d.exitFullscreen();
-      else if (d.webkitExitFullscreen) d.webkitExitFullscreen();
+    var on = ui.immersive || !!(d.fullscreenElement || d.webkitFullscreenElement);
+    if (on) {
+      ui.wantFull = false;
+      setImmersive(false);
+      if (d.fullscreenElement || d.webkitFullscreenElement) showOverlayless();
+      if (d.exitFullscreen) { try { d.exitFullscreen(); } catch (e) {} }
+      else if (d.webkitExitFullscreen) { try { d.webkitExitFullscreen(); } catch (e) {} }
+      toast('전체화면을 닫았어요');
+      return;
     }
+    ui.wantFull = true;
+    ui.lastFullTry = 0;
+    // 브라우저가 전체화면을 막아도(iOS Safari 등) 화면을 꽉 채우는 모드로 바로 들어간다
+    setImmersive(true);
+    var p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' })
+      : (el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null);
+    if (!p) {
+      toast('전체화면 대신 화면을 꽉 채웠어요 · 홈 화면에 추가하면 앱처럼 열립니다', 2800);
+      return;
+    }
+    if (p.catch) p.catch(function () {
+      toast('전체화면 대신 화면을 꽉 채웠어요 · 홈 화면에 추가하면 앱처럼 열립니다', 2800);
+    });
   }
+
+  /* 화면을 꽉 채우는 모드 — 전체화면 API 성공/실패와 무관하게 같은 레이아웃을 쓴다 */
+  function setImmersive(on) {
+    ui.immersive = !!on;
+    var el = doc.documentElement;
+    el.classList.toggle('fs', ui.immersive);
+    try {
+      if (root.visualViewport) root.visualViewport.dispatchEvent(new Event('resize'));
+    } catch (e) {}
+    syncFullBtn();
+    if (ui.screen === 'play') setTimeout(layout, 24);
+  }
+  function showOverlayless() { $('#pauseOv').classList.add('hidden'); }
+
   function syncFullBtn() {
-    var on = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+    var on = ui.immersive || !!(doc.fullscreenElement || doc.webkitFullscreenElement);
     $('#btnFull').classList.toggle('on', on);
+    var ico = $('#btnFull .ico');
+    if (ico) ico.textContent = on ? '⤢' : '⛶';
   }
 
   function pauseGame() {
@@ -5045,10 +5167,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     });
     doc.addEventListener('fullscreenchange', function () {
       syncFullBtn();
-      if (!doc.fullscreenElement && ui.wantFull && ui.screen === 'play') {
-        var now = Date.now();
-        if (now - ui.lastFullTry > 1500) { ui.lastFullTry = now; setTimeout(toggleFull, 60); }
-      }
+      var real = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+      if (real) setImmersive(true);
+      else if (!ui.wantFull) setImmersive(false);   // 사용자가 시스템으로 빠져나온 경우
+      if (ui.screen === 'play') setTimeout(layout, 40);
     });
     root.addEventListener('resize', function () {
       if (ui.screen === 'play') layout();
@@ -5142,7 +5264,22 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       saveArt: function (stage) { saveArt(stage || 1); },
       bestClassic: function (stage, rank) { return Store.bestOfClassic(stage, rank); },
       online: function () { return HJ.Online ? HJ.Online.testState() : null; },
-      onlineRecord: function () { return Store.online; }
+      onlineRecord: function () { return Store.online; },
+      full: function () {
+        var cv = doc.querySelector('#board');
+        var r = cv ? cv.getBoundingClientRect() : null;
+        var wrap = doc.querySelector('#boardWrap');
+        var wr = wrap ? wrap.getBoundingClientRect() : null;
+        return {
+          immersive: !!ui.immersive,
+          real: !!(doc.fullscreenElement || doc.webkitFullscreenElement),
+          cls: doc.documentElement.classList.contains('fs'),
+          board: r ? { w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), left: Math.round(r.left) } : null,
+          wrap: wr ? { w: Math.round(wr.width), h: Math.round(wr.height) } : null,
+          vw: root.innerWidth, vh: root.innerHeight
+        };
+      },
+      setFull: function (on) { setImmersive(!!on); }
     };
     if (HJ.Classic && HJ.Classic.hook) root.__hjC = HJ.Classic.hook();
   }
@@ -5341,8 +5478,13 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (!C.active) return;
     var wrap = $('#boardWrap');
     if (!wrap) return;
-    var w = Math.max(120, wrap.clientWidth - 16);
-    var h = Math.max(120, wrap.clientHeight - 16);
+    // 패딩을 뺀 '진짜 보이는 영역'을 그대로 쓴다 — 전체화면에서 보드가 화면을 꽉 채운다
+    var cs = null;
+    try { cs = root.getComputedStyle(wrap); } catch (e) { cs = null; }
+    var padX = cs ? (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) : 16;
+    var padY = cs ? (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) : 16;
+    var w = Math.max(120, wrap.clientWidth - padX);
+    var h = Math.max(120, wrap.clientHeight - padY);
     R.resize(w, h);
     R.clampView();
     draw();
@@ -5422,14 +5564,28 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     $('#trayCount').textContent = S.tray.length + '개';
   }
 
-  /* ---------------- 드래그: 트레이 → 보드 ---------------- */
+  /* ---------------- 드래그: 트레이 → 보드 ----------------
+     폰 터치에서 '가로 스크롤'과 '위로 꺼내기'를 확실히 갈라 낸다.
+       · 짧은 탭(TAP_SLOP 이내) → 바로 보드 빈 자리로 올린다
+       · 세로 우세 이동(SLOP 초과) → 즉시 조각 드래그로 전환(트레이 스크롤을 막는다)
+       · 가로 우세 이동 → 트레이 스크롤에 맡긴다
+     손가락이 살짝 흔들려도 둘 중 하나로 확실히 잡히게 임계값을 나눴다. */
   function trayDown(e, pid, node) {
     if (!S || S.finished) return;
+    if (e && e.isPrimary === false) return;           // 두 번째 손가락은 핀치/팬에 맡긴다
     e.preventDefault();
     SFX.unlock();
-    var startX = e.clientX, startY = e.clientY, dragging = false, moved = false;
+    var startX = e.clientX, startY = e.clientY, dragging = false, scrolling = false;
+    var SLOP = 6, TAP_SLOP = 16;
     try { node.setPointerCapture(e.pointerId); } catch (err) {}
     var sz = itemSize();
+    // 트레이가 어느 방향으로 스크롤되는지에 따라 '집기' 방향이 달라진다
+    // (세로 트레이=가로로 끌면 집기, 가로 트레이=세로로 끌면 집기)
+    var trEl = node.parentNode;
+    var axis = 'x';
+    try {
+      if (trEl && trEl.scrollHeight > trEl.clientHeight + 2 && trEl.scrollWidth <= trEl.clientWidth + 2) axis = 'y';
+    } catch (err) { axis = 'x'; }
 
     function makeGhost() {
       var im = R.thumb(S, pid, sz.w * 1.5, sz.h * 1.5, Math.min(2, root.devicePixelRatio || 2));
@@ -5449,33 +5605,50 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       if (res.ok) afterAction(res, b[0], b[1]);
       renderTray(false);
       draw(); updateHud(); save(true);
+      emitSnaps();
     }
     function onMove(ev) {
       if (ev.pointerId !== e.pointerId) return;
       var dx = ev.clientX - startX, dy = ev.clientY - startY;
-      if (!dragging) {
-        if (Math.abs(dx) + Math.abs(dy) < 9) return;
-        // 트레이 안에서 좌우로만 끄는 것은 스크롤로 넘긴다. 위로 빠져나가면 조각 드래그.
-        var tr = node.parentNode ? node.parentNode.getBoundingClientRect() : null;
-        var outOfTray = tr ? (ev.clientY < tr.top - 2 || ev.clientY > tr.bottom + 2) : true;
-        if (!outOfTray && Math.abs(dx) > Math.abs(dy) * 1.2) { cleanup(); return; }
-        dragging = true; moved = true;
-        node.classList.add('lift');
-        ghost = makeGhost();
+      if (!dragging && !scrolling) {
+        var adx = Math.abs(dx), ady = Math.abs(dy);
+        var along = axis === 'x' ? adx : ady;      // 트레이 스크롤 방향
+        var across = axis === 'x' ? ady : adx;     // 조각을 꺼내는 방향
+        if (across > SLOP && across >= along * 0.9) {
+          dragging = true;                         // 트레이 밖으로 끌기 = 조각 집기
+          node.classList.add('lift');
+          ghost = makeGhost();
+          SFX.select();
+          try { api.haptic(8); } catch (err) {}
+        } else if (along > SLOP + 4 && along > across * 1.35) {
+          scrolling = true;                        // 트레이 스크롤에 맡긴다
+          cleanup();
+          return;
+        }
       }
-      if (ghost) {
-        ghost.style.left = (ev.clientX - sz.w * 0.75) + 'px';
-        ghost.style.top = (ev.clientY - sz.h * 1.1 - R.lift) + 'px';
-        var r = R.canvas.getBoundingClientRect();
-        var over = ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom;
-        ghost.classList.toggle('over', over);
+      if (dragging) {
+        if (ev.cancelable) ev.preventDefault();
+        if (ghost) {
+          ghost.style.left = (ev.clientX - sz.w * 0.75) + 'px';
+          ghost.style.top = (ev.clientY - sz.h * 1.1 - R.lift) + 'px';
+          var r = R.canvas.getBoundingClientRect();
+          var over = ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom;
+          ghost.classList.toggle('over', over);
+        }
       }
+      void scrolling;
     }
     function onUp(ev) {
       if (ev.pointerId !== e.pointerId) return;
       cleanup();
-      if (!dragging) { tapPiece(pid); return; }
       node.classList.remove('lift');
+      if (!dragging) {
+        if (ghost) { ghost.remove(); ghost = null; }
+        var moved = Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY);
+        if (moved <= TAP_SLOP) tapPiece(pid);       // 짧은 터치는 무조건 '꺼내기'
+        else renderTray(false);
+        return;
+      }
       var r = R.canvas.getBoundingClientRect();
       if (ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom) {
         place(ev.clientX - r.left, ev.clientY - r.top);
@@ -5499,7 +5672,6 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     node.addEventListener('pointermove', onMove);
     node.addEventListener('pointerup', onUp);
     node.addEventListener('pointercancel', onCancel);
-    void moved;
   }
 
   // 탭: 보드 가운데 빈 곳으로 꺼내기
@@ -5509,8 +5681,12 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var res = J.applyAction(S, { type: 'tap', pid: pid, x: c[0], y: c[1], tol: tolBoard(), box: safeBox() });
     if (!res.ok) { SFX.blocked(); return; }
     SFX.select();
+    try { api.haptic(8); } catch (e) {}
     var q = J.piecePos(S, pid);
-    if (q) afterAction(res, q.x + S.pw / 2, q.y + S.ph / 2);
+    if (q) {
+      afterAction(res, q.x + S.pw / 2, q.y + S.ph / 2);
+      U.rings.push({ x: q.x + S.pw / 2, y: q.y + S.ph / 2, t0: now() });   // 어디로 갔는지 보이게
+    }
     renderTray(false);
     draw(); updateHud(); save(true);
     emitSnaps();
@@ -5543,7 +5719,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     try { R.canvas.setPointerCapture(id); } catch (err) {}
     SFX.unlock();
     var b2 = R.toBoard(p.x, p.y);
-    var hit = R.hitTest(S, b2[0], b2[1]);
+    // 손가락 반경만큼 넉넉히 — 윤곽을 정확히 안 밟아도 조각을 집는다(빈 곳이면 패닝).
+    var padBoard = Math.min(S.pw, S.ph) * 0.34;
+    var hit = R.hitTest(S, b2[0], b2[1], padBoard);
     if (hit >= 0) {
       var gid = S.pieces[hit].g;
       var g = S.groups[gid];
@@ -5551,6 +5729,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       D.px0 = b2[0]; D.py0 = b2[1];
       D.gx0 = g.x; D.gy0 = g.y;
       D.sx0 = p.x; D.sy0 = p.y;
+      SFX.select();
+      try { api.haptic(8); } catch (err) {}
       e.preventDefault();
     } else {
       P.pan = { x: p.x, y: p.y, tx: R.view.tx, ty: R.view.ty, id: id };
