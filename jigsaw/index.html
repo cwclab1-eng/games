@@ -293,6 +293,11 @@ h1.title em{
 .result .badges{font-size:11.5px; color:var(--aqua); font-weight:800; margin:10px 0 0; min-height:16px}
 .result .acts{display:flex; gap:8px; margin-top:14px}
 .result .acts .btn{flex:1; padding:12px 8px; font-size:13.5px}
+/* 메인 진행 버튼은 한 줄 전체 — '다음 난이도 (중수 5×8)' 처럼 길어서 */
+.result .acts.go{display:block; margin-top:14px}
+.result .acts.go .btn{width:100%; padding:13px 10px; font-size:14px; letter-spacing:-.01em}
+.result .acts.more{margin-top:8px}
+.result .acts.more .btn{font-size:12.5px; padding:10px 6px}
 
 /* 갤러리 */
 #scr-gallery{padding-top:calc(10px + var(--safe-t)); overflow-y:auto; padding-bottom:calc(18px + var(--safe-b))}
@@ -327,8 +332,9 @@ h1.title em{
 .toast{
   position:fixed; left:50%; bottom:calc(92px + var(--safe-b)); transform:translateX(-50%) translateY(10px);
   background:rgba(8,14,26,.94); color:#e7f0ff; border:1px solid var(--line2);
-  padding:10px 16px; border-radius:999px; font-size:12.5px; font-weight:800; opacity:0;
-  transition:opacity .2s ease, transform .2s ease; pointer-events:none; z-index:80; white-space:nowrap;
+  padding:10px 16px; border-radius:18px; font-size:12.5px; font-weight:800; opacity:0;
+  transition:opacity .2s ease, transform .2s ease; pointer-events:none; z-index:80;
+  max-width:min(92vw, 380px); white-space:normal; text-align:center; line-height:1.45; word-break:keep-all;
 }
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 
@@ -668,6 +674,18 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
   position:absolute; display:block; border:1px solid rgba(255,255,255,.4);
   box-shadow:0 0 0 999px rgba(3,7,14,.74); pointer-events:none;
 }
+/* 달인 전: 밝은 영역 위에 옅은 블록 이음새(아직 퍼즐로만 맞춘 상태) */
+.gal .gal-seam{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; opacity:.9;
+}
+/* 달인 클리어: 이음새가 걷히는 연출 */
+.result .art .seamfade{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; z-index:2;
+  animation:seamfade 1.6s ease-out .45s forwards;
+}
+@keyframes seamfade{ from{opacity:1} 55%{opacity:.45} to{opacity:0} }
 .gal .gal-badge{
   position:absolute; left:5px; top:5px; padding:2px 6px; border-radius:6px;
   font-size:9px; font-weight:900; letter-spacing:.02em; color:#ffd76f;
@@ -680,6 +698,17 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
 .detail .cropstate{font-size:11.5px; font-weight:800; margin-top:6px}
 .detail .cropstate .ok{color:var(--gold)}
 .btn.off{opacity:.62; color:var(--dim)}
+
+/* ================= 잠긴 그림(앞 그림의 달인을 클리어해야 열림) ================= */
+.stage.locked img{filter:grayscale(.85) brightness(.55) blur(2px); transform:scale(1.04)}
+.stage.locked{background:#0a1220; border-color:rgba(255,255,255,.06)}
+.stage.locked .lock{background:rgba(6,12,22,.86); border-color:rgba(255,203,77,.4); color:#ffd76f}
+.stage.locked .lock.gate{
+  left:9px; right:9px; top:42%; transform:translateY(-50%); text-align:center;
+  font-size:9.5px; font-weight:800; line-height:1.4; padding:6px 5px; letter-spacing:-.01em;
+}
+.stage .meta .req{font-size:9.5px; font-weight:800; color:rgba(255,215,120,.72); letter-spacing:.01em}
+.stage-grid.gated .stage:not(.locked):not(.done){border-color:rgba(94,224,208,.5)}
 
 /* 초대: 링크 복사 · 문자 · 카톡/공유 (2026-11-28) */
 .ol-invite{display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; justify-content:flex-end}
@@ -698,7 +727,7 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
     <div class="home-hero">
       <div class="brand">🧩 한판 직소</div>
       <h1 class="title">그림 한 장이 <em>조각</em>이 되고,<br>손끝에서 다시 그림이 된다</h1>
-      <p class="lede">해변을 거니는 미소녀와 강아지, 고양이, 만발한 코스모스. 그림 10장을 <b>🧩 클래식 직소</b>와 <b>⚡ 스피드 스왑</b> 두 가지 모드로 맞춰 보세요.<br><b>초보 → 달인</b> 순서로 열리고, <b>달인</b>을 풀어야 원본 전체 사진을 갖게 됩니다.</p>
+      <p class="lede">해변을 거니는 미소녀와 강아지, 고양이, 만발한 코스모스. 그림 10장을 <b>🧩 클래식 직소</b>와 <b>⚡ 스피드 스왑</b> 두 가지 모드로 맞춰 보세요.<br><b>초보 → 달인</b> 순서로 열리고, 그림을 깨면 <b>같은 그림의 다음 난이도</b>로 이어집니다. <b>달인</b>을 풀어야 다음 그림이 열리고 원본 전체 사진을 갖게 됩니다.</p>
       <div class="stats">
         <div class="stat"><b id="statStars">0<small>/240</small></b><span>모은 별</span></div>
         <div class="stat"><b id="statClear">0<small>/10</small></b><span>완성한 그림</span></div>
@@ -722,7 +751,8 @@ html.fs #scr-play .board-wrap::after{background:radial-gradient(95% 70% at 50% 4
     <div class="foot">
       <b>🧩 클래식 직소</b> — 조각을 끌어 자석처럼 착 붙이면 그룹으로 합쳐집니다. (초보 4×6 24조각 ~ 달인 8×12 96조각)<br>
       <b>⚡ 스피드 스왑</b> — 칸을 두 번 터치해 맞바꾸기. (초보 4×5 20조각 ~ 달인 8×9 72조각)<br>
-      난이도는 초보부터 차례로 열리고, 낮은 난이도는 그림의 일부만 — <b>달인</b>을 풀면 원본 전체를 소장합니다.
+      깨면 <b>같은 그림의 다음 난이도</b>로 이어지고, <b>달인</b>을 풀어야 다음 그림이 열립니다.<br>
+      달인 전에는 맞춘 그림에 옅은 블록 이음새가 남아 있고, <b>달인</b>을 풀면 이음새가 걷힌 원본 전체를 소장합니다.
     </div>
   </section>
 
@@ -1408,7 +1438,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   var Store = HJ.Store = {
     settings: { v: K.v, muted: false, mode: 'classic', guide: 0.25 },
-    progress: { v: K.v, best: {}, cleared: {} },
+    progress: { v: K.v, best: {}, cleared: {}, opened: {} },
     online: { v: K.v, w: 0, l: 0, d: 0, hist: [] },
 
     load: function () {
@@ -1423,7 +1453,10 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       }
       try { p = JSON.parse(read(K.progress) || 'null'); } catch (e) { p = null; }
       if (p && typeof p === 'object' && p.v === K.v && p.best && p.cleared) {
-        this.progress = { v: K.v, best: p.best, cleared: p.cleared };
+        this.progress = {
+          v: K.v, best: p.best, cleared: p.cleared,
+          opened: (p.opened && typeof p.opened === 'object') ? p.opened : {}
+        };
         this._migrate();
       }
       var o = null;
@@ -1482,17 +1515,45 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       if (i <= 0) return i === 0;
       return this.clearedRank(mode, stage, order[i - 1]);
     },
-    /* 그 그림에서 지금까지 해금한 가장 넓은 원본 영역(갤러리 부분 공개용) */
+    /* ---------------- 그림(스테이지) 진행 게이트 ----------------
+       앞 그림의 **달인**을 클리어해야 다음 그림이 열린다(모드는 클래식·스왑 어느 쪽이든).
+       1번 그림은 처음부터. 이미 시작한 그림(별이 있는 그림)은 잠그지 않는다 — 공들인 기록을 빼앗지 않으려고. */
+    masterCleared: function (stage) {
+      return !!(this.clearedRank('classic', stage, 'master') || this.clearedRank('swap', stage, 'master'));
+    },
+    stageUnlocked: function (stage) {
+      stage = stage | 0;
+      if (stage <= 1) return true;
+      if (this.progress.opened && this.progress.opened[stage]) return true;
+      if (this.bestStarsOf(stage) > 0) return true;
+      return this.masterCleared(stage - 1);
+    },
+    /* 테스트·개발용: 게이트만 열어 둔다(그림 클리어 기록은 남기지 않는다) */
+    openStage: function (stage) {
+      this.progress.opened = this.progress.opened || {};
+      this.progress.opened[stage | 0] = 1;
+      this.saveProgress();
+    },
+    /* 다음 그림이 열리는 조건을 아직 못 채운 정도를 알려 준다(안내 문구용) */
+    stageLockText: function (stage) {
+      return (stage - 1) + '번 그림의 달인을 클리어하면 열립니다';
+    },
+
+    /* 그 그림에서 지금까지 해금한 가장 넓은 원본 영역(갤러리 부분 공개·이음새 표시용).
+       mode·rank 는 그 영역을 만든 클리어(가장 넓은 난이도) — 갤러리 이음새를 같은 격자로 그린다. */
     artCrop: function (stage) {
       var order = HJ.RANK_ORDER || ['easy', 'normal', 'hard', 'master'], i, sw = 0, any = false, master = false;
+      var mode = '', rank = '', md, m;
       for (i = 0; i < order.length; i++) {
-        if (this.clearedRank('classic', stage, order[i]) || this.clearedRank('swap', stage, order[i])) {
+        for (m = 0; m < 2; m++) {
+          md = m === 0 ? 'classic' : 'swap';
+          if (!this.clearedRank(md, stage, order[i])) continue;
           any = true;
-          if (HJ.cropFor(order[i]).sw > sw) sw = HJ.cropFor(order[i]).sw;
+          if (HJ.cropFor(order[i]).sw > sw) { sw = HJ.cropFor(order[i]).sw; mode = md; rank = order[i]; }
           if (order[i] === 'master') master = true;
         }
       }
-      return { sw: any ? sw : 0, any: any, master: master };
+      return { sw: any ? sw : 0, any: any, master: master, mode: mode, rank: rank };
     },
 
     _better: function (rec, prev) {
@@ -3451,6 +3512,170 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
 </script>
 <script>
+/* =====================================================================
+   한판 직소 — 옅은 블록 이음새 (seams.js)
+
+   달인 전(초보·중수·고수)에 맞춘 그림은 '아직 퍼즐로만 맞춘 상태'다.
+   결과창·갤러리·저장 그림 위에 옅은 조각 경계선을 겹쳐 그려 그 사실을 보여 주고,
+   달인을 클리어하면 선이 걷힌 깨끗한 100% 원본을 준다.
+
+   · 클래식: 그 판과 **같은 시드·같은 격자**의 실제 베지어 요철 경계선(내부 변만)
+   · 스왑  : c×r 격자 이음새 선
+
+   좌표는 보드 단위(0~1000, 그림 한 장)로 만들고 그릴 때 상자 크기에 맞춰 늘린다.
+   결과창·갤러리·저장(saveArt)이 모두 이 한 곳을 쓴다.
+   ===================================================================== */
+(function (root) {
+  'use strict';
+  var HJ = root.HJ || (root.HJ = {});
+  var S = HJ.Seams = {};
+  var U = 1000;
+
+  /* ---------- 1. 곡선 만들기 (보드 단위) ---------- */
+
+  /* 클래식: 내부 세로 변(cols-1 개 × rows) + 내부 가로 변(rows-1 개 × cols).
+     조각 윤곽과 **같은 함수**(J.edgeSegs)로 만들어 이웃 조각 경계와 정확히 겹친다. */
+  S.jigsaw = function (cols, rows, seed) {
+    cols = Math.max(2, cols | 0); rows = Math.max(2, rows | 0);
+    var J = HJ.Jigsaw;
+    if (!J || !J.buildEdges || !J.edgeSegs) return S.swap(cols, rows);
+    var pw = U / cols, ph = U / rows, base = Math.min(pw, ph);
+    var edges = J.buildEdges((seed >>> 0) || 1, rows, cols);
+    var out = [], r, c, e;
+    // 세로 내부 변: (r,c) 의 오른쪽 = (r,c+1) 의 왼쪽. 위 → 아래
+    for (r = 0; r < rows; r++) {
+      for (c = 0; c < cols - 1; c++) {
+        e = edges.V[r][c];
+        out.push(J.edgeSegs((c + 1) * pw, r * ph, (c + 1) * pw, (r + 1) * ph, e.sign, e.jitter, base));
+      }
+    }
+    // 가로 내부 변: (r,c) 의 아래 = (r+1,c) 의 위. 조각을 시계 방향으로 도는 방향이라 오른 → 왼
+    for (r = 0; r < rows - 1; r++) {
+      for (c = 0; c < cols; c++) {
+        e = edges.H[r][c];
+        out.push(J.edgeSegs((c + 1) * pw, (r + 1) * ph, c * pw, (r + 1) * ph, e.sign, e.jitter, base));
+      }
+    }
+    return out;
+  };
+
+  /* 스왑: 칸 경계 격자선 */
+  S.swap = function (cols, rows) {
+    cols = Math.max(2, cols | 0); rows = Math.max(2, rows | 0);
+    var out = [], i;
+    for (i = 1; i < cols; i++) out.push([['M', i * U / cols, 0], ['L', i * U / cols, U]]);
+    for (i = 1; i < rows; i++) out.push([['M', 0, i * U / rows], ['L', U, i * U / rows]]);
+    return out;
+  };
+
+  /* {mode:'classic'|'swap', cols, rows, seed} → 곡선 목록 */
+  S.curves = function (o) {
+    if (!o) return [];
+    var cols = Math.max(2, Math.min(12, o.cols | 0 || 4));
+    var rows = Math.max(2, Math.min(12, o.rows | 0 || 6));
+    if (o.mode === 'swap') return S.swap(cols, rows);
+    return S.jigsaw(cols, rows, o.seed || 1);
+  };
+
+  /* ---------- 2. data-seam 문자열 (classic:8:12:12345) ---------- */
+  S.spec = function (o) {
+    if (!o || !o.cols || !o.rows) return '';
+    return [o.mode === 'swap' ? 'swap' : 'classic', o.cols | 0, o.rows | 0, (o.seed >>> 0) || 0].join(':');
+  };
+  S.parse = function (s) {
+    if (!s || typeof s !== 'string') return null;
+    var p = s.split(':');
+    if (p.length < 3) return null;
+    return { mode: p[0] === 'swap' ? 'swap' : 'classic', cols: p[1] | 0, rows: p[2] | 0, seed: p[3] | 0 };
+  };
+
+  /* ---------- 3. 그리기 ---------- */
+
+  /* 곡선을 (w × h) 상자에 맞춰 옅게 긋는다. 긋은 선 수를 돌려준다.
+     밝은 그림 위에서도 읽히도록 어두운 선(홈)을 깔고 그 위에 밝은 선을 얹는다. */
+  S.stroke = function (ctx, curves, w, h, opts) {
+    opts = opts || {};
+    if (!ctx || !curves || !curves.length || !(w > 1) || !(h > 1)) return 0;
+    var kx = w / U, ky = h / U, i, j, seg, path, lw;
+    // 상자가 작으면(갤러리 썸네일) 선도 가늘게 — 너무 굵으면 그림을 덮는다
+    var unit = Math.min(w, h);
+    lw = Math.max(0.65, (opts.width || 1.15) * Math.max(0.7, Math.min(2.2, unit / 340)));
+
+    function pathAll() {
+      ctx.beginPath();
+      for (i = 0; i < curves.length; i++) {
+        path = curves[i];
+        for (j = 0; j < path.length; j++) {
+          seg = path[j];
+          if (seg[0] === 'M') ctx.moveTo(seg[1] * kx, seg[2] * ky);
+          else if (seg[0] === 'L') ctx.lineTo(seg[1] * kx, seg[2] * ky);
+          else if (seg[0] === 'C') ctx.bezierCurveTo(seg[1] * kx, seg[2] * ky, seg[3] * kx, seg[4] * ky, seg[5] * kx, seg[6] * ky);
+        }
+      }
+    }
+
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    // ① 홈 — 살짝 어두운 선으로 경계를 만든다(밝은 하늘·모래 위에서도 보이게)
+    if (opts.groove !== false) {
+      ctx.strokeStyle = opts.grooveColor || 'rgba(8,14,24,0.24)';
+      ctx.lineWidth = lw * 2.1;
+      ctx.shadowColor = opts.shadow || 'rgba(0,0,0,0.34)';
+      ctx.shadowBlur = Math.max(0.6, lw * 1.4);
+      pathAll();
+      ctx.stroke();
+    }
+    // ② 옅은 흰 선 — 이음새 자체
+    ctx.strokeStyle = opts.color || 'rgba(255,255,255,0.22)';
+    ctx.lineWidth = lw;
+    ctx.shadowColor = 'rgba(0,0,0,0)';
+    ctx.shadowBlur = 0;
+    pathAll();
+    ctx.stroke();
+    ctx.restore();
+    return curves.length;
+  };
+
+  /* 캔버스 하나에 이음새만 그린다.
+     spec  : data-seam 문자열 또는 {mode,cols,rows,seed}
+     opts  : { w, h, dpr, box:{x0,y0,w,h} (0~1 비율, 그 영역에만), width, color, shadow } */
+  S.paint = function (cv, spec, opts) {
+    if (!cv) return 0;
+    opts = opts || {};
+    var o = typeof spec === 'string' ? S.parse(spec) : spec;
+    if (!o) return 0;
+    var dpr = opts.dpr || Math.min(3, root.devicePixelRatio || 1);
+    var cw = Math.max(1, Math.round(opts.w || (cv.clientWidth || cv.width || 1)));
+    var ch = Math.max(1, Math.round(opts.h || (cv.clientHeight || cv.height || 1)));
+    cv.width = Math.round(cw * dpr);
+    cv.height = Math.round(ch * dpr);
+    var c = cv.getContext('2d');
+    if (!c) return 0;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, cw, ch);
+    var b = opts.box || { x0: 0, y0: 0, w: 1, h: 1 };
+    var bx = b.x0 * cw, by = b.y0 * ch, bw = b.w * cw, bh = b.h * ch;
+    c.save();
+    c.beginPath();
+    c.rect(bx, by, bw, bh);
+    c.clip();
+    c.translate(bx, by);
+    var n = S.stroke(c, S.curves(o), bw, bh, opts);
+    c.restore();
+    return n;
+  };
+
+  /* 테스트·확인용: 그 spec 으로 긋는 선(곡선) 수 */
+  S.count = function (spec) {
+    var o = typeof spec === 'string' ? S.parse(spec) : spec;
+    return o ? S.curves(o).length : 0;
+  };
+
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+<script>
 /* ===== 한판 직소 · net: 방 코드 · MQTT over WebSocket 중계 · BroadcastChannel =====
    한판 맞고 2단계에서 검증한 구조를 그대로 옮겼다 (jigsaw/v1/ 네임스페이스).
 
@@ -4791,6 +5016,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       if (el) el.classList.toggle('hidden', s !== name);
     });
     ui.screen = name;
+    // 갤러리 이음새 캔버스는 화면에 붙은 뒤(크기가 정해진 뒤)에 그린다
+    if (name === 'gallery') setTimeout(paintGallerySeams, 40);
   }
   function overlay(html, opts) {
     opts = opts || {};
@@ -4810,12 +5037,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   /* 원본의 일부만 보여 주는 그림 상자(크롭) — 달인 전에는 전체 사진을 보여 주지 않는다.
      상자의 비율에 맞춰(cover) 그리도록 캔버스로 만들고, 오버레이가 붙은 뒤 paintCrops 가 그린다. */
   function artSrc(stage) { return root.THUMB[stage] || root.ART[stage]; }
-  function cropArtHTML(stage, crop, cls) {
+  /* 이음새 spec({mode,cols,rows,seed}) → data-seam 문자열. 달인(전체 원본)이면 null */
+  function seamSpec(seam) { return (HJ.Seams && HJ.Seams.spec) ? HJ.Seams.spec(seam) : ''; }
+  /* 달인 전에는 맞춘 그림 위에 옅은 블록 이음새를 겹친다(seam) — '아직 퍼즐로만 맞춘 상태' */
+  function cropArtHTML(stage, crop, seam) {
     var src = artSrc(stage);
     var c = crop || { sx: 0, sy: 0, sw: 1, sh: 1 };
+    var sp = seamSpec(seam);
     if (c.sw >= 0.999 && c.sh >= 0.999) return '<img src="' + src + '" alt="" draggable="false">';
-    return '<div class="cropimg' + (cls ? ' ' + cls : '') + '"><canvas class="cimg" width="384" height="384" data-stage="' + stage +
-      '" data-sx="' + c.sx + '" data-sy="' + c.sy + '" data-sw="' + c.sw + '" data-sh="' + c.sh + '"></canvas></div>';
+    return '<div class="cropimg"><canvas class="cimg" width="480" height="480" data-stage="' + stage +
+      '" data-sx="' + c.sx + '" data-sy="' + c.sy + '" data-sw="' + c.sw + '" data-sh="' + c.sh + '"' +
+      (sp ? ' data-seam="' + sp + '"' : '') + '></canvas></div>';
   }
   var artCache = {};
   function artImage(stage, cb) {
@@ -4840,35 +5072,61 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         if (!c) return;
         c.drawImage(im, sx * im.naturalWidth, sy * im.naturalHeight,
           sw * im.naturalWidth, sh * im.naturalHeight, 0, 0, w, h);
+        var sp = cv.getAttribute('data-seam');
+        if (sp && HJ.Seams) HJ.Seams.stroke(c, HJ.Seams.curves(HJ.Seams.parse(sp)), w, h, { width: 1.5 });
       } catch (e) { /* 그림을 못 그리면 빈 상자로 둔다 */ }
     });
   }
   function paintCrops(scope) {
     var list = (scope || doc).querySelectorAll('canvas.cimg[data-stage]'), i;
     for (i = 0; i < list.length; i++) paintOne(list[i]);
+    paintSeamCanvases(scope);
   }
+  /* 이음새만 그리는 캔버스 — 갤러리 타일(.gal-seam) · 달인 클리어 결과창(.seamfade) */
+  function paintSeamCanvases(scope) {
+    if (!HJ.Seams) return;
+    var list = (scope || doc).querySelectorAll('canvas[data-seam]'), i, cv, box, p;
+    for (i = 0; i < list.length; i++) {
+      cv = list[i];
+      if (cv.classList.contains('cimg')) continue;       // 그림 위에는 paintOne 이 함께 그린다
+      box = cv.getAttribute('data-box');
+      p = box ? box.split(',') : null;
+      HJ.Seams.paint(cv, cv.getAttribute('data-seam'), {
+        w: cv.clientWidth || 320, h: cv.clientHeight || 150,
+        // 작은 갤러리 타일은 선을 조금 긇게 (그래도 옅게)
+        width: (cv.clientWidth || 320) < 170 ? 1.7 : 1.15,
+        box: p ? { x0: +p[0], y0: +p[1], w: +p[2], h: +p[3] } : null
+      });
+    }
+  }
+  function paintGallerySeams() { paintSeamCanvases(doc.getElementById('galGrid')); }
   /* 테스트·이어하기용: 잠겨 있으면 그 단계에서 지금 열린 가장 높은 난이도로 */
   function safeRank(md, stage, want) {
     return Store.isUnlocked(md, stage, want) ? want : Store.nextRank(md, stage);
   }
 
-  /* ---------------- 홈 ---------------- */
+  /* ---------------- 홈 ----------------
+     그림 1번은 처음부터, 2번부터는 **앞 그림의 달인**을 클리어해야 열린다. */
   function buildHome() {
-    var grid = $('#stageGrid'), i, st, best, cls, lockHtml;
+    var grid = $('#stageGrid'), i, st, best, cls, lockHtml, open, nextLock = 0;
     var html = '';
     for (i = 0; i < STAGES.length; i++) {
       st = STAGES[i];
       best = Store.bestStarsOf(st.id);
-      cls = best > 0 ? 'stage done' : 'stage';
-      lockHtml = best > 0 ? '' : '<span class="lock">미완성</span>';
-      html += '<button class="' + cls + '" data-stage="' + st.id + '">' +
+      open = Store.stageUnlocked(st.id);
+      cls = !open ? 'stage locked' : (best > 0 ? 'stage done' : 'stage');
+      lockHtml = !open ? '<span class="lock gate">🔒 이전 그림 달인<br>클리어 시 열림</span>'
+        : (best > 0 ? '' : '<span class="lock">미완성</span>');
+      if (!open && !nextLock) nextLock = st.id;
+      html += '<button class="' + cls + '" data-stage="' + st.id + '" data-open="' + (open ? 1 : 0) + '">' +
         '<img src="' + (root.THUMB[st.id] || root.ART[st.id]) + '" alt="' + st.title + '" draggable="false">' +
         '<div class="scrim"></div>' +
         '<span class="num">' + (st.id < 10 ? '0' : '') + st.id + '</span>' + lockHtml +
-        '<div class="meta"><b>' + st.title + '</b>' + starHTML(best) + '</div>' +
+        '<div class="meta"><b>' + st.title + '</b>' + (open ? starHTML(best) : '<span class="req">' + (st.id - 1) + '번 달인 필요</span>') + '</div>' +
         '</button>';
     }
     grid.innerHTML = html;
+    grid.classList.toggle('gated', nextLock > 0);
 
     var total = Store.totalStars();
     var cleared = Store.clearedCount();
@@ -4967,8 +5225,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         b.classList.toggle('on', b.getAttribute('data-m') === md2);
       });
       w.querySelector('#sheetSub').innerHTML = md2 === 'classic'
-        ? '초보 → 달인 순서로 열립니다 · 이전 난이도를 클리어해야 다음이 열려요<br>달인을 풀어야 원본 전체 사진을 소장합니다.'
-        : '초보 → 달인 순서로 열립니다 · 이전 난이도를 클리어해야 다음이 열려요<br>조각을 맞바꿔 그림을 완성하세요.';
+        ? '초보 → 달인 순서로 열립니다 · 이전 난이도를 클리어해야 다음이 열려요<br>이 그림의 <b>달인</b>을 풀어야 다음 그림이 열리고 원본 전체를 소장합니다.'
+        : '초보 → 달인 순서로 열립니다 · 이전 난이도를 클리어해야 다음이 열려요<br>이 그림의 <b>달인</b>을 풀어야 다음 그림이 열립니다.';
       w.querySelector('#rankRows').innerHTML = rows(md2);
       w.querySelector('#btnRankGo').textContent = label(md2);
     }
@@ -5161,22 +5419,51 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     }
   }
 
+  /* ---------------- 결과창의 메인 진행 단계 ----------------
+     같은 그림의 다음 난이도 → … → 달인을 클리어해야 비로소 다음 그림.
+     마지막(10번) 그림의 달인까지 깨면 갤러리로 돌아간다. */
+  function nextStep(mode, stage, rankKey, stageCount) {
+    var order = HJ.RANK_ORDER, list = mode === 'classic' ? HJ.Jigsaw.RANKS : HJ.RANKS;
+    var i = order.indexOf(rankKey), k, nrank = null;
+    if (i >= 0 && i < order.length - 1) {
+      for (k = 0; k < list.length; k++) if (list[k].key === order[i + 1]) nrank = list[k];
+      if (nrank) {
+        return { act: 'next-rank', rank: nrank.key,
+          label: '▶ 다음 난이도 (' + nrank.name + ' ' + nrank.c + '×' + nrank.r + ')' };
+      }
+    }
+    if (stage < stageCount) {
+      return { act: 'next-stage', stage: stage + 1, rank: 'easy',
+        label: '▶ 다음 그림 도전 (' + (stage + 1) + '번 · 초보)' };
+    }
+    return { act: 'gallery', label: '🏆 갤러리로 (10장 완주)' };
+  }
+
+  /* 달인 클리어: 이음새 선이 싹 걷기는 연출 — 완전한 그림 위에 잠간 얹었다가 지운다 */
+  function seamFadeHTML(seam) {
+    var sp = seamSpec(seam);
+    return sp ? '<canvas class="seamfade" data-seam="' + sp + '"></canvas>' : '';
+  }
+
   function showResult(stars, rec, submitRes) {
     if (resultOpen) return;
     resultOpen = true;
     var st = stageById(cur.stage);
     var rank = HJ.rankByKey(cur.rank) || HJ.RANKS[0];
     var crop = HJ.cropFor(cur.rank);
+    var full = rank.key === 'master';
+    var seam = full ? null : { mode: 'swap', cols: G ? G.cols : rank.c, rows: G ? G.rows : rank.r };
+    var step = nextStep('swap', cur.stage, cur.rank, STAGES.length);
     var badge = submitRes.isNew ? '🎉 새 최고 기록!' : '';
     if (submitRes.isNew && !submitRes.prev) badge = '🎉 첫 완성! 갤러리에 담겼어요';
-    var lockLine = rank.key === 'master'
-      ? '🏆 완벽한 사진을 손에 넣었어요 · 전체 그림 저장 가능'
-      : '🔒 최고 난이도(달인)를 풀면 전체 사진을 소장할 수 있어요!';
-    var nextStage = cur.stage >= STAGES.length ? 1 : cur.stage + 1;
+    var lockLine = full
+      ? '🏆 이음새가 걷힌 100% 원본 사진을 손에 넣었어요 · 원본 저장 가능'
+      : '🔒 달인을 클리어하면 옅은 이음새가 걷힌 전체 사진을 소장합니다';
     var w = overlay('<div class="result">' +
-      '<div class="art">' + cropArtHTML(cur.stage, crop) + '</div>' +
+      '<div class="art">' + cropArtHTML(cur.stage, crop, seam) +
+      (full ? seamFadeHTML({ mode: 'swap', cols: G ? G.cols : rank.c, rows: G ? G.rows : rank.r }) : '') + '</div>' +
       '<div class="body">' +
-      '<div class="kicker">' + G.board.length + '조각 완성 · ' + rank.name + '</div>' +
+      '<div class="kicker">' + (G ? G.board.length : rank.pieces) + '조각 완성 · ' + rank.name + '</div>' +
       '<h3>' + st.title + '</h3>' +
       '<div class="stars" id="resStars">' + '<span class="off">★</span><span class="off">★</span><span class="off">★</span>' + '</div>' +
       '<div class="nums">' +
@@ -5186,10 +5473,12 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       '</div>' +
       '<p class="badges">' + badge + '</p>' +
       '<p class="lockline">' + lockLine + '</p>' +
-      '<div class="acts">' +
-      '<button class="btn primary" data-act="next">다음 그림</button>' +
+      '<div class="acts go">' +
+      '<button class="btn primary" data-act="next">' + step.label + '</button>' +
+      '</div>' +
+      '<div class="acts more">' +
       '<button class="btn" data-act="again">다시</button>' +
-      '<button class="btn" data-act="save">🖼️</button>' +
+      '<button class="btn" data-act="save">' + (full ? '🖼️ 원본 저장' : '🖼️ 부분 저장') + '</button>' +
       '<button class="btn" data-act="home">목록</button>' +
       '</div></div></div>', { center: true, dismiss: false });
 
@@ -5208,10 +5497,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var b = e.target.closest('[data-act]');
       if (!b) return;
       var act = b.getAttribute('data-act');
-      if (act === 'save') { saveArt(cur.stage, { crop: HJ.cropFor(cur.rank) }); return; }
+      if (act === 'save') {
+        if (full) saveArt(cur.stage, { full: true });
+        else saveArt(cur.stage, { crop: crop, seams: seam });
+        return;
+      }
       closeOverlay(); resultOpen = false;
-      if (act === 'next') startPlay(nextStage, safeRank('swap', nextStage, cur.rank));
-      else if (act === 'again') startPlay(cur.stage, cur.rank);
+      if (act === 'next') {
+        if (step.act === 'next-rank') startPlay(cur.stage, step.rank);
+        else if (step.act === 'next-stage') startPlay(step.stage, 'easy');
+        else { buildGallery(); showScreen('gallery'); }
+      } else if (act === 'again') startPlay(cur.stage, cur.rank);
       else { showScreen('home'); buildHome(); }
     });
   }
@@ -5332,8 +5628,18 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
      · 미해금 그림: 잠금
      · 초보~고수만 깼다: 그동안 해금한 가장 넓은 영역만 보이고 바깥은 어둡게 + '달인 미해금'
      · 달인을 깼다: 원본 전체 사진 + 전체 저장 가능 */
+  /* 갤러리 타일 이음새 — 그 그림에서 가장 넓게 깬 난이도의 격자로, 그림마다 같은 모양(시드 고정) */
+  function gallerySeam(stage, art) {
+    var rankKey = art.rank || 'easy';
+    var list = art.mode === 'swap' ? HJ.RANKS : HJ.Jigsaw.RANKS, i, r = null;
+    for (i = 0; i < list.length; i++) if (list[i].key === rankKey) r = list[i];
+    r = r || list[0];
+    return { mode: art.mode === 'swap' ? 'swap' : 'classic', cols: r.c, rows: r.r,
+             seed: HJ.hashSeed('seam' + stage + rankKey) };
+  }
+
   function buildGallery() {
-    var grid = $('#galGrid'), i, st, stars, locked, art, inset, badge;
+    var grid = $('#galGrid'), i, st, stars, locked, art, inset, frac, badge, seam, sp;
     var html = '';
     for (i = 0; i < STAGES.length; i++) {
       st = STAGES[i];
@@ -5341,6 +5647,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       locked = stars <= 0;
       art = locked ? { sw: 0, any: false, master: false } : Store.artCrop(st.id);
       inset = Math.max(0, (1 - art.sw) / 2) * 100;
+      frac = Math.max(0, (1 - art.sw) / 2);
+      seam = (!locked && !art.master && art.sw > 0) ? gallerySeam(st.id, art) : null;
+      sp = seamSpec(seam);
       badge = !locked && !art.master ? '<span class="gal-badge">달인 미해금 ' + Math.round(art.sw * 100) + '%</span>' :
         (!locked ? '<span class="gal-badge full">전체 사진</span>' : '');
       html += '<button class="gal' + (locked ? ' locked' : '') + (art.master ? ' full' : '') +
@@ -5350,12 +5659,16 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         (!locked && art.sw > 0 && art.sw < 0.999
           ? '<span class="gal-crop" style="left:' + inset.toFixed(2) + '%;top:' + inset.toFixed(2) +
             '%;right:' + inset.toFixed(2) + '%;bottom:' + inset.toFixed(2) + '%"></span>' : '') +
+        // 달인 전에는 밝은 영역 위에 옅은 블록 이음새 — '아직 퍼즐로만 맞춘 상태'
+        (sp ? '<canvas class="gal-seam" data-seam="' + sp + '" data-box="' + frac.toFixed(5) + ',' +
+          frac.toFixed(5) + ',' + art.sw.toFixed(4) + ',' + art.sw.toFixed(4) + '"></canvas>' : '') +
         badge +
         '<span class="gal-foot"><span class="gnum">' + (st.id < 10 ? '0' : '') + st.id + '</span>' +
         (locked ? '<span class="st off">미완성</span>' : starHTML(stars)) + '</span>' +
         '</button>';
     }
     grid.innerHTML = html;
+    paintGallerySeams();
     var full = 0;
     for (i = 0; i < STAGES.length; i++) if (Store.artCrop(STAGES[i].id).master) full++;
     $('#galSub').textContent = '완성한 그림 ' + Store.clearedCount() + ' / ' + STAGES.length +
@@ -5386,10 +5699,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (art.sw >= 0.999) crop = HJ.cropFor('master');
     else if (art.sw >= 0.82) crop = HJ.cropFor('hard');
     else if (art.sw >= 0.65) crop = HJ.cropFor('normal');
+    var seam = art.master ? null : gallerySeam(stage, art);
     var state = art.master
       ? '<span class="ok">전체 사진 해금 · 원본 100%</span>'
-      : '<span style="color:var(--dim)">지금까지 ' + Math.round(art.sw * 100) + '% 공개 · <b>달인을 풀면 전체 사진</b></span>';
-    var w = overlay('<div class="detail">' + cropArtHTML(stage, crop) +
+      : '<span style="color:var(--dim)">지금까지 ' + Math.round(art.sw * 100) + '% 공개 · <b>달인을 풀면 이음새가 걷힌 전체 사진</b></span>';
+    var w = overlay('<div class="detail">' + cropArtHTML(stage, crop, seam) +
       '<div class="d-body"><h3>' + st.title + '</h3>' +
       '<div style="font-size:12px;color:#9fb0cc">' + st.sub + '</div>' +
       '<div class="cropstate">' + state + '</div>' +
@@ -5495,8 +5809,14 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     $('#stageGrid').addEventListener('click', function (e) {
       var b = e.target.closest('.stage');
       if (!b) return;
+      var stg = +b.getAttribute('data-stage');
+      if (!Store.stageUnlocked(stg)) {          // 앞 그림의 달인을 풀어야 열린다
+        SFX.blocked(); haptic(20);
+        toast(Store.stageLockText(stg), 2600);
+        return;
+      }
       SFX.unlock(); SFX.tap();
-      openRankSheet(+b.getAttribute('data-stage'));
+      openRankSheet(stg);
     });
     $('#resumeCard').addEventListener('click', function () {
       var r = Store.resume();
@@ -5615,6 +5935,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     });
     root.addEventListener('resize', function () {
       if (ui.screen === 'play') layout();
+      else if (ui.screen === 'gallery') paintGallerySeams();
     });
     root.addEventListener('orientationchange', function () {
       setTimeout(function () { if (ui.screen === 'play') layout(); }, 220);
@@ -5658,7 +5979,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
 
   /* ---------------- 그림 저장 ----------------
      opts.full  : 원본 전체(달인 해금 후에만)
-     opts.crop  : 방금 깬 난이도의 영역만 저장(기본 = 전체) */
+     opts.crop  : 방금 깬 난이도의 영역만 저장
+     opts.seams : 그 영역 위에 옅은 블록 이음새를 함께 구움(달인 전 — 아직 퍼즐로만 맞춘 상태) */
+  var lastSaveInfo = null;
   function saveArt(stage, opts) {
     opts = opts || {};
     var crop = opts.full ? null : (opts.crop || null);
@@ -5675,15 +5998,20 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         cv.width = cw; cv.height = ch;
         var c = cv.getContext('2d');
         c.drawImage(im, cx, cy, cw, ch, 0, 0, cw, ch);
+        if (opts.seams && HJ.Seams) HJ.Seams.stroke(c, HJ.Seams.curves(opts.seams), cw, ch, { width: 1.6 });
         var url = cv.toDataURL('image/png');
         var a = doc.createElement('a');
         a.href = url;
         a.download = '한판직소_그림' + (stage < 10 ? '0' : '') + stage +
-          (crop ? '_' + Math.round(crop.sw * 100) : '') + '.png';
+          (crop ? '_' + Math.round(crop.sw * 100) : '') + (opts.seams ? '_퍼즐' : '') + '.png';
         doc.body.appendChild(a);
         a.click();
         setTimeout(function () { if (a.parentNode) a.remove(); }, 400);
-        toast(crop ? '이번에 깬 부분을 저장했어요 · 달인을 풀면 전체 사진을 저장할 수 있어요' : '그림을 저장했어요 · 사진첩에서 확인하세요', 2400);
+        lastSaveInfo = { stage: stage, pct: crop ? Math.round(crop.sw * 100) : 100,
+          full: !crop, seams: !!opts.seams, w: cw, h: ch, name: a.download };
+        toast(opts.seams
+          ? '이번에 맞춘 부분을 이음새와 함께 저장했어요 · 달인을 풀면 이음새 없는 원본을 저장합니다'
+          : '그림을 저장했어요 · 사진첩에서 확인하세요', 2400);
       } catch (e) { toast('그림을 저장하지 못했어요'); }
     };
     im.onerror = function () { toast('그림을 불러오지 못했어요'); };
@@ -5729,8 +6057,43 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
         buildHome();
         return this.unlocks(stage, md);
       },
+      /* 테스트: 그림 진행 게이트만 연다(클리어 기록은 남기지 않는다) */
+      openStage: function (stage) {
+        Store.openStage(stage);
+        buildHome();
+        return Store.stageUnlocked(stage);
+      },
+      stageLock: function (stage) {
+        return { unlocked: Store.stageUnlocked(stage), master: Store.masterCleared(stage),
+                 text: Store.stageLockText(stage) };
+      },
+      /* 테스트: 결과창의 진행 버튼·이음새·저장 버튼 상태 */
+      resultInfo: function () {
+        var el = doc.querySelector('.result');
+        if (!el) return null;
+        var b = el.querySelector('[data-act="next"]');
+        var cv = el.querySelector('canvas[data-seam]:not(.seamfade)');
+        var spec = cv ? cv.getAttribute('data-seam') : '';
+        return {
+          main: b ? b.textContent : '',
+          lockline: (el.querySelector('.lockline') || {}).textContent || '',
+          save: (el.querySelector('[data-act="save"]') || {}).textContent || '',
+          seamSpec: spec,
+          seamCurves: spec ? HJ.Seams.count(spec) : 0,
+          fade: !!el.querySelector('canvas.seamfade'),
+          full: !!el.querySelector('.art img')
+        };
+      },
+      gallerySeams: function () {
+        return [].map.call(doc.querySelectorAll('.gal'), function (b) {
+          var cv = b.querySelector('canvas.gal-seam');
+          return { stage: +b.getAttribute('data-stage'), seam: cv ? cv.getAttribute('data-seam') : '',
+                   spec: cv ? cv.getAttribute('data-box') : '', w: cv ? cv.width : 0, h: cv ? cv.height : 0 };
+        });
+      },
+      lastSave: function () { return lastSaveInfo; },
       resetProgress: function () {
-        Store.progress = { v: 1, best: {}, cleared: {} };
+        Store.progress = { v: 1, best: {}, cleared: {}, opened: {} };
         Store.saveProgress(); Store.clearGame(); Store.clearJigsaw();
         buildHome();
         return true;
@@ -5770,6 +6133,7 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     showScreen: showScreen,
     showHome: function () { showScreen('home'); buildHome(); },
     buildHome: buildHome,
+    buildGallery: buildGallery,
     toast: toast,
     haptic: haptic,
     overlay: overlay,
@@ -5780,6 +6144,11 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     stageById: stageById,
     stages: function () { return STAGES; },
     saveArt: saveArt,
+    cropArtHTML: cropArtHTML,
+    paintCrops: paintCrops,
+    paintSeamCanvases: paintSeamCanvases,
+    seamSpec: seamSpec,
+    nextStep: nextStep,
     screen: function () { return ui.screen; },
     sfx: SFX
   };
@@ -5790,7 +6159,8 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     if (C && C.setup) C.setup({ toast: toast, haptic: haptic, overlay: overlay, closeOverlay: closeOverlay,
       cropArtHTML: cropArtHTML, paintCrops: paintCrops,
       showScreen: showScreen, buildHome: buildHome, stageById: stageById, stageCount: function () { return STAGES.length; },
-      saveArt: saveArt, sfx: SFX });
+      saveArt: saveArt, sfx: SFX, nextStep: nextStep, seamSpec: seamSpec, seamFadeHTML: seamFadeHTML,
+      buildGallery: buildGallery });
     SFX.setMuted(Store.settings.muted);
     bindBoard();
     bindUI();
@@ -5844,8 +6214,9 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
   var $ = function (s) { return doc.querySelector(s); };
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
-  /* 원본의 일부(난이도별 크롭)만 보여 주는 그림 상자 — 달인 전에는 전체 사진을 보여 주지 않는다 */
-  function cropArtHTML(crop) { return api.cropArtHTML(cur.stage, crop); }
+  /* 원본의 일부(난이도별 크롭)만 보여 주는 그림 상자 — 달인 전에는 전체 사진을 보여 주지 않는다.
+     seam 을 주면 맞춘 부분 위에 옅은 블록 이음새를 겹친다. */
+  function cropArtHTML(crop, seam) { return api.cropArtHTML(cur.stage, crop, seam); }
 
   /* ---------------- dp·좌표 유틸 ---------------- */
   /* 자석 스냅 허용 반경(보드 단위).
@@ -6530,15 +6901,20 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
     var rank = J.rankByKey(cur.rank);
     var crop = J.cropFor(cur.rank);
     var full = rank.key === 'master';
+    // 달인 전에는 맞춘 부분 위에 옅은 블록 이음새 — 그 판과 같은 시드·격자의 실제 조각 경계
+    var seam = full ? null : { mode: 'classic', cols: S.cols, rows: S.rows, seed: S.seed };
+    var step = api.nextStep ? api.nextStep('classic', cur.stage, cur.rank, api.stageCount())
+      : { act: 'next-stage', stage: cur.stage + 1, rank: 'easy', label: '▶ 다음 그림 도전' };
     var badge = '';
     if (submitRes.isNew && !submitRes.prev) badge = '🎉 첫 완성! 갤러리에 담겼어요';
     else if (submitRes.isNew) badge = '🎉 새 최고 기록!';
     var lockLine = full
-      ? '🏆 완벽한 사진을 손에 넣었어요 · 전체 그림 저장 가능'
-      : '🔒 최고 난이도(달인)를 풀면 전체 사진을 소장할 수 있어요!';
-    var nextStage = cur.stage >= api.stageCount() ? 1 : cur.stage + 1;
+      ? '🏆 이음새가 걷힌 100% 원본 사진을 손에 넣었어요 · 원본 저장 가능'
+      : '🔒 달인을 클리어하면 옅은 이음새가 걷힌 전체 사진을 소장합니다';
     var w = api.overlay('<div class="result">' +
-      '<div class="art">' + cropArtHTML(crop) + '</div>' +
+      '<div class="art">' + cropArtHTML(crop, seam) +
+      (full && api.seamFadeHTML ? api.seamFadeHTML({ mode: 'classic', cols: S.cols, rows: S.rows, seed: S.seed }) : '') +
+      '</div>' +
       '<div class="body">' +
       '<div class="kicker">🧩 클래식 ' + rank.name + ' · ' + S.pieces.length + '조각 완성</div>' +
       '<h3>' + st.title + '</h3>' +
@@ -6550,10 +6926,12 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       '</div>' +
       '<p class="badges">' + badge + '</p>' +
       '<p class="lockline">' + lockLine + '</p>' +
-      '<div class="acts">' +
-      '<button class="btn primary" data-act="next">다음 그림</button>' +
+      '<div class="acts go">' +
+      '<button class="btn primary" data-act="next">' + step.label + '</button>' +
+      '</div>' +
+      '<div class="acts more">' +
       '<button class="btn" data-act="again">다시</button>' +
-      '<button class="btn" data-act="save">🖼️ 저장</button>' +
+      '<button class="btn" data-act="save">' + (full ? '🖼️ 원본 저장' : '🖼️ 부분 저장') + '</button>' +
       '<button class="btn" data-act="home">목록</button>' +
       '</div></div></div>', { center: true, dismiss: false });
 
@@ -6571,10 +6949,17 @@ window.THUMB={1:"data:image/webp;base64,UklGRuJfAABXRUJQVlA4INZfAACwmAGdASqkAaQB
       var b = e.target.closest('[data-act]');
       if (!b) return;
       var act = b.getAttribute('data-act');
-      if (act === 'save') { api.saveArt(cur.stage, { crop: crop }); return; }
+      if (act === 'save') {
+        if (full) api.saveArt(cur.stage, { full: true });
+        else api.saveArt(cur.stage, { crop: crop, seams: seam });
+        return;
+      }
       api.closeOverlay(); resultOpen = false;
-      if (act === 'next') C.start(nextStage, rank.key);
-      else if (act === 'again') C.start(cur.stage, rank.key);
+      if (act === 'next') {
+        if (step.act === 'next-rank') C.start(cur.stage, step.rank);
+        else if (step.act === 'next-stage') C.start(step.stage, 'easy');
+        else { C.stop(); if (api.buildGallery) api.buildGallery(); api.showScreen('gallery'); }
+      } else if (act === 'again') C.start(cur.stage, rank.key);
       else { C.stop(); api.showScreen('home'); api.buildHome(); }
     });
   }
